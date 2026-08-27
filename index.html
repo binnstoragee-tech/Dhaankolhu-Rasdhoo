@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Smooth cross-page transitions: hide the page instantly (before first paint)
+       so script.js can fade it in — this inline script MUST stay first in <head>. -->
+  <script>document.documentElement.classList.add("is-preload");</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b6e70" />
+  <meta name="description" content="Dhaankolhu Rasdhoo Island — a quiet stretch of the Indian Ocean, kept simple, kept beautiful." />
+  <link rel="icon" type="image/png" href="img/logo/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Center the "Guest Moments" gallery heading block (eyebrow, title, lede) */
+    .gallery-heading {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .gallery-heading .display-heading {
+      white-space: nowrap;
+    }
+    .gallery-heading .section-lede {
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (max-width: 640px) {
+      .gallery-heading .display-heading {
+        white-space: normal;
+      }
+      .section-shell {
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
+      }
+      #gallery .section-index {
+        margin-bottom: 12px !important;
+      }
+    }
+
+    /* --- Modern animated hamburger / close icon --- */
+    #menu-trigger {
+      position: relative !important;
+      width: 40px !important;
+      height: 40px !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    /* Only show the hamburger on mobile/tablet — matches the .desktop-nav
+       breakpoint in style.css (max-width: 900px). On desktop, .menu-trigger
+       keeps its default display:none from style.css. */
+    @media (max-width: 900px) {
+      #menu-trigger { display: inline-flex !important; }
+    }
+    #menu-trigger .hamburger-icon {
+      position: relative;
+      width: 22px;
+      height: 16px;
+      display: inline-block;
+    }
+    #menu-trigger .hamburger-icon .line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+                  opacity 0.25s ease,
+                  top 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    #menu-trigger .hamburger-icon .line1 { top: 0; }
+    #menu-trigger .hamburger-icon .line2 { top: 7px; }
+    #menu-trigger .hamburger-icon .line3 { top: 14px; }
+    #menu-trigger[aria-expanded="true"] .hamburger-icon .line1 {
+      top: 7px;
+      transform: rotate(45deg);
+    }
+    #menu-trigger[aria-expanded="true"] .hamburger-icon .line2 {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    #menu-trigger[aria-expanded="true"] .hamburger-icon .line3 {
+      top: 7px;
+      transform: rotate(-45deg);
+    }
+
+    /* --- YouTube-style play button --- */
+    .video-play-button {
+      background: #ff0000 !important;
+      color: #ffffff !important;
+      border: none !important;
+      width: 52px !important;
+      height: 37px !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 0 !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+      transition: background 0.2s ease, transform 0.2s ease !important;
+      cursor: pointer;
+    }
+    .video-play-button::before {
+      content: "";
+      display: block;
+      width: 0;
+      height: 0;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 16px solid #ffffff;
+      margin-left: 4px;
+    }
+    .video-play-button:hover {
+      background: #cc0000 !important;
+      filter: brightness(1.08);
+    }
+    @media (max-width: 640px) {
+      .video-play-button {
+        width: 42px !important;
+        height: 30px !important;
+        border-radius: 8px !important;
+      }
+      .video-play-button::before {
+        border-top-width: 7px;
+        border-bottom-width: 7px;
+        border-left-width: 12px;
+        margin-left: 3px;
+      }
+    }
+
+    /* --- Fix hero zoom animation gap --- */
+    .hero-section {
+      overflow: hidden !important;
+    }
+    .hero-backdrop {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background-image: url('img/home%20web.jpeg') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      transform-origin: center center !important;
+      animation-name: heroSafeZoom !important;
+      animation-duration: 18s !important;
+      animation-timing-function: ease-in-out !important;
+      animation-iteration-count: infinite !important;
+      animation-direction: alternate !important;
+    }
+    @media (max-width: 640px) {
+      .hero-backdrop {
+        background-image: url('img/home%20mobile.jpeg') !important;
+      }
+    }
+    @keyframes heroSafeZoom {
+      0% { transform: scale(1.06); }
+      100% { transform: scale(1.16); }
+    }
+
+    /* --- Mobile menu: dropdown from navbar, full width --- */
+    .mobile-menu {
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+      background: rgba(250, 248, 244, 0.96) !important;
+      backdrop-filter: blur(28px) saturate(160%);
+      -webkit-backdrop-filter: blur(28px) saturate(160%);
+      border: none !important;
+      border-radius: 0 0 20px 20px !important;
+      transform-origin: top center !important;
+      transform: scaleY(0) !important;
+      transform-box: fill-box;
+      overflow: hidden;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1) !important, opacity 0.35s ease !important;
+      transition-delay: 0s !important;
+      will-change: transform, opacity;
+    }
+    .mobile-menu.is-open {
+      transform: scaleY(1) !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      overflow-y: auto;
+      transition: transform 0.45s cubic-bezier(0.34, 1.2, 0.4, 1) !important, opacity 0.3s ease !important;
+      transition-delay: 0s !important;
+    }
+    .mobile-menu-inner {
+      background: transparent !important;
+      padding-top: 76px !important;
+      padding-bottom: 8px !important;
+      box-sizing: border-box;
+    }
+    .mobile-menu .eyebrow {
+      color: #6b6355 !important;
+    }
+    .mobile-menu nav a {
+      color: #12100d !important;
+      border-bottom: 1px solid rgba(20, 18, 14, 0.12);
+      background: transparent !important;
+    }
+    .mobile-menu nav a span {
+      color: #8a8071 !important;
+    }
+    .mobile-menu nav a:hover,
+    .mobile-menu nav a:focus {
+      background: rgba(20, 18, 14, 0.06) !important;
+      color: #000000 !important;
+    }
+    .mobile-menu .mobile-book {
+      background: #12100d !important;
+      color: #ffffff !important;
+    }
+    .mobile-menu-divider {
+      display: none;
+    }
+    .mobile-book-now {
+      display: block !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      text-align: left !important;
+      align-self: stretch !important;
+      margin: 0 !important;
+      background: transparent !important;
+      color: #12100d !important;
+      border: none !important;
+      border-top: 1px solid rgba(20, 18, 14, 0.12) !important;
+      border-bottom: none !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-radius: 0 !important;
+      padding: 16px 24px !important;
+      font-family: "DM Sans", sans-serif;
+      font-size: 1rem !important;
+      font-weight: 400 !important;
+      letter-spacing: normal !important;
+      text-decoration: none !important;
+      cursor: pointer;
+    }
+    .mobile-book-now:hover {
+      background: rgba(20, 18, 14, 0.06) !important;
+      color: #000000 !important;
+    }
+    /* Keep header logo + close button dark and visible while the menu is open */
+    .site-shell:has(.mobile-menu.is-open) .site-header .brand-lockup,
+    .site-shell:has(.mobile-menu.is-open) .site-header .brand-type,
+    .site-shell:has(.mobile-menu.is-open) .site-header .brand-type strong {
+      color: #12100d !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .site-shell:has(.mobile-menu.is-open) .site-header .brand-mark {
+      filter: none !important;
+    }
+    .site-shell:has(.mobile-menu.is-open) .site-header {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      z-index: 1001 !important;
+      background: rgba(250, 248, 244, 0.98) !important;
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      box-shadow: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+    }
+    .site-shell:has(.mobile-menu.is-open) .mobile-menu {
+      position: fixed !important;
+      top: 0 !important;
+    }
+    .site-shell:has(.mobile-menu.is-open) .site-header #menu-trigger {
+      color: #12100d !important;
+      z-index: 1002 !important;
+      position: relative !important;
+    }
+    .site-footer-v2 {
+      background: #0b1524;
+      color: #b9c3d4;
+      padding: 64px 6vw 24px;
+      font-family: "DM Sans", sans-serif;
+    }
+    .footer-v2-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.2fr 1.4fr;
+      gap: 40px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .footer-v2-col { display: flex; flex-direction: column; gap: 10px; }
+    .footer-v2-brand h2 {
+      color: #ffffff;
+      font-family: "DM Sans", sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      margin: 0;
+    }
+    .footer-v2-tag {
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: #7a879c;
+    }
+    .footer-v2-brand p { font-size: 0.88rem; line-height: 1.6; color: #96a2b5; margin-top: 4px; }
+    .footer-v2-heading {
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.09em;
+      font-weight: 700;
+      color: #d99a5b;
+      margin-bottom: 6px;
+    }
+    .footer-v2-col a {
+      color: #b9c3d4;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s ease;
+    }
+    .footer-v2-col a:hover { color: #ffffff; }
+    .footer-v2-label {
+      text-transform: uppercase;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: #7a879c;
+      margin-top: 6px;
+    }
+    .footer-v2-value { color: #b9c3d4; font-size: 0.9rem; text-decoration: none; }
+    .footer-v2-value.footer-v2-accent { color: #d99a5b; }
+    .footer-v2-col p { font-size: 0.88rem; line-height: 1.6; color: #96a2b5; margin: 0 0 6px; }
+    .footer-v2-subscribe { display: flex; flex-direction: column; gap: 10px; }
+    .footer-v2-subscribe input {
+      background: #131f31;
+      border: 1px solid #26374f;
+      color: #ffffff;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-family: "DM Sans", sans-serif;
+    }
+    .footer-v2-subscribe input::placeholder { color: #6d7a8e; }
+    .footer-v2-subscribe button {
+      background: #d9a86c;
+      color: #21160a;
+      border: none;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .footer-v2-subscribe button:hover { background: #e5b87f; }
+    .footer-v2-bottom {
+      max-width: 1280px;
+      margin: 48px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid #1d293c;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: #7a879c;
+    }
+    .footer-v2-legal { display: flex; gap: 20px; }
+    .footer-v2-legal a { color: #7a879c; text-decoration: none; }
+    .footer-v2-legal a:hover { color: #ffffff; }
+    @media (max-width: 900px) {
+      .footer-v2-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .footer-v2-grid { grid-template-columns: 1fr; }
+      .footer-v2-bottom { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+  <title>Dhaankolhu Rasdhoo Island — Local Island Beach Resort</title>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header" id="site-header">
+      <a class="brand-lockup" href="#home" aria-label="Dhaankolhu Rasdhoo Island home"><img class="brand-mark" src="img/logo/logo%20black.png" alt="Dhaankolhu Rasdhoo Island logo" /></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a href="#about">About</a><a href="#highlights">Highlights</a><a href="#experience">Experience</a><a href="#gallery">Gallery</a><a href="#contact">Contact</a></nav>
+      <a class="header-cta" href="book-now.html">Book now</a>
+      <button class="menu-trigger" id="menu-trigger" type="button" aria-label="Open menu" aria-expanded="false"><span class="hamburger-icon"><span class="line line1"></span><span class="line line2"></span><span class="line line3"></span></span></button>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true"><div class="mobile-menu-inner"><span class="eyebrow">The local island edit</span><nav aria-label="Mobile navigation"><a href="#about"><span>01</span>About</a><a href="#highlights"><span>02</span>Highlights</a><a href="#experience"><span>03</span>Experience</a><a href="#gallery"><span>04</span>Gallery</a><a href="#contact"><span>05</span>Contact</a></nav><div class="mobile-menu-divider"></div><a class="mobile-book-now" href="book-now.html">Book now</a></div></div>
+
+    <main>
+      <section id="home" class="hero-section"><div class="hero-backdrop"></div><div class="hero-shade"></div><div class="hero-grain"></div><div class="hero-content"><span class="eyebrow hero-eyebrow reveal">Welcome to</span><h1 class="hero-title reveal">Dhaankolhu <br class="hero-title-break">Rasdhoo</h1><p class="hero-copy reveal">A quiet stretch of the Indian Ocean, kept simple, kept beautiful.</p></div></section>
+
+      <div class="ticker-bar" aria-label="Island highlights">
+        <div class="ticker-track">
+          <span class="ticker-group">
+            <span class="ticker-item">Budget-Friendly Paradise</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Authentic Local Culture</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Diverse Activities</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Heartbeat of the Maldives</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Easy Accessibility</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Blend of Cultures</span><span class="ticker-dot">•</span>
+          </span>
+          <span class="ticker-group" aria-hidden="true">
+            <span class="ticker-item">Budget-Friendly Paradise</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Authentic Local Culture</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Diverse Activities</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Heartbeat of the Maldives</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Easy Accessibility</span><span class="ticker-dot">•</span>
+            <span class="ticker-item">Blend of Cultures</span><span class="ticker-dot">•</span>
+          </span>
+        </div>
+      </div>
+
+      <section id="about" class="intro-section section-shell"><div class="section-index reveal">01 <span>/ about</span></div><div class="intro-layout"><div class="intro-aside reveal"><span class="eyebrow">About</span><div class="vertical-rule"></div><p>Here, the horizon is the only appointment worth keeping.</p></div><div class="intro-copy"><h2 class="display-heading reveal">A peaceful escape <em>by the sea</em></h2><div class="intro-body reveal"><p>Beyond the noise of the everyday, Dhaankolhu Rasdhoo is a small and generous world. Coral sands, warm lagoons, and the kind of stillness that lets you hear your own thoughts again.</p><div><a class="text-link" href="#experience">Discover the island <span>→</span></a></div></div></div></div></section>
+
+      <section class="video-section"><div class="video-section-inner section-shell"><div class="video-section-heading"><span class="eyebrow reveal">Resort experience</span><h2 class="display-heading reveal">Discover Dhaankolhu Rasdhoo Island <em>in Motion</em></h2></div><div class="video-frame reveal" id="island-video" data-youtube-id="cNzxC0jEzJY"><img src="https://img.youtube.com/vi/cNzxC0jEzJY/maxresdefault.jpg" alt="Dhaankolhu Rasdhoo Island film still" /><button class="video-play-button" type="button" aria-label="Play island film">▶</button></div><p class="video-caption reveal">Immerse yourself in the beauty of Dhaankolhu Rasdhoo Island — from the glistening shoreline and swaying palms to cozy cottages and golden sunsets. Every frame captures the serenity and natural wonder that awaits you.</p></div></section>
+
+      <section id="highlights" class="highlights-section section-shell"><div class="section-heading-row"><span class="eyebrow highlights-eyebrow reveal">Highlights</span><h2 class="display-heading reveal highlights-heading">What Awaits You at Dhaankolhu Rasdhoo Island</h2><p class="section-lede reveal">Three ways to settle into the rhythm of the island.</p></div><div class="stay-card-grid"><article class="stay-card reveal card-offset-1"><div class="card-image-wrap"><img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=85" alt="Beachfront relaxation" /></div><div class="card-copy"><h3>Beachfront Relaxation</h3><p>Unwind on our pristine shore with gentle ocean breezes and the sound of waves lulling you into perfect relaxation.</p></div></article><article class="stay-card reveal card-offset-2"><div class="card-image-wrap"><img src="https://images.unsplash.com/photo-1505881502353-a1986add3762?auto=format&fit=crop&w=1200&q=85" alt="Family picnic and cottage areas" /></div><div class="card-copy"><h3>Family Picnic &amp; Cottage Areas</h3><p>Spend quality time in our shaded cottage areas, perfect for family gatherings, picnics, and heartfelt moments together.</p></div></article><article class="stay-card reveal card-offset-3"><div class="card-image-wrap"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=85" alt="Sunset ocean views" /></div><div class="card-copy"><h3>Sunset Ocean Views</h3><p>As dusk falls, the horizon transforms into a breathtaking canvas of warm golden hues — a view you will never forget.</p></div></article></div></section>
+
+      <section id="experience" class="slideshow-section section-shell"><div class="section-heading-row"><span class="eyebrow reveal">Experience</span><h2 class="display-heading reveal">Special Offers at Dhaankolhu Rasdhoo Island</h2></div><div class="slideshow" id="offer-slideshow"><div class="slideshow-track"><div class="slide is-active" style="background-image:url('https://images.unsplash.com/photo-1502301103665-0b95cc738daf?auto=format&fit=crop&w=1600&q=88')"><div class="slide-overlay"></div><div class="slide-content"><span class="slide-badge">Weekend getaway</span><h2>Escape to Clear Waters &amp; White Sand</h2><p>Our signature weekend packages include full beach access, cottage accommodations, and stunning ocean sunrise views.</p><a class="slide-cta" href="book-now.html">Learn more</a></div></div><div class="slide" style="background-image:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=88')"><div class="slide-overlay"></div><div class="slide-content"><span class="slide-badge">Family escape</span><h2>Gather Under the Palms</h2><p>Shaded picnic spots and cottage stays make room for slow mornings and easy family time.</p><a class="slide-cta" href="book-now.html">Learn more</a></div></div><div class="slide" style="background-image:url('https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=1600&q=88')"><div class="slide-overlay"></div><div class="slide-content"><span class="slide-badge">Sunset dining</span><h2>Dine Above the Lagoon</h2><p>Private overwater tables set the scene for an evening you won't forget.</p><a class="slide-cta" href="book-now.html">Learn more</a></div></div><div class="slideshow-dots" role="tablist" aria-label="Slideshow navigation"><button class="dot is-active" type="button" data-index="0" aria-label="Show slide 1"></button><button class="dot" type="button" data-index="1" aria-label="Show slide 2"></button><button class="dot" type="button" data-index="2" aria-label="Show slide 3"></button></div></div></div></section>
+
+      <section id="gallery" class="gallery-section section-shell"><div class="section-index reveal">03 <span>/ gallery</span></div><div class="gallery-heading"><span class="eyebrow reveal">Gallery</span><h2 class="display-heading reveal">Joy, Laughter &amp; Beautiful Memories</h2><p class="section-lede reveal">Every visit to Dhaankolhu Rasdhoo Island creates a story worth telling. Here are some of the beautiful moments our guests have shared with us.</p></div><div class="gallery-grid"><figure class="gallery-item gallery-tall reveal"><img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1400&q=85" alt="Turquoise lagoon meeting a quiet beach" /></figure><figure class="gallery-item gallery-wide reveal"><img src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=85" alt="Palm-framed coastal path" /></figure><figure class="gallery-item gallery-square reveal"><img src="https://images.unsplash.com/photo-1493552152660-f915ab47ae9d?auto=format&fit=crop&w=1200&q=85" alt="Calm ocean water" /></figure><figure class="gallery-item gallery-square reveal"><img src="https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=1200&q=85" alt="Island shoreline" /></figure><figure class="gallery-item gallery-wide reveal"><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=85" alt="Coastal landscape" /></figure></div></section>
+
+    </main>
+
+    <footer id="contact" class="site-footer-v2">
+      <div class="footer-v2-grid">
+        <div class="footer-v2-col footer-v2-brand reveal">
+          <img class="footer-mark" src="img/logo/logo%20white.png" alt="Dhaankolhu Rasdhoo Island logo" />
+          <h2>Dhaankolhu Rasdhoo Island</h2>
+          <span class="footer-v2-tag">Beach Resort</span>
+          <p>A peaceful beach destination where the ocean meets serenity. Relax, unwind, and create lasting memories by the sea.</p>
+        </div>
+        <div class="footer-v2-col reveal">
+          <span class="footer-v2-heading">Quick Links</span>
+          <a href="#about">About</a>
+          <a href="#highlights">Highlights</a>
+          <a href="#experience">Experience</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#experience">Packages</a>
+        </div>
+        <div class="footer-v2-col reveal">
+          <span class="footer-v2-heading">Contact Us</span>
+          <span class="footer-v2-label">Address</span>
+          <span class="footer-v2-value">South Ari Atoll, Maldives</span>
+          <span class="footer-v2-label">Phone</span>
+          <a class="footer-v2-value" href="tel:+9607002020">+960 700 2020</a>
+          <span class="footer-v2-label">Email</span>
+          <a class="footer-v2-value" href="mailto:stay@dhaankolhu.island">stay@dhaankolhu.island</a>
+          <span class="footer-v2-label">Hours</span>
+          <span class="footer-v2-value footer-v2-accent">Open daily, 6:00 AM – 8:00 PM</span>
+        </div>
+        <div class="footer-v2-col reveal">
+          <span class="footer-v2-heading">Stay in Touch</span>
+          <p>Subscribe to receive updates on seasonal promos, events, and new offerings at Dhaankolhu Rasdhoo Island.</p>
+          <form class="footer-v2-subscribe" onsubmit="event.preventDefault();">
+            <input type="email" required placeholder="Your email address" aria-label="Your email address" />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-v2-bottom">
+        <span>© 2026 Dhaankolhu Rasdhoo Island. All rights reserved.</span>
+        <div class="footer-v2-legal"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Sitemap</a></div>
+      </div>
+    </footer>
+
+  </div>
+  <script src="script.js"></script>
+  <script>
+    (function () {
+      var menu = document.getElementById("mobile-menu");
+      var trigger = document.getElementById("menu-trigger");
+      if (!menu || !trigger) return;
+
+      var iconHTML =
+        '<span class="hamburger-icon"><span class="line line1"></span><span class="line line2"></span><span class="line line3"></span></span>';
+      var restoring = false;
+
+      function ensureIcon() {
+        if (restoring) return;
+        if (trigger.querySelector(".hamburger-icon")) return;
+        restoring = true;
+        trigger.innerHTML = iconHTML;
+        restoring = false;
+      }
+
+      ensureIcon();
+
+      var iconObserver = new MutationObserver(ensureIcon);
+      iconObserver.observe(trigger, { childList: true, characterData: true, subtree: true });
+
+      window.addEventListener("scroll", function () {
+        if (menu.classList.contains("is-open")) {
+          menu.classList.remove("is-open");
+          menu.setAttribute("aria-hidden", "true");
+          trigger.setAttribute("aria-expanded", "false");
+          trigger.setAttribute("aria-label", "Open menu");
+          ensureIcon();
+        }
+      }, { passive: true });
+    })();
+  </script>
+
+  <!-- floating WhatsApp chat bubble -->
+  <a class="wa-bubble" href="https://wa.me/9609291605?text=Hi%20Dhaankolhu%20Rasdhoo%2C%20I%27d%20like%20to%20ask%20about%20a%20stay." target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
+    <span class="wa-bubble-tooltip">Chat with us</span>
+    <span class="wa-bubble-btn">
+      <img src="img/whatsapp.webp" alt="" />
+    </span>
+  </a>
+</body>
+</html>
