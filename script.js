@@ -727,6 +727,41 @@
 
   measure();
   applyTransform();
+
+  /* measure() is called immediately above, but the excursion-card images
+     (several are remote Unsplash photos) are often still loading at that
+     point, so track.scrollWidth is briefly too small. That produces a
+     wrong halfWidth, which makes the seamless wrap point land in the wrong
+     place — the two duplicated card sets end up slightly misaligned and
+     visibly overlap/ghost into each other for a moment. Once every image
+     has actually finished loading, remeasure and re-snap the position
+     (keeping the same relative point in the loop) so the wrap is clean. */
+  var loopImages = Array.prototype.slice.call(track.querySelectorAll("img"));
+  var pendingImages = loopImages.filter(function (img) { return !img.complete; });
+  function resyncAfterImagesLoad() {
+    var ratio = halfWidth > 0 ? pos / halfWidth : 0;
+    measure();
+    pos = ratio * halfWidth;
+    wrap();
+    applyTransform();
+  }
+  if (pendingImages.length) {
+    var remaining = pendingImages.length;
+    pendingImages.forEach(function (img) {
+      img.addEventListener("load", function () {
+        remaining -= 1;
+        if (remaining <= 0) resyncAfterImagesLoad();
+      }, { once: true });
+      img.addEventListener("error", function () {
+        remaining -= 1;
+        if (remaining <= 0) resyncAfterImagesLoad();
+      }, { once: true });
+    });
+  }
+  /* belt-and-suspenders: also resync once the whole page (all resources)
+     has finished loading, in case any image listener above was missed */
+  window.addEventListener("load", resyncAfterImagesLoad, { once: true });
+
   window.addEventListener("resize", function () {
     var ratio = halfWidth > 0 ? pos / halfWidth : 0;
     measure();

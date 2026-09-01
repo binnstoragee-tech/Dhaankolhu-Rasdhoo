@@ -56,20 +56,34 @@
   header.classList.add("is-scrolled");
 
   /* hide navbar when scrolling down, reveal it again on scroll up — matches
-     the behavior in script.js on the main site */
+     the behavior in script.js on the main site.
+     NOTE: the step-transition auto-close (hideHeaderForStep) stays disabled
+     below — header only reacts to scroll direction now, not to step changes. */
   var scrollTicking = false;
   var lastScrollY = window.scrollY;
   var HIDE_AFTER = 120;
   function applyHeaderScrollState() {
     var currentY = window.scrollY;
+    var scrollingUp = currentY < lastScrollY;
     var scrollingDown = currentY > lastScrollY;
-    if (scrollingDown && currentY > HIDE_AFTER && !menu.classList.contains("is-open")) {
-      header.classList.add("is-hidden");
-    } else {
+    if (scrollingUp) {
       header.classList.remove("is-hidden");
+      header.classList.remove("is-drawer-hidden");
+    } else if (scrollingDown && currentY > HIDE_AFTER && !menu.classList.contains("is-open")) {
+      header.classList.add("is-hidden");
     }
     lastScrollY = currentY;
     scrollTicking = false;
+  }
+
+  /* closes the header like a drawer — smooth 1.5s slide-up — the moment the
+     person starts moving through the booking steps (Next button or tapping
+     a rail tab), regardless of current scroll position. It only reopens on
+     an explicit scroll-up (handled in applyHeaderScrollState above).
+     NOTE: disabled per request — header stays visible through step changes. */
+  function hideHeaderForStep() {
+    header.classList.remove("is-drawer-hidden");
+    header.classList.remove("is-hidden");
   }
 
   window.addEventListener("scroll", function () {
@@ -82,6 +96,7 @@
 
   menuTrigger.addEventListener("click", function () {
     header.classList.remove("is-hidden");
+    header.classList.remove("is-drawer-hidden");
     setMenu(!menu.classList.contains("is-open"));
   });
   document.querySelectorAll(".mobile-menu a").forEach(function (link) {
@@ -122,7 +137,6 @@
   var bkGrid = document.querySelector(".bk-grid");
   var successView = document.getElementById("bk-success");
   var nextBtn = document.getElementById("bk-next");
-  var backBtn = document.getElementById("bk-back");
   var actions = document.getElementById("bk-actions");
 
   /* keep the top of the booking panel in view on every step change,
@@ -135,11 +149,15 @@
     window.scrollTo({ top: top, behavior: "smooth" });
   }
   var railSteps = document.querySelectorAll(".bk-rail-step");
+  var railEl = document.getElementById("bk-rail");
+  var railIndicator = document.getElementById("bk-rail") ? document.querySelector(".bk-rail-indicator") : null;
   var reviewList = document.getElementById("bk-review-list");
   var reviewDownloadLink = document.getElementById("bk-review-download-link");
 
   var arrivalInput = document.getElementById("bk-arrival");
   var departureInput = document.getElementById("bk-departure");
+  var arrivalTimeInput = document.getElementById("bk-arrival-time");
+  var departureTimeInput = document.getElementById("bk-departure-time");
   var stepper = document.querySelector(".bk-stepper");
   var stepperCount = stepper.querySelector("span");
   var roomGrid = document.getElementById("bk-room-grid");
@@ -150,7 +168,7 @@
   var ticketTotalEl = document.getElementById("bk-ticket-total");
   var ticketCodeEl = document.getElementById("bk-ticket-code");
 
-  var state = { arrival: "", departure: "", guests: 2, room: null, price: 0, name: "", email: "", phone: "", country: "" };
+  var state = { arrival: "", departure: "", arrivalTime: "14:00", departureTime: "12:00", guests: 5, room: null, price: 0, name: "", email: "", phone: "", country: "" };
   var currentStep = 1;
   var TOTAL_STEPS = 4;
   var pdfDownloaded = false;
@@ -186,8 +204,6 @@
 
   /* today as the earliest selectable date */
   var todayStr = new Date().toISOString().slice(0, 10);
-  arrivalInput.min = todayStr;
-  departureInput.min = todayStr;
 
   /* ---------- guest stepper ---------- */
   stepper.addEventListener("click", function (event) {
@@ -203,7 +219,6 @@
   /* ---------- dates ---------- */
   arrivalInput.addEventListener("change", function () {
     state.arrival = arrivalInput.value;
-    departureInput.min = arrivalInput.value || todayStr;
     validateStep();
     updateTicket("dates");
     saveDraft();
@@ -214,6 +229,316 @@
     updateTicket("dates");
     saveDraft();
   });
+  arrivalTimeInput.addEventListener("change", function () {
+    state.arrivalTime = arrivalTimeInput.value;
+    updateTicket("dates");
+    saveDraft();
+  });
+  departureTimeInput.addEventListener("change", function () {
+    state.departureTime = departureTimeInput.value;
+    updateTicket("dates");
+    saveDraft();
+  });
+
+  /* ---------- custom animated date pickers ---------- */
+  var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  function toISO(y, m, d) {
+    var mm = String(m + 1).padStart(2, "0");
+    var dd = String(d).padStart(2, "0");
+    return y + "-" + mm + "-" + dd;
+  }
+
+  function parseISO(str) {
+    if (!str) return null;
+    var parts = str.split("-");
+    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  }
+
+  function displayDate(str) {
+    var d = parseISO(str);
+    if (!d) return "";
+    var dd = String(d.getDate()).padStart(2, "0");
+    var mm = String(d.getMonth() + 1).padStart(2, "0");
+    return dd + "/" + mm + "/" + d.getFullYear();
+  }
+
+  function to12Hour(hhmm) {
+    var parts = (hhmm || "12:00").split(":");
+    var h = Number(parts[0]);
+    var m = parts[1] || "00";
+    var period = h >= 12 ? "PM" : "AM";
+    var h12 = h % 12;
+    if (h12 === 0) h12 = 12;
+    return { hour: String(h12), minute: m, period: period };
+  }
+
+  function to24Hour(hour12, minute, period) {
+    var h = Number(hour12) % 12;
+    if (period === "PM") h += 12;
+    return String(h).padStart(2, "0") + ":" + minute;
+  }
+
+  function formatTime(hhmm) {
+    if (!hhmm) return "";
+    var t = to12Hour(hhmm);
+    return t.hour + ":" + t.minute + " " + t.period;
+  }
+
+  function makeDatePicker(opts) {
+    var root = document.getElementById(opts.rootId);
+    var trigger = document.getElementById(opts.triggerId);
+    var valueEl = trigger.querySelector(".bk-date-value");
+    var input = document.getElementById(opts.inputId);
+    var clearBtn = document.getElementById(opts.clearId);
+    var panel = root.querySelector(".bk-date-panel");
+    var titleEl = root.querySelector(".bk-cal-title");
+    var gridEl = root.querySelector(".bk-cal-grid");
+    var timeInput = document.getElementById(opts.timeInputId);
+    var hourSelect = root.querySelector(".bk-cal-hour-select");
+    var minuteSelect = root.querySelector(".bk-cal-minute-select");
+    var periodSelect = root.querySelector(".bk-cal-period-select");
+    var todayD = parseISO(todayStr);
+    var view = parseISO(input.value) || todayD;
+    view = new Date(view.getFullYear(), view.getMonth(), 1);
+
+    /* time selects */
+    for (var hh = 1; hh <= 12; hh++) {
+      var hOpt = document.createElement("option");
+      hOpt.value = String(hh);
+      hOpt.textContent = String(hh);
+      hourSelect.appendChild(hOpt);
+    }
+    ["00", "15", "30", "45"].forEach(function (mm) {
+      var mOpt = document.createElement("option");
+      mOpt.value = mm;
+      mOpt.textContent = mm;
+      minuteSelect.appendChild(mOpt);
+    });
+
+    function syncTimeSelects() {
+      var t = to12Hour(timeInput.value);
+      hourSelect.value = t.hour;
+      minuteSelect.value = t.minute;
+      periodSelect.value = t.period;
+    }
+
+    function commitTime() {
+      timeInput.value = to24Hour(hourSelect.value, minuteSelect.value, periodSelect.value);
+      timeInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    [hourSelect, minuteSelect, periodSelect].forEach(function (sel) {
+      sel.addEventListener("click", function (e) { e.stopPropagation(); });
+      sel.addEventListener("change", commitTime);
+    });
+
+    syncTimeSelects();
+
+    function minDate() {
+      var min = opts.getMin ? parseISO(opts.getMin()) : todayD;
+      return min && min > todayD ? min : todayD;
+    }
+
+    function isSameDay(a, b) {
+      return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    }
+
+    function render() {
+      titleEl.textContent = MONTH_NAMES[view.getMonth()] + " " + view.getFullYear();
+      gridEl.innerHTML = "";
+      var min = minDate();
+      var selected = parseISO(input.value);
+      var rangeStart = parseISO(arrivalInput.value);
+      var rangeEnd = parseISO(departureInput.value);
+      var firstWeekday = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+      var daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      var daysInPrevMonth = new Date(view.getFullYear(), view.getMonth(), 0).getDate();
+      var totalCells = 42;
+      var frag = document.createDocumentFragment();
+
+      for (var i = 0; i < totalCells; i++) {
+        var dayNum, cellMonth, cellYear, isOutside = false;
+        if (i < firstWeekday) {
+          dayNum = daysInPrevMonth - firstWeekday + 1 + i;
+          cellMonth = view.getMonth() - 1;
+          cellYear = view.getFullYear();
+          isOutside = true;
+        } else if (i >= firstWeekday + daysInMonth) {
+          dayNum = i - (firstWeekday + daysInMonth) + 1;
+          cellMonth = view.getMonth() + 1;
+          cellYear = view.getFullYear();
+          isOutside = true;
+        } else {
+          dayNum = i - firstWeekday + 1;
+          cellMonth = view.getMonth();
+          cellYear = view.getFullYear();
+        }
+        var cellDate = new Date(cellYear, cellMonth, dayNum);
+
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = String(dayNum);
+        btn.className = "bk-cal-day";
+        if (isOutside) btn.classList.add("is-outside");
+        if (isSameDay(cellDate, todayD)) btn.classList.add("is-today");
+        if (isSameDay(cellDate, selected)) btn.classList.add("is-selected");
+        if (rangeStart && rangeEnd && cellDate > rangeStart && cellDate < rangeEnd) btn.classList.add("is-in-range");
+        if (isSameDay(cellDate, rangeStart)) btn.classList.add("is-range-start");
+        if (isSameDay(cellDate, rangeEnd)) btn.classList.add("is-range-end");
+        if (cellDate < min) {
+          btn.disabled = true;
+          btn.classList.add("is-disabled");
+        }
+        btn.addEventListener("click", function (d) {
+          return function () { selectDate(d); };
+        }(cellDate));
+        frag.appendChild(btn);
+      }
+      gridEl.appendChild(frag);
+    }
+
+    function selectDate(d) {
+      input.value = toISO(d.getFullYear(), d.getMonth(), d.getDate());
+      valueEl.textContent = displayDate(input.value);
+      valueEl.classList.add("has-value");
+      root.classList.add("has-date");
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      closePanel();
+      if (opts.onSelect) opts.onSelect(d);
+      /* re-render the *other* picker too, so the visual range/min updates immediately */
+      if (opts.sibling) opts.sibling.refresh();
+    }
+
+    function clearDate() {
+      input.value = "";
+      valueEl.textContent = valueEl.getAttribute("data-empty-text");
+      valueEl.classList.remove("has-value");
+      root.classList.remove("has-date");
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      render();
+      if (opts.onClear) opts.onClear();
+      if (opts.sibling) opts.sibling.refresh();
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        clearDate();
+      });
+    }
+
+    function openPanel() {
+      closeAllPickers(root);
+      view = new Date((parseISO(input.value) || minDate()).getFullYear(), (parseISO(input.value) || minDate()).getMonth(), 1);
+      render();
+      root.classList.add("is-open");
+      trigger.setAttribute("aria-expanded", "true");
+      var panelWrap = root.closest(".bk-panel");
+      if (panelWrap) panelWrap.classList.add("bk-allow-overflow");
+    }
+
+    function closePanel() {
+      root.classList.remove("is-open");
+      trigger.setAttribute("aria-expanded", "false");
+      var panelWrap = root.closest(".bk-panel");
+      if (panelWrap && !panelWrap.querySelector(".bk-date-select.is-open")) panelWrap.classList.remove("bk-allow-overflow");
+    }
+
+    function togglePanel() {
+      if (root.classList.contains("is-open")) closePanel();
+      else openPanel();
+    }
+
+    trigger.addEventListener("click", function (e) {
+      e.stopPropagation();
+      togglePanel();
+    });
+
+    root.querySelectorAll(".bk-cal-nav").forEach(function (nav) {
+      nav.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var dir = Number(nav.getAttribute("data-nav"));
+        view = new Date(view.getFullYear(), view.getMonth() + dir, 1);
+        render();
+      });
+    });
+
+    panel.addEventListener("click", function (e) { e.stopPropagation(); });
+
+    if (input.value) {
+      valueEl.textContent = displayDate(input.value);
+      valueEl.classList.add("has-value");
+      root.classList.add("has-date");
+    }
+
+    var api = { close: closePanel, refresh: render, root: root, clear: clearDate, syncTime: syncTimeSelects };
+    return api;
+  }
+
+  function closeAllPickers(except) {
+    document.querySelectorAll(".bk-date-select.is-open").forEach(function (el) {
+      if (el !== except) {
+        el.classList.remove("is-open");
+        var t = el.querySelector(".bk-date-trigger");
+        if (t) t.setAttribute("aria-expanded", "false");
+        var panelWrap = el.closest(".bk-panel");
+        if (panelWrap && !panelWrap.querySelector(".bk-date-select.is-open")) panelWrap.classList.remove("bk-allow-overflow");
+      }
+    });
+  }
+
+  document.addEventListener("click", function () { closeAllPickers(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAllPickers(); });
+
+  var arrivalPicker = makeDatePicker({
+    rootId: "bk-arrival-select",
+    triggerId: "bk-arrival-trigger",
+    inputId: "bk-arrival",
+    clearId: "bk-arrival-clear",
+    timeInputId: "bk-arrival-time",
+    getMin: function () { return todayStr; },
+    onSelect: function (d) {
+      /* if departure is now before the new arrival, clear it */
+      var dep = parseISO(departureInput.value);
+      if (dep && dep <= d) {
+        departureInput.value = "";
+        var depValueEl = document.querySelector("#bk-departure-trigger .bk-date-value");
+        depValueEl.textContent = depValueEl.getAttribute("data-empty-text");
+        depValueEl.classList.remove("has-value");
+        document.getElementById("bk-departure-select").classList.remove("has-date");
+        departureInput.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      /* smoothly guide the guest into picking the departure date next */
+      window.setTimeout(function () {
+        document.getElementById("bk-departure-trigger").click();
+      }, 220);
+    },
+    onClear: function () {
+      /* clearing arrival also clears departure, since it depends on it */
+      var dep = departureInput;
+      if (dep.value) {
+        dep.value = "";
+        var depValueEl = document.querySelector("#bk-departure-trigger .bk-date-value");
+        depValueEl.textContent = depValueEl.getAttribute("data-empty-text");
+        depValueEl.classList.remove("has-value");
+        document.getElementById("bk-departure-select").classList.remove("has-date");
+        dep.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+  });
+
+  var departurePicker = makeDatePicker({
+    rootId: "bk-departure-select",
+    triggerId: "bk-departure-trigger",
+    inputId: "bk-departure",
+    clearId: "bk-departure-clear",
+    timeInputId: "bk-departure-time",
+    getMin: function () { return arrivalInput.value || todayStr; }
+  });
+
+  arrivalPicker.sibling = departurePicker;
+  departurePicker.sibling = arrivalPicker;
 
   /* ---------- room selection ---------- */
   roomGrid.addEventListener("click", function (event) {
@@ -462,12 +787,12 @@
     if (!which || which === "dates") {
       var n = nights();
       if (state.arrival) {
-        setTicketRow("checkin", formatDate(state.arrival), true);
+        setTicketRow("checkin", formatDateTime(state.arrival, state.arrivalTime), true);
       } else {
         setTicketRow("checkin", "Select above", false);
       }
       if (state.departure) {
-        setTicketRow("checkout", formatDate(state.departure), true);
+        setTicketRow("checkout", formatDateTime(state.departure, state.departureTime), true);
       } else {
         setTicketRow("checkout", "Select above", false);
       }
@@ -501,6 +826,11 @@
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }
 
+  function formatDateTime(str, timeStr) {
+    if (!str) return "";
+    return formatDate(str) + ", " + formatTime(timeStr);
+  }
+
   /* keep total in sync whenever dates or room change */
   [arrivalInput, departureInput].forEach(function (input) {
     input.addEventListener("change", function () { updateTicket("total"); });
@@ -525,24 +855,54 @@
   /* ---------- rail (top step indicator — tappable once a step has been reached) ---------- */
   var maxStepReached = 1;
 
+  function moveRailIndicator(activeBtn) {
+    if (!railIndicator || !activeBtn || !railEl) return;
+    var railRect = railEl.getBoundingClientRect();
+    var btnRect = activeBtn.getBoundingClientRect();
+    var offset = btnRect.left - railRect.left + railEl.scrollLeft;
+    railIndicator.style.width = btnRect.width + "px";
+    railIndicator.style.transform = "translateX(" + offset + "px)";
+  }
+
   function updateRail(step) {
+    var activeBtn = null;
     railSteps.forEach(function (btn) {
       var n = Number(btn.getAttribute("data-step"));
-      btn.classList.toggle("is-active", n === step);
+      var active = n === step;
+      btn.classList.toggle("is-active", active);
       btn.classList.toggle("is-done", n < step);
       btn.disabled = n === 5 ? false : n > maxStepReached;
+      if (active) activeBtn = btn;
     });
+    if (activeBtn) {
+      /* scroll the rail itself (not scrollIntoView, which can drag the
+         whole page horizontally along with it) so only the tab strip
+         shifts to center the active step, never the page content below */
+      if (railEl) {
+        var targetScroll = activeBtn.offsetLeft - (railEl.clientWidth - activeBtn.offsetWidth) / 2;
+        var maxScroll = railEl.scrollWidth - railEl.clientWidth;
+        targetScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+        railEl.scrollTo({ left: targetScroll, behavior: "smooth" });
+      }
+      window.requestAnimationFrame(function () { moveRailIndicator(activeBtn); });
+    }
     /* the Review step (04) has its own full summary list, so the sticky
        reservation-note sidebar would just repeat it — hide it there and
        on the final Send screen (05), which also repeats the same details. */
     if (bkGrid) bkGrid.classList.toggle("bk-review-active", step === TOTAL_STEPS || step === 5);
   }
 
+  window.addEventListener("resize", function () {
+    var current = document.querySelector(".bk-rail-step.is-active");
+    if (current) moveRailIndicator(current);
+  });
+
   document.getElementById("bk-rail").addEventListener("click", function (event) {
     var btn = event.target.closest(".bk-rail-step");
     if (!btn || btn.disabled) return;
     var target = Number(btn.getAttribute("data-step"));
     if (target === 5 || target === currentStep) return;
+    hideHeaderForStep();
     if (currentStep === 5) {
       successView.classList.remove("is-current", "bk-anim-in-start", "bk-anim-out");
       form.style.display = "";
@@ -556,7 +916,7 @@
     var n = nights();
     var total = state.price && n ? state.price * n : 0;
     var rows = [
-      ["Dates", state.arrival && state.departure ? formatDate(state.arrival) + " – " + formatDate(state.departure) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"],
+      ["Dates", state.arrival && state.departure ? formatDateTime(state.arrival, state.arrivalTime) + " – " + formatDateTime(state.departure, state.departureTime) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"],
       ["Guests", state.guests + (state.guests === 1 ? " guest" : " guests")],
       ["Stay", state.room || "—"],
       ["Traveller", state.name || "—"],
@@ -617,14 +977,26 @@
     if (nextCursor) nextCursor.classList.add("is-active");
   });
 
-  /* ---------- step navigation with rise-up transition ---------- */
+  /* ---------- step navigation with rise-up transition ----------
+     Rail tab clicks, Next, and Back all use the same immediate swap now:
+     the current step's fields fade out (~0.38s) while the rail pill moves,
+     then the target step's fields fade in — everything happens together,
+     no extra pause.
+
+     `stepTransitioning` guards against overlapping transitions: without it,
+     clicking a second tab while the first one's swap is still in flight
+     would run two goToStep() calls at once, each grabbing its own stale
+     "current" element and independently adding "is-current" to a different
+     step — which caused two steps' fields to render stacked on each other. */
+  var stepTransitioning = false;
   function goToStep(target) {
+    if (stepTransitioning) return;
     var current = form.querySelector('.bk-step.is-current');
     var next = form.querySelector('.bk-step[data-step="' + target + '"]');
     if (!current || !next) return;
+    stepTransitioning = true;
 
-    current.classList.add("bk-anim-out");
-    window.setTimeout(function () {
+    var reveal = function () {
       current.classList.remove("is-current", "bk-anim-out");
       next.classList.add("is-current", "bk-anim-in-start");
       window.requestAnimationFrame(function () {
@@ -633,7 +1005,6 @@
       currentStep = target;
       if (target > maxStepReached) maxStepReached = target;
       updateRail(target);
-      backBtn.style.visibility = target === 1 ? "hidden" : "visible";
       nextBtn.textContent = target === TOTAL_STEPS ? "Send via WhatsApp" : "Next step";
       if (!nextBtn.querySelector("span")) nextBtn.innerHTML = nextBtn.textContent + " <span>→</span>";
       if (target === TOTAL_STEPS) buildReview();
@@ -643,8 +1014,11 @@
       }
       validateStep();
       saveDraft();
-      scrollPanelIntoView();
-    }, 380);
+      stepTransitioning = false;
+    };
+
+    current.classList.add("bk-anim-out");
+    window.setTimeout(reveal, 380);
   }
 
   var WHATSAPP_NUMBER_DISPLAY = "+960 929 1605";
@@ -695,7 +1069,7 @@
     var total = state.price && n ? state.price * n : 0;
     var lines = [
       "Hi! I'd like to inquire about a stay at Dhaankolhu Rasdhoo Island.",
-      "Dates: " + (state.arrival && state.departure ? formatDate(state.arrival) + " - " + formatDate(state.departure) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"),
+      "Dates: " + (state.arrival && state.departure ? formatDateTime(state.arrival, state.arrivalTime) + " - " + formatDateTime(state.departure, state.departureTime) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"),
       "Guests: " + state.guests,
       "Stay: " + (state.room || "—"),
       "Estimated total: $" + total.toLocaleString() + " +TGST",
@@ -773,8 +1147,8 @@
 
     /* table rows: label left cell, value right cell */
     var rows = [
-      ["Check-in", state.arrival ? formatDate(state.arrival) : "\u2014"],
-      ["Check-out", state.departure ? formatDate(state.departure) : "\u2014"],
+      ["Check-in", state.arrival ? formatDateTime(state.arrival, state.arrivalTime) : "\u2014"],
+      ["Check-out", state.departure ? formatDateTime(state.departure, state.departureTime) : "\u2014"],
       ["Nights", state.arrival && state.departure && n > 0 ? String(n) : "\u2014"],
       ["Guests", state.guests + (state.guests === 1 ? " guest" : " guests")],
       ["Stay", state.room || "\u2014"],
@@ -885,6 +1259,7 @@
 
   function goNext() {
     if (!validateStep()) return;
+    hideHeaderForStep();
     if (currentStep < TOTAL_STEPS) {
       goToStep(currentStep + 1);
     } else {
@@ -893,19 +1268,6 @@
   }
 
   nextBtn.addEventListener("click", goNext);
-  backBtn.addEventListener("click", function () {
-    if (currentStep > 1) goToStep(currentStep - 1);
-  });
-
-  var successBackBtn = document.getElementById("bk-success-back");
-  if (successBackBtn) {
-    successBackBtn.addEventListener("click", function () {
-      successView.classList.remove("is-current", "bk-anim-in-start", "bk-anim-out");
-      form.style.display = "";
-      actions.style.display = "";
-      goToStep(4);
-    });
-  }
 
   form.addEventListener("submit", function (event) { event.preventDefault(); });
 
@@ -925,8 +1287,25 @@
 
     /* dates */
     arrivalInput.value = state.arrival || "";
-    departureInput.min = state.arrival || todayStr;
     departureInput.value = state.departure || "";
+    arrivalTimeInput.value = state.arrivalTime || "14:00";
+    departureTimeInput.value = state.departureTime || "12:00";
+    arrivalPicker.syncTime();
+    departurePicker.syncTime();
+    [
+      ["bk-arrival-trigger", state.arrival],
+      ["bk-departure-trigger", state.departure]
+    ].forEach(function (pair) {
+      var el = document.getElementById(pair[0]);
+      if (!el) return;
+      var valueEl = el.querySelector(".bk-date-value");
+      if (pair[1]) {
+        valueEl.textContent = displayDate(pair[1]);
+        valueEl.classList.add("has-value");
+        var selectWrap = el.closest(".bk-date-select");
+        if (selectWrap) selectWrap.classList.add("has-date");
+      }
+    });
 
     /* guests */
     stepperCount.textContent = state.guests;
@@ -977,7 +1356,6 @@
         target.classList.add("is-current");
       }
       currentStep = savedStep;
-      backBtn.style.visibility = savedStep === 1 ? "hidden" : "visible";
       nextBtn.textContent = savedStep === TOTAL_STEPS ? "Send via WhatsApp" : "Next step";
       if (!nextBtn.querySelector("span")) nextBtn.innerHTML = nextBtn.textContent + " <span>→</span>";
       if (savedStep === TOTAL_STEPS) buildReview();
@@ -992,4 +1370,21 @@
   restoreDraft();
   updateTicket();
   validateStep();
+  updateRail(currentStep);
+
+  /* the rail highlight's position/width is measured from the rendered
+     button text, but if it's measured before the DM Sans/Poppins webfonts
+     swap in, it locks onto the fallback font's (slightly different) text
+     width — leaving the white highlight a few pixels off from the label
+     it's supposed to sit under, clipping into the first letter. Re-measure
+     once the real fonts are actually ready, and once more after a short
+     delay as a fallback for browsers without the Font Loading API. */
+  function recalibrateRailIndicator() {
+    var active = document.querySelector(".bk-rail-step.is-active");
+    if (active) moveRailIndicator(active);
+  }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(recalibrateRailIndicator).catch(function () {});
+  }
+  window.setTimeout(recalibrateRailIndicator, 400);
 })();

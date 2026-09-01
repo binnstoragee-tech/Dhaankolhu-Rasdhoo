@@ -643,13 +643,13 @@
     })();
   </script>
 
-  <!-- floating contact bubble: tap to reveal WhatsApp + Viber -->
+  <!-- floating contact bubble: tap to reveal WhatsApp + Telegram -->
   <div class="contact-bubbles" id="contact-bubbles">
     <div class="contact-bubble-options" id="contact-bubble-options">
-      <a class="wa-bubble viber-bubble" href="viber://chat?number=%2B9609291605" aria-label="Chat with us on Viber">
-        <span class="wa-bubble-tooltip">Chat on Viber</span>
-        <span class="wa-bubble-btn viber-bubble-btn">
-          <img src="img/viber.webp" alt="" />
+      <a class="wa-bubble telegram-bubble" href="https://t.me/+9609291605" target="_blank" rel="noopener" aria-label="Chat with us on Telegram">
+        <span class="wa-bubble-tooltip">Chat on Telegram</span>
+        <span class="wa-bubble-btn telegram-bubble-btn">
+          <img src="img/telegram.webp" alt="" />
         </span>
       </a>
       <a class="wa-bubble" href="https://wa.me/9609291605?text=Hi%20Dhaankolhu%20Rasdhoo%2C%20I%27d%20like%20to%20ask%20about%20a%20stay." target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
@@ -691,6 +691,61 @@
       document.addEventListener("keydown", function (event) {
         if (event.key === "Escape") setOpen(false);
       });
+
+      /* icon colour swap: sample the actual background colour sitting behind
+         the bubble (instead of hard-coding section class names, which drift
+         out of sync as sections get renamed/restructured) and flip the icon
+         to black once that backdrop is light, white when it's dark. Covers
+         mobile too, and also the scroll-jacked pinned hero intro, where the
+         window doesn't fire real "scroll" events while it's locked. */
+      function relativeLuminance(rgb) {
+        var a = rgb.map(function (v) {
+          v /= 255;
+          return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+      }
+      function parseRGB(str) {
+        var m = str && str.match(/rgba?\(([^)]+)\)/);
+        if (!m) return null;
+        var parts = m[1].split(",").map(function (n) { return parseFloat(n); });
+        if (parts.length >= 4 && parts[3] === 0) return null; /* fully transparent */
+        return [parts[0], parts[1], parts[2]];
+      }
+      var zoneTicking = false;
+      function checkZone() {
+        zoneTicking = false;
+        var rect = trigger.getBoundingClientRect();
+        var cx = Math.max(0, rect.left - 6);
+        var cy = rect.top + rect.height / 2;
+        wrap.style.pointerEvents = "none";
+        var node = document.elementFromPoint(cx, cy);
+        wrap.style.pointerEvents = "";
+        var isLight = true; /* default: most of the page is ivory/white */
+        while (node && node !== document.documentElement) {
+          var rgb = parseRGB(window.getComputedStyle(node).backgroundColor);
+          if (rgb) {
+            isLight = relativeLuminance(rgb) > 0.55;
+            break;
+          }
+          node = node.parentElement;
+        }
+        wrap.classList.toggle("is-on-light", isLight);
+      }
+      function queueZoneCheck() {
+        if (!zoneTicking) {
+          zoneTicking = true;
+          window.requestAnimationFrame(checkZone);
+        }
+      }
+      window.addEventListener("scroll", queueZoneCheck, { passive: true });
+      window.addEventListener("resize", queueZoneCheck);
+      /* the pinned hero intro captures wheel/touch input directly and may
+         not move window.scrollY at all while it plays, so also recheck on
+         those events to stay in sync during that phase */
+      window.addEventListener("wheel", queueZoneCheck, { passive: true });
+      window.addEventListener("touchmove", queueZoneCheck, { passive: true });
+      checkZone();
     })();
   </script>
   <!-- highlight card expand overlay: smooth "grow from the card" transition -->

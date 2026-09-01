@@ -42,16 +42,30 @@
 
     <main>
       <section class="bk-flow-section section-shell" id="booking-flow">
-        <div class="bk-rail" id="bk-rail">
-          <button class="bk-rail-step is-active" data-step="1" type="button" disabled><span class="bk-rail-num">01</span><span class="bk-rail-label">Dates &amp; Party</span></button>
-          <div class="bk-rail-divider"></div>
-          <button class="bk-rail-step" data-step="2" type="button" disabled><span class="bk-rail-num">02</span><span class="bk-rail-label">Your Stay</span></button>
-          <div class="bk-rail-divider"></div>
-          <button class="bk-rail-step" data-step="3" type="button" disabled><span class="bk-rail-num">03</span><span class="bk-rail-label">Your Details</span></button>
-          <div class="bk-rail-divider"></div>
-          <button class="bk-rail-step" data-step="4" type="button" disabled><span class="bk-rail-num">04</span><span class="bk-rail-label">Review</span></button>
-          <div class="bk-rail-divider"></div>
-          <button class="bk-rail-step bk-rail-step-fixed" data-step="5" type="button"><span class="bk-rail-num">05</span><span class="bk-rail-label">Send</span></button>
+        <div class="bk-rail-outer">
+          <div class="bk-rail" id="bk-rail">
+            <div class="bk-rail-indicator" aria-hidden="true"></div>
+            <button class="bk-rail-step is-active" data-step="1" type="button" disabled>
+              <svg class="bk-rail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3.5" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 3V6.2M16 3V6.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span class="bk-rail-label">Dates &amp; Guests</span>
+            </button>
+            <button class="bk-rail-step" data-step="2" type="button" disabled>
+              <svg class="bk-rail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 19V7.5C3.5 6.67 4.17 6 5 6H10.5C11.33 6 12 6.67 12 7.5V13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 13H19C19.83 13 20.5 13.67 20.5 14.5V19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 19H21.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="6.75" cy="9.25" r="1.35" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="bk-rail-label">Your Stay</span>
+            </button>
+            <button class="bk-rail-step" data-step="3" type="button" disabled>
+              <svg class="bk-rail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.3" r="3.3" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 20c0-3.87 3.36-6.5 7.5-6.5s7.5 2.63 7.5 6.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span class="bk-rail-label">Your Details</span>
+            </button>
+            <button class="bk-rail-step" data-step="4" type="button" disabled>
+              <svg class="bk-rail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.3" stroke="currentColor" stroke-width="1.7"/><path d="M9 3.5H15V5.5C15 6.05 14.55 6.5 14 6.5H10C9.45 6.5 9 6.05 9 5.5V3.5Z" stroke="currentColor" stroke-width="1.7"/><path d="M8.5 12.5L11 15L15.5 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="bk-rail-label">Review</span>
+            </button>
+            <button class="bk-rail-step bk-rail-step-fixed" data-step="5" type="button">
+              <svg class="bk-rail-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20L20.5 12L4 4L4 10.5L14.5 12L4 13.5L4 20Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              <span class="bk-rail-label">Send</span>
+            </button>
+          </div>
         </div>
 
         <div class="bk-grid">
@@ -61,26 +75,93 @@
               <!-- Step 1 — Dates & Party -->
               <div class="bk-step is-current" data-step="1">
                 <div class="bk-step-head">
-                  <span class="bk-step-eyebrow">Step 01</span>
                   <h2>When are you sailing in?</h2>
                   <p>Pick your arrival and departure, and tell us how many are travelling.</p>
                 </div>
                 <div class="bk-field-row">
                   <div class="bk-field">
                     <label for="bk-arrival">Arrival</label>
-                    <input type="date" id="bk-arrival" name="arrival" required />
+                    <div class="bk-date-select" id="bk-arrival-select">
+                      <button type="button" class="bk-date-trigger" id="bk-arrival-trigger" aria-haspopup="dialog" aria-expanded="false">
+                        <svg class="bk-date-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 3V6.2M16 3V6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                        <span class="bk-date-value" data-empty-text="dd/mm/yyyy">dd/mm/yyyy</span>
+                      </button>
+                      <button type="button" class="bk-date-clear" id="bk-arrival-clear" aria-label="Clear arrival date">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                      </button>
+                      <input type="hidden" id="bk-arrival" name="arrival" required />
+                      <input type="hidden" id="bk-arrival-time" name="arrivalTime" value="14:00" />
+                      <div class="bk-date-panel" role="dialog" aria-modal="false" aria-label="Choose your arrival date">
+                        <div class="bk-cal-head">
+                          <button type="button" class="bk-cal-nav" data-nav="-1" aria-label="Previous month">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          </button>
+                          <span class="bk-cal-title"></span>
+                          <button type="button" class="bk-cal-nav" data-nav="1" aria-label="Next month">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          </button>
+                        </div>
+                        <div class="bk-cal-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+                        <div class="bk-cal-grid" role="grid"></div>
+                        <div class="bk-cal-time-row">
+                          <span class="bk-cal-time-label">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Time
+                          </span>
+                          <div class="bk-cal-time-controls">
+                            <select class="bk-cal-hour-select" aria-label="Hour"></select>
+                            <span class="bk-cal-time-colon">:</span>
+                            <select class="bk-cal-minute-select" aria-label="Minute"></select>
+                            <select class="bk-cal-period-select" aria-label="AM or PM"><option value="AM">AM</option><option value="PM">PM</option></select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div class="bk-field">
                     <label for="bk-departure">Departure</label>
-                    <input type="date" id="bk-departure" name="departure" required />
+                    <div class="bk-date-select" id="bk-departure-select">
+                      <button type="button" class="bk-date-trigger" id="bk-departure-trigger" aria-haspopup="dialog" aria-expanded="false">
+                        <svg class="bk-date-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 3V6.2M16 3V6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                        <span class="bk-date-value" data-empty-text="dd/mm/yyyy">dd/mm/yyyy</span>
+                      </button>
+                      <button type="button" class="bk-date-clear" id="bk-departure-clear" aria-label="Clear departure date">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                      </button>
+                      <input type="hidden" id="bk-departure" name="departure" required />
+                      <input type="hidden" id="bk-departure-time" name="departureTime" value="12:00" />
+                      <div class="bk-date-panel" role="dialog" aria-modal="false" aria-label="Choose your departure date">
+                        <div class="bk-cal-head">
+                          <button type="button" class="bk-cal-nav" data-nav="-1" aria-label="Previous month">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          </button>
+                          <span class="bk-cal-title"></span>
+                          <button type="button" class="bk-cal-nav" data-nav="1" aria-label="Next month">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          </button>
+                        </div>
+                        <div class="bk-cal-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+                        <div class="bk-cal-grid" role="grid"></div>
+                        <div class="bk-cal-time-row">
+                          <span class="bk-cal-time-label">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Time
+                          </span>
+                          <div class="bk-cal-time-controls">
+                            <select class="bk-cal-hour-select" aria-label="Hour"></select>
+                            <span class="bk-cal-time-colon">:</span>
+                            <select class="bk-cal-minute-select" aria-label="Minute"></select>
+                            <select class="bk-cal-period-select" aria-label="AM or PM"><option value="AM">AM</option><option value="PM">PM</option></select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class="bk-field-row bk-field-row-single">
-                  <div class="bk-field">
+                  <div class="bk-field bk-field-guests">
                     <label>Guests</label>
-                    <div class="bk-stepper" data-count="2">
+                    <div class="bk-stepper" data-count="5">
                       <button type="button" data-action="decrease" aria-label="Fewer guests">−</button>
-                      <span>2</span>
+                      <span>5</span>
                       <button type="button" data-action="increase" aria-label="More guests">+</button>
                     </div>
                   </div>
@@ -90,7 +171,6 @@
               <!-- Step 2 — Choose Your Stay -->
               <div class="bk-step" data-step="2">
                 <div class="bk-step-head">
-                  <span class="bk-step-eyebrow">Step 02</span>
                   <h2>Choose your stay</h2>
                   <p>Three ways to settle into the rhythm of the island. Pick the one that suits your party.</p>
                 </div>
@@ -128,7 +208,6 @@
               <!-- Step 3 — Your Details -->
               <div class="bk-step" data-step="3">
                 <div class="bk-step-head">
-                  <span class="bk-step-eyebrow">Step 03</span>
                   <h2>Who should we expect?</h2>
                   <p>Share a few details and our island team will shape a considered stay around you.</p>
                 </div>
@@ -173,7 +252,6 @@
               <!-- Step 4 — Review -->
               <div class="bk-step" data-step="4">
                 <div class="bk-step-head">
-                  <span class="bk-step-eyebrow">Step 04</span>
                   <h2>Review your booking</h2>
                   <p>Everything below is what we'll hold for you. Download your booking summary, then confirm to continue on WhatsApp.</p>
                 </div>
@@ -193,7 +271,6 @@
               </div>
 
               <div class="bk-actions" id="bk-actions">
-                <button type="button" class="bk-btn bk-btn-ghost" id="bk-back" style="visibility:hidden;">← Back</button>
                 <span class="bk-next-wrap">
                   <button type="button" class="bk-btn bk-btn-primary" id="bk-next" disabled>Next step <span>→</span></button>
                   <span class="bk-download-cursor bk-next-cursor" id="bk-next-cursor" aria-hidden="true">
@@ -204,8 +281,6 @@
             </form>
 
             <div class="bk-success" data-step="success" id="bk-success">
-              <button type="button" class="bk-btn bk-btn-ghost bk-success-back" id="bk-success-back">← Back</button>
-
               <span class="bk-step-eyebrow" style="display:block;">One step left</span>
               <h2><span style="white-space:nowrap;">Send this on</span> <em>WhatsApp</em></h2>
               <p>Your booking isn't confirmed yet. Tap below to send your summary on WhatsApp so our team can confirm availability.</p>
@@ -220,7 +295,7 @@
 
               <div class="bk-success-note">
                 <span class="bk-success-note-icon">!</span>
-                <p><strong>WhatsApp not opening?</strong> Search +960 929 1605 and send your booking details there.</p>
+                <p><strong>Not opening?</strong> Message +960 929 1605.</p>
               </div>
             </div>
           </div>
@@ -237,7 +312,7 @@
                 <div class="bk-ticket-row is-empty" data-field="checkin"><span>Check-in</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="checkout"><span>Check-out</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="nights"><span>Nights</span><span>—</span></div>
-                <div class="bk-ticket-row is-empty" data-field="guests"><span>Guests</span><span>2 guests</span></div>
+                <div class="bk-ticket-row is-empty" data-field="guests"><span>Guests</span><span>5 guests</span></div>
                 <div class="bk-ticket-row is-empty" data-field="room"><span>Stay</span><span>Not chosen yet</span></div>
                 <div class="bk-ticket-row is-empty" data-field="name"><span>Traveller</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="phone"><span>Contact</span><span>—</span></div>
