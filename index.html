@@ -47,7 +47,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 4vh 6vw 3vh;
+    padding: 2vh 6vw 2vh;
   }
   .content {
     flex: 1;
@@ -55,12 +55,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-bottom: 8vh;
+    padding-bottom: 3vh;
   }
   .logo {
-    height: 288px;
+    height: clamp(90px, 18vh, 220px);
     width: auto;
-    margin-bottom: -3rem;
+    margin-bottom: -2rem;
     opacity: 0.95;
   }
   .badge {
@@ -79,11 +79,18 @@
     letter-spacing: -0.01em;
   }
   p {
-    max-width: 420px;
+    max-width: 620px;
     font-size: 0.88rem;
     line-height: 1.6;
     color: #cdd6e2;
     margin: 0 auto 1.4rem;
+    white-space: nowrap;
+  }
+  @media (max-width: 768px) {
+    p {
+      max-width: 420px;
+      white-space: normal;
+    }
   }
   .contact {
     display: flex;
@@ -111,6 +118,48 @@
     font-size: 0.68rem;
     color: #cdd6e2;
     margin-top: 1.5rem;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  @media (max-width: 640px) {
+    .wrap {
+      padding: 3vh 7vw 2vh;
+    }
+    .content {
+      padding-bottom: 2vh;
+    }
+    .logo {
+      height: clamp(70px, 14vh, 140px);
+      margin-bottom: -1rem;
+    }
+    .badge {
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+    }
+    h1 {
+      font-size: clamp(1.4rem, 6vw, 1.8rem);
+      line-height: 1.25;
+    }
+    p {
+      font-size: 0.82rem;
+      line-height: 1.55;
+      margin-bottom: 1.2rem;
+    }
+    .contact {
+      flex-direction: column;
+      gap: 0.7rem;
+      width: 100%;
+      margin-bottom: 1.4rem;
+    }
+    .contact a {
+      width: 100%;
+      font-size: 0.8rem;
+      padding: 0.65rem 1rem;
+    }
+    .foot {
+      font-size: 0.62rem;
+      margin-top: 1rem;
+    }
   }
 </style>
 </head>
@@ -120,7 +169,7 @@
       <img class="logo" src="img/logo/logo%20white.png" alt="Dhaankolhu Rasdhoo Island logo" />
       <div class="badge">Under Maintenance</div>
       <h1>We're polishing things up.</h1>
-      <p>Our website is currently getting a quick refresh. thank you for your patience.</p>
+      <p>Our website is currently getting a quick refresh. We'll be back online shortly — thank you for your patience.</p>
       <div class="contact">
         <a href="https://wa.me/9609898130" target="_blank" rel="noopener">WhatsApp: +960 989 8130</a>
         <a href="mailto:info@dhaankolhu.com">info@dhaankolhu.com</a>
