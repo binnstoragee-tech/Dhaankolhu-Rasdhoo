@@ -38,6 +38,22 @@
     document.body.classList.remove("is-leaving");
   });
 
+  /* Same quick, smooth lazy-image fade-in as script.js (room photos, footer
+     mark, chat icons, and the dynamically-sourced FLIP room-expand image) —
+     300ms fade instead of an abrupt pop, skipped entirely for anything
+     already cached so it never feels like an added delay. */
+  (function () {
+    var lazyImgs = Array.prototype.slice.call(document.querySelectorAll('img[loading="lazy"]'));
+    lazyImgs.forEach(function (img) {
+      if (img.complete && img.naturalWidth > 0) {
+        img.classList.add("is-loaded");
+        return;
+      }
+      img.addEventListener("load", function () { img.classList.add("is-loaded"); }, { once: true });
+      img.addEventListener("error", function () { img.classList.add("is-loaded"); }, { once: true });
+    });
+  })();
+
   /* ---------- header + mobile menu (matches script.js on the main site) ---------- */
   var header = document.getElementById("site-header");
   var menu = document.getElementById("mobile-menu");
@@ -139,13 +155,18 @@
   var nextBtn = document.getElementById("bk-next");
   var actions = document.getElementById("bk-actions");
 
-  /* keep the top of the booking panel in view on every step change,
-     so people always land on the heading/CTA instead of wherever
-     the previous step happened to be scrolled to */
+  /* keep the 5-step rail + top of the booking panel in view on every step
+     change (Next, or a rail-tab click), so people always land back up top
+     instead of wherever the previous step happened to be scrolled to */
+  var bkRailOuter = document.querySelector(".bk-rail-outer");
   function scrollPanelIntoView() {
-    if (!panel) return;
-    var headerOffset = 96;
-    var top = panel.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    var anchor = bkRailOuter || panel;
+    if (!anchor) return;
+    /* the fixed site header is ~106px tall once scrolled — this offset has
+       to clear that plus a bit of breathing room, or the rail lands
+       partly hidden behind/flush against the navbar instead of just below it */
+    var headerOffset = 130;
+    var top = anchor.getBoundingClientRect().top + window.pageYOffset - headerOffset;
     window.scrollTo({ top: top, behavior: "smooth" });
   }
   var railSteps = document.querySelectorAll(".bk-rail-step");
@@ -302,21 +323,32 @@
     var view = parseISO(input.value) || todayD;
     view = new Date(view.getFullYear(), view.getMonth(), 1);
 
-    /* time selects */
-    for (var hh = 1; hh <= 12; hh++) {
-      var hOpt = document.createElement("option");
-      hOpt.value = String(hh);
-      hOpt.textContent = String(hh);
-      hourSelect.appendChild(hOpt);
+    /* time selects — the Time-of-day picker UI was removed; arrival/departure
+       still carry a fixed default time (set via the hidden inputs' value attr)
+       used for the summary/PDF, so this just guards against the now-missing
+       select elements instead of throwing. */
+    if (hourSelect && minuteSelect && periodSelect) {
+      for (var hh = 1; hh <= 12; hh++) {
+        var hOpt = document.createElement("option");
+        hOpt.value = String(hh);
+        hOpt.textContent = String(hh);
+        hourSelect.appendChild(hOpt);
+      }
+      ["00", "15", "30", "45"].forEach(function (mm) {
+        var mOpt = document.createElement("option");
+        mOpt.value = mm;
+        mOpt.textContent = mm;
+        minuteSelect.appendChild(mOpt);
+      });
+
+      [hourSelect, minuteSelect, periodSelect].forEach(function (sel) {
+        sel.addEventListener("click", function (e) { e.stopPropagation(); });
+        sel.addEventListener("change", commitTime);
+      });
     }
-    ["00", "15", "30", "45"].forEach(function (mm) {
-      var mOpt = document.createElement("option");
-      mOpt.value = mm;
-      mOpt.textContent = mm;
-      minuteSelect.appendChild(mOpt);
-    });
 
     function syncTimeSelects() {
+      if (!hourSelect || !minuteSelect || !periodSelect) return;
       var t = to12Hour(timeInput.value);
       hourSelect.value = t.hour;
       minuteSelect.value = t.minute;
@@ -327,11 +359,6 @@
       timeInput.value = to24Hour(hourSelect.value, minuteSelect.value, periodSelect.value);
       timeInput.dispatchEvent(new Event("change", { bubbles: true }));
     }
-
-    [hourSelect, minuteSelect, periodSelect].forEach(function (sel) {
-      sel.addEventListener("click", function (e) { e.stopPropagation(); });
-      sel.addEventListener("change", commitTime);
-    });
 
     syncTimeSelects();
 
@@ -1014,6 +1041,7 @@
       }
       validateStep();
       saveDraft();
+      scrollPanelIntoView();
       stepTransitioning = false;
     };
 
@@ -1021,8 +1049,8 @@
     window.setTimeout(reveal, 380);
   }
 
-  var WHATSAPP_NUMBER_DISPLAY = "+960 929 1605";
-  var WHATSAPP_NUMBER_RAW = "9609291605";
+  var WHATSAPP_NUMBER_DISPLAY = "+960 989 8130";
+  var WHATSAPP_NUMBER_RAW = "9609898130";
   var whatsappLink = document.getElementById("bk-whatsapp-link");
 
   /* Preload the black resort emblem as a data URL so it can be embedded in the
@@ -1114,14 +1142,14 @@
     }
 
     /* Top-right block: location, then contact number + email right below it.
-       SAMPLE VALUES — swap "+960 700 2020" and "stay@dhaankolhu.island" for
+       SAMPLE VALUES — swap "+960 989 8130" and "info@dhaankolhu.com" for
        the resort's real contact number and email once you have them. */
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor.apply(doc, MUTED);
     doc.text("Local island \u00B7 South Ari Atoll, Maldives", margin + contentW, y + 14, { align: "right" });
-    doc.text("+960 700 2020", margin + contentW, y + 28, { align: "right" });
-    doc.text("stay@dhaankolhu.island", margin + contentW, y + 42, { align: "right" });
+    doc.text("+960 989 8130", margin + contentW, y + 28, { align: "right" });
+    doc.text("info@dhaankolhu.com", margin + contentW, y + 42, { align: "right" });
 
     var headerBlockH = Math.max(logoSize, 42) + 18;
     y += headerBlockH;
@@ -1387,4 +1415,257 @@
     document.fonts.ready.then(recalibrateRailIndicator).catch(function () {});
   }
   window.setTimeout(recalibrateRailIndicator, 400);
+})();
+
+/* ==========================================================================
+   Room photo viewer — same "grow from the card" morph effect as index.html's
+   highlight-expand-overlay (a FLIP animation: the panel is set to the
+   clicked image's exact on-screen rect with no transition, then on the next
+   frame we change its rect to fill the screen while a transition is on, so
+   the browser animates the interpolation between the two — this is what
+   makes it look like the card itself is smoothly growing into the full
+   view, rather than a modal just fading/popping in). Reuses the very same
+   CSS classes as the index.html version (already defined in style.css), so
+   the visual result is identical; this module only drives book-now.html's
+   copy of that markup and adds angle (prev/next) browsing within one room's
+   3 photos instead of cycling between sibling cards.
+   ========================================================================== */
+(function () {
+  var wraps = Array.prototype.slice.call(document.querySelectorAll("[data-room-gallery]"));
+  var overlay = document.getElementById("room-expand-overlay");
+  if (!wraps.length || !overlay) return;
+
+  var backdrop = document.getElementById("room-expand-backdrop");
+  var panel = document.getElementById("room-expand-panel");
+  var panelImg = document.getElementById("room-expand-img");
+  var panelTitle = document.getElementById("room-expand-title");
+  var panelDesc = document.getElementById("room-expand-desc");
+  var panelTags = document.getElementById("room-expand-tags");
+  var panelThumbs = document.getElementById("room-expand-thumbs");
+  var closeBtn = document.getElementById("room-expand-close");
+  var prevBtn = document.getElementById("room-expand-prev");
+  var nextBtn = document.getElementById("room-expand-next");
+
+  var EXPAND_MS = 600;
+  var COLLAPSE_MS = 480;
+  var activeWrap = null;
+  var activeAngles = [];
+  var activeIndex = 0;
+  var isAnimating = false;
+
+  function setPanelRect(rect, radius) {
+    panel.style.top = rect.top + "px";
+    panel.style.left = rect.left + "px";
+    panel.style.width = rect.width + "px";
+    panel.style.height = rect.height + "px";
+    panel.style.borderRadius = radius;
+  }
+
+  function getExpandedRect() {
+    return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
+  }
+
+  function getAngles(wrap) {
+    var img = wrap.querySelector(".bk-room-photo");
+    return (img.getAttribute("data-angles") || img.src).split("|").filter(Boolean);
+  }
+
+  function getRoomMeta(wrap) {
+    var card = wrap.closest(".bk-room");
+    var titleEl = card ? card.querySelector("h3") : null;
+    var descEl = card ? card.querySelector(".bk-room-body p") : null;
+    return {
+      title: titleEl ? titleEl.textContent.trim() : "",
+      desc: descEl ? descEl.textContent.trim() : ""
+    };
+  }
+
+  function syncCardActiveAngle(wrap, index) {
+    var media = wrap.closest(".bk-room-media");
+    if (!media) return;
+    var mainImg = wrap.querySelector(".bk-room-photo");
+    var angles = getAngles(wrap);
+    var url = angles[index];
+    if (mainImg.getAttribute("src") !== url) {
+      mainImg.classList.add("is-swapping");
+      window.setTimeout(function () {
+        mainImg.src = url;
+        mainImg.classList.remove("is-swapping");
+      }, 180);
+    }
+    /* TEMP DEMO ONLY: the 3 angle slots currently point to the same photo
+       (placeholder until real distinct room photos are uploaded), so a
+       plain src-swap wouldn't visibly show anything changed. This shifts
+       the crop/zoom per angle purely so switching is visibly obvious in
+       the meantime — remove the data-demo-angle attribute (and its CSS in
+       book-now.css) once each angle has its own real photo. */
+    mainImg.setAttribute("data-demo-angle", index);
+    media.querySelectorAll(".bk-room-angle").forEach(function (btn, i) {
+      btn.classList.toggle("is-active", i === index);
+      btn.setAttribute("aria-pressed", i === index ? "true" : "false");
+    });
+  }
+
+  function renderPanel() {
+    panelImg.src = activeAngles[activeIndex];
+    panelImg.setAttribute("data-demo-angle", activeIndex); /* TEMP DEMO ONLY — see note in syncCardActiveAngle */
+    var meta = getRoomMeta(activeWrap);
+    panelTitle.textContent = meta.title;
+    panelTitle.style.display = meta.title ? "" : "none";
+    panelDesc.textContent = meta.desc;
+    panelDesc.style.display = meta.desc ? "" : "none";
+
+    /* thumbnail strip: one button per angle, active one highlighted,
+       clicking jumps straight to that angle (same crossfade as prev/next) */
+    panelThumbs.innerHTML = "";
+    if (activeAngles.length > 1) {
+      activeAngles.forEach(function (url, i) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "room-expand-thumb" + (i === activeIndex ? " is-active" : "");
+        btn.style.backgroundImage = "url('" + url + "')";
+        btn.setAttribute("aria-label", "Photo " + (i + 1) + " of " + activeAngles.length);
+        btn.setAttribute("aria-pressed", i === activeIndex ? "true" : "false");
+        btn.addEventListener("click", function (event) {
+          event.stopPropagation();
+          if (i !== activeIndex) showAngle(i, true);
+        });
+        panelThumbs.appendChild(btn);
+      });
+      panelThumbs.style.display = "";
+    } else {
+      panelThumbs.style.display = "none";
+    }
+  }
+
+  function showAngle(index, animate) {
+    activeIndex = (index + activeAngles.length) % activeAngles.length;
+    if (animate) {
+      panel.classList.add("is-swapping");
+      window.setTimeout(function () {
+        renderPanel();
+        panel.classList.remove("is-swapping");
+      }, 220);
+    } else {
+      renderPanel();
+    }
+    syncCardActiveAngle(activeWrap, activeIndex);
+  }
+
+  function openViewer(wrap, startIndex) {
+    if (isAnimating) return;
+    isAnimating = true;
+    activeWrap = wrap;
+    activeAngles = getAngles(wrap);
+    activeIndex = startIndex || 0;
+    syncCardActiveAngle(wrap, activeIndex);
+    renderPanel();
+
+    var startRect = wrap.getBoundingClientRect();
+    var startRadius = getComputedStyle(wrap).borderRadius || "0px";
+
+    overlay.classList.add("is-visible");
+    document.body.classList.add("highlight-expand-lock");
+
+    panel.style.transition = "none";
+    setPanelRect(startRect, startRadius);
+    panel.classList.add("is-active");
+    void panel.offsetWidth; /* force reflow so the next change animates */
+
+    requestAnimationFrame(function () {
+      panel.style.transition = "top " + EXPAND_MS + "ms cubic-bezier(.16,1,.3,1), left " + EXPAND_MS + "ms cubic-bezier(.16,1,.3,1), width " + EXPAND_MS + "ms cubic-bezier(.16,1,.3,1), height " + EXPAND_MS + "ms cubic-bezier(.16,1,.3,1), border-radius " + EXPAND_MS + "ms cubic-bezier(.16,1,.3,1)";
+      backdrop.classList.add("is-visible");
+      setPanelRect(getExpandedRect(), "0px");
+    });
+
+    window.setTimeout(function () {
+      panel.classList.add("show-content");
+      isAnimating = false;
+    }, EXPAND_MS);
+  }
+
+  function closeViewer() {
+    if (isAnimating || !activeWrap) return;
+    isAnimating = true;
+    panel.classList.remove("show-content");
+
+    var endRect = activeWrap.getBoundingClientRect();
+    var endRadius = getComputedStyle(activeWrap).borderRadius || "0px";
+
+    backdrop.classList.remove("is-visible");
+    panel.style.transition = "top " + COLLAPSE_MS + "ms cubic-bezier(.4,0,.2,1), left " + COLLAPSE_MS + "ms cubic-bezier(.4,0,.2,1), width " + COLLAPSE_MS + "ms cubic-bezier(.4,0,.2,1), height " + COLLAPSE_MS + "ms cubic-bezier(.4,0,.2,1), border-radius " + COLLAPSE_MS + "ms cubic-bezier(.4,0,.2,1)";
+    setPanelRect(endRect, endRadius);
+
+    window.setTimeout(function () {
+      panel.classList.remove("is-active");
+      overlay.classList.remove("is-visible");
+      document.body.classList.remove("highlight-expand-lock");
+      isAnimating = false;
+      activeWrap = null;
+    }, COLLAPSE_MS);
+  }
+
+  /* the main photo used to open the full viewer on click; now it's just
+     part of the card's visual surface, so clicking it (or Enter/Space
+     when focused) falls through to the existing room-selection handler
+     on .bk-room via normal bubbling — no listener needed here anymore. */
+
+  /* angle thumbnails: these just switch which photo the card's main image
+     shows (a quiet "select" action) — they no longer open the full-screen
+     viewer themselves. Only the big photo (data-room-gallery wrap) opens
+     that; clicking a thumbnail first picks the angle, then a click on the
+     now-bigger main photo opens the viewer landed on that same angle. */
+  document.querySelectorAll(".bk-room-media").forEach(function (media) {
+    var wrap = media.querySelector("[data-room-gallery]");
+    media.querySelectorAll(".bk-room-angle").forEach(function (btn, index) {
+      btn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        syncCardActiveAngle(wrap, index);
+      });
+      btn.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        btn.click();
+      });
+    });
+  });
+
+  closeBtn.addEventListener("click", closeViewer);
+  backdrop.addEventListener("click", closeViewer);
+  prevBtn.addEventListener("click", function () { showAngle(activeIndex - 1, true); });
+  nextBtn.addEventListener("click", function () { showAngle(activeIndex + 1, true); });
+  document.addEventListener("keydown", function (event) {
+    if (!panel.classList.contains("is-active")) return;
+    if (event.key === "Escape") closeViewer();
+    if (event.key === "ArrowRight") showAngle(activeIndex + 1, true);
+    if (event.key === "ArrowLeft") showAngle(activeIndex - 1, true);
+  });
+})();
+
+/* ==========================================================================
+   Header contact bubble toggle (mirrors the floating contact-bubbles open/
+   close behaviour from index.html/script.js — same interaction, just wired
+   to this page's inline header version instead of the fixed corner one).
+   ========================================================================== */
+(function () {
+  var wrap = document.getElementById("header-contact-bubbles");
+  var trigger = document.getElementById("header-contact-trigger");
+  if (!wrap || !trigger) return;
+
+  function setOpen(open) {
+    wrap.classList.toggle("is-open", open);
+    trigger.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  trigger.addEventListener("click", function () {
+    setOpen(!wrap.classList.contains("is-open"));
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!wrap.contains(event.target)) setOpen(false);
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") setOpen(false);
+  });
 })();

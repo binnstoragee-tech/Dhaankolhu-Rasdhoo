@@ -85,6 +85,16 @@ body {
 }
 /* JS adds this right before navigating to the next page */
 body.is-leaving { opacity: 0; pointer-events: none; }
+
+/* Quick, smooth fade-in for lazy-loaded images (see script.js) — hidden
+   until loaded, then a short 300ms fade rather than an abrupt pop. Kept
+   fast on purpose so scrolling through the gallery/cards still feels
+   snappy instead of laggy. */
+img[loading="lazy"], img.fade-load { opacity: 0; transition: opacity .3s ease; }
+img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  img[loading="lazy"], img.fade-load { opacity: 1; transition: none; }
+}
 .site-header {
   position: fixed;
   inset: 0 0 auto;
@@ -108,6 +118,13 @@ body.is-leaving { opacity: 0; pointer-events: none; }
    the snappy scroll-triggered hide above. */
 .site-header.is-drawer-hidden {
   transition: background-color .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out), box-shadow .35s var(--ease-out), min-height .35s var(--ease-out), padding-top .35s var(--ease-out), padding-bottom .35s var(--ease-out), transform 1.5s cubic-bezier(.65,0,.35,1), opacity 1.5s cubic-bezier(.65,0,.35,1);
+}
+/* Slow, deliberate "drawer sliding open" reveal for the navbar — used when
+   it reappears alongside the hero story's final full-bleed frame chapter,
+   instead of the snappy .5s scroll-triggered fade above. JS adds this class
+   right as it removes .is-story-hidden, then clears it once settled. */
+.site-header.is-frame-reveal {
+  transition: background-color .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out), box-shadow .35s var(--ease-out), min-height .35s var(--ease-out), padding-top .35s var(--ease-out), padding-bottom .35s var(--ease-out), transform 1.5s cubic-bezier(.16,1,.3,1), opacity 1.5s cubic-bezier(.16,1,.3,1);
 }
 /* hidden while the pinned hero story is playing through its scroll-linked
    chapters, so the welcome/about text can sit dead-center in the full
@@ -332,7 +349,7 @@ body.is-leaving { opacity: 0; pointer-events: none; }
   position: absolute; inset: 0; margin: 0; border-radius: 22px; overflow: hidden;
   box-shadow: 0 34px 70px rgba(10,22,24,.28);
   opacity: 0; transform: scale(0.88) translateY(26px);
-  transition: opacity .8s cubic-bezier(.22,.68,0,1) .1s, transform .8s cubic-bezier(.22,.68,0,1) .1s;
+  transition: opacity .8s cubic-bezier(.22,.68,0,1) .1s, transform .8s cubic-bezier(.22,.68,0,1) .1s, border-radius .9s cubic-bezier(.22,.68,0,1);
   will-change: opacity, transform, left, right, border-radius;
 }
 .collage-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -365,6 +382,29 @@ body.is-leaving { opacity: 0; pointer-events: none; }
 .story-panel-frame.is-active .collage-main { opacity: 1; transform: none; }
 .story-panel-frame.is-active .collage-accent { opacity: 1; transform: none; transition-delay: .15s; }
 .story-panel-frame.is-active .collage-badge { opacity: 1; transform: none; transition-delay: .38s; }
+/* Bonus "exit" beat once you keep scrolling past this last chapter: the
+   circle photo and the location badge slide clear across/off the screen
+   and fade as they go (badge just a beat behind, so it reads as following
+   the circle out), while the main rectangular photo — the only thing left
+   — smoothly loses its rounded corners as it zooms in to fill the whole
+   screen (the actual "zoom in and take over" scale-up lives on
+   .collage-main in the <style> block, since scaling just that photo —
+   not the shared .collage-tilt wrapper — keeps the circle/badge above
+   from being dragged along by the same zoom). */
+.story-panel-frame.is-frame-exiting .collage-accent {
+  opacity: 0;
+  transform: translateY(-130vh) scale(0.7);
+  transition: opacity 1.3s ease .5s, transform 2s cubic-bezier(.3,.7,.4,1);
+}
+.story-panel-frame.is-frame-exiting .collage-badge {
+  opacity: 0;
+  transform: translateY(-130vh) scale(0.85);
+  transition: opacity 1.3s ease .58s, transform 2s cubic-bezier(.3,.7,.4,1) .08s;
+}
+.story-panel-frame.is-frame-exiting .collage-main {
+  border-radius: 0;
+}
+
 @media (max-width: 640px) {
   .collage-tilt { width: 94%; aspect-ratio: 4 / 3; }
   .collage-accent { width: 48%; right: -7%; top: -16%; }
@@ -382,6 +422,7 @@ body.is-leaving { opacity: 0; pointer-events: none; }
 .gallery-heading h2 { max-width: 480px; margin: 1.1rem 0 1.5rem; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
 .gallery-heading .section-lede { max-width: 22rem; margin: 0; }
 .gallery-grid { display: grid; grid-template-columns: 1.1fr .8fr 1.1fr; grid-template-rows: 250px 250px 250px; gap: 1.1rem; }
+.highlights-gallery-grid { margin-top: clamp(2.5rem, 5vw, 3.8rem); }
 .gallery-item { position: relative; margin: 0; overflow: hidden; background: var(--secondary); }
 .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease-out), filter .6s ease; }
 .gallery-item:hover img { transform: scale(1.06); filter: saturate(1.08); }
@@ -426,9 +467,10 @@ body.is-leaving { opacity: 0; pointer-events: none; }
 .site-footer { padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 4vw, 4.75rem) 1.5rem; background: var(--ink); color: var(--ivory); }
 .footer-top { display: grid; grid-template-columns: 1fr 1.45fr; gap: 3rem; width: min(100%, 1280px); margin: 0 auto; padding-bottom: clamp(4rem, 8vw, 8rem); }
 .footer-brand { max-width: 340px; }
-.footer-mark { width: 192px; height: 192px; margin-bottom: 1.8rem; filter: brightness(0) invert(1); opacity: .9; }
+.footer-v2-brand-row { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.footer-mark { width: auto; height: 40px; margin-bottom: 0; filter: brightness(0) invert(1); opacity: .9; flex-shrink: 0; }
 @media (max-width: 640px) {
-  .footer-mark, .footer-mark-fallback { width: 144px; height: 144px; margin-bottom: 1.5rem; }
+  .footer-mark, .footer-mark-fallback { width: auto; height: 34px; margin-bottom: 0; }
   .footer-mark-fallback { font-size: 5.8rem; }
 }
 .footer-brand h2 { margin: 0; font-family: "Poppins", Arial, sans-serif; font-size: clamp(2.5rem, 4vw, 4.6rem); font-weight: 500; letter-spacing: -.06em; line-height: .86; }
@@ -492,8 +534,15 @@ body.is-leaving { opacity: 0; pointer-events: none; }
   .site-header { grid-template-columns: 1fr auto; }
   .desktop-nav, .header-cta { display: none; }
   .menu-trigger { display: grid; }
-  .mobile-menu { position: fixed; z-index: 45; display: block; top: 4.6rem; left: 1rem; right: 1rem; max-height: 0; overflow: hidden; visibility: hidden; border-radius: 18px; border: 1px solid rgba(255,255,255,.35); background: rgba(245,241,232,.55); color: var(--ink); box-shadow: 0 20px 45px rgba(23,35,42,.22); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); opacity: 0; transform: translateY(-14px); pointer-events: none; transition: max-height 1.5s var(--ease-out), opacity 1.5s var(--ease-out), transform 1.5s var(--ease-out), visibility 1.5s; }
-  .mobile-menu.is-open { visibility: visible; opacity: 1; transform: translateY(0); max-height: 28rem; pointer-events: auto; }
+  /* Was animated via `max-height` (0 -> 28rem) over 1.5s — max-height is a
+     layout property, so the browser had to recompute layout on nearly
+     every frame of that 1.5-second animation just to open a menu, which is
+     exactly what reads as "laggy". Switched to `transform: scaleY()`
+     (already used for this same menu on book-now.html) so the whole open/
+     close is handled by the compositor — no layout, no repaint — and cut
+     the duration down to something that actually feels instant. */
+  .mobile-menu { position: fixed; z-index: 45; display: block; top: 4.6rem; left: 1rem; right: 1rem; overflow: hidden; visibility: hidden; border-radius: 18px; border: 1px solid rgba(255,255,255,.35); background: rgba(245,241,232,.55); color: var(--ink); box-shadow: 0 20px 45px rgba(23,35,42,.22); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); opacity: 0; transform-origin: top center; transform: scaleY(0); pointer-events: none; will-change: transform, opacity; transition: transform .4s cubic-bezier(.65,0,.35,1), opacity .3s ease, visibility .4s; }
+  .mobile-menu.is-open { visibility: visible; opacity: 1; transform: scaleY(1); pointer-events: auto; }
   .mobile-menu-inner { display: block; min-height: 0; padding: 1.05rem 0; }
   .mobile-menu .eyebrow, .mobile-book { display: none; }
   .mobile-menu nav { display: flex; flex-direction: column; margin: 0; }
@@ -738,9 +787,9 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 /* New "Discover Dhaankolhu Rasdhoo Island in Motion" video showcase section, replacing the old film scroller. */
 .video-section { padding: clamp(6rem, 11vw, 10rem) 0 clamp(5rem, 10vw, 9rem); background: var(--ivory); }
 .video-section-inner { text-align: center; }
-.video-section-heading { max-width: 760px; margin: 0 auto clamp(2.2rem, 4.5vw, 3.2rem); }
+.video-section-heading { max-width: 760px; margin: 0 auto clamp(2.2rem, 4.5vw, 3.2rem); text-align: center; }
 .video-section-heading .eyebrow { display: block; margin-bottom: 1.1rem; color: var(--brass); }
-.video-section-heading h2 { color: var(--ink); font-size: clamp(1.4rem, 3.1vw, 2.7rem); white-space: nowrap; }
+.video-section-heading h2 { color: var(--ink); font-size: clamp(1.1rem, 2.2vw, 1.9rem); white-space: nowrap; }
 .video-section-heading h2 em { color: var(--ink); }
 .video-frame { position: relative; overflow: hidden; border-radius: 16px; aspect-ratio: 16 / 9; background: #1c1c1c; max-width: 860px; margin: 0 auto; }
 .video-frame img { width: 100%; height: 100%; object-fit: cover; opacity: .82; transition: transform .8s var(--ease-out), opacity .3s ease; }
@@ -822,6 +871,21 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 
 /* Image slideshow with badge, heading, copy, CTA, and dot navigation, replacing the static offer banner. */
 .slideshow-section { padding-bottom: clamp(3rem, 6vw, 6rem); }
+/* Location / map section — replaces the full-bleed banner that used to sit
+   below Island Activities. Heading matches the Experience section's centered,
+   single-line treatment; the map itself is edge-to-edge, no frame/border. */
+.location-section { padding-bottom: clamp(3rem, 6vw, 6rem); }
+.location-section .section-heading-row { padding-top: clamp(2rem, 4vw, 3rem); margin-bottom: clamp(1.6rem, 3vw, 2.6rem); text-align: center; }
+.location-section .eyebrow { color: var(--brass); margin-bottom: 1.1rem; }
+.location-section .display-heading { font-size: clamp(1.5rem, 2.6vw, 2.1rem); white-space: nowrap; }
+.location-section .section-lede { max-width: none; margin: 0 auto; }
+.location-frame { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+.location-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.location-cta-row { margin-top: clamp(1.8rem, 3.5vw, 2.6rem); text-align: center; }
+@media (max-width: 640px) {
+  .location-section .display-heading { white-space: normal; font-size: clamp(1.5rem, 7vw, 2.1rem); }
+  .location-frame { height: 100svh; }
+}
 /* heading row was removed from this section (no title/eyebrow above the
    slideshow anymore) — add back a bit of breathing room above it since it
    no longer inherits spacing from the heading row that used to precede it. */
@@ -871,6 +935,59 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 @media (max-width: 640px) {
   .site-header:not(.is-scrolled) { min-height: 70px; }
   .site-header.is-scrolled { min-height: 58px; }
+}
+
+/* ---------- hero "scroll down" cue: mirrors the contact bubble on the
+   opposite (left) side at the same bottom offset; only visible while the
+   pinned hero stepper (html.story-scroll-lock) still owns the scroll ---------- */
+.hero-scroll-cue {
+  position: fixed;
+  left: clamp(1.1rem, 3vw, 1.8rem);
+  bottom: clamp(1.1rem, 3vw, 1.8rem);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity .4s ease, transform .4s ease, visibility 0s linear .4s;
+  pointer-events: none;
+}
+html.story-scroll-lock .hero-scroll-cue {
+  opacity: .92;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity .4s ease .15s, transform .4s ease .15s, visibility 0s linear 0s;
+}
+.hero-scroll-cue-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.55);
+  flex-shrink: 0;
+  animation: heroScrollCueBounce 1.6s ease-in-out infinite;
+}
+.hero-scroll-cue-text {
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+@keyframes heroScrollCueBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-cue-icon { animation: none; }
+}
+@media (max-width: 640px) {
+  .hero-scroll-cue-text { display: none; }
 }
 
 /* ---------- floating contact bubbles (WhatsApp + Telegram, site-wide) ---------- */
@@ -1050,28 +1167,37 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 /* ---------- "View all" excursion gallery: full-screen grid of every photo,
    opened from the carousel's View all link; clicking a tile hands off to the
    same [data-expand] expand-lightbox used everywhere else on the site ---------- */
-.excursion-gallery-overlay { position: fixed; inset: 0; z-index: 190; display: none; overflow-y: auto; background: #fff; transform: translateX(-100%); transition: transform 2.5s ease; }
+.excursion-gallery-overlay { position: fixed; inset: 0; z-index: 190; display: none; overflow-y: auto; background: #fff; transform: translate3d(-100%,0,0); transition: transform .45s cubic-bezier(.4,0,.2,1); will-change: transform; backface-visibility: hidden; contain: layout style paint; }
 .excursion-gallery-overlay.is-visible { display: block; }
-.excursion-gallery-overlay.is-shown { transform: translateX(0); }
-.excursion-gallery-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 6vw; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(23,35,42,.08); }
+.excursion-gallery-overlay.is-shown { transform: translate3d(0,0,0); }
+/* backdrop-filter is expensive to recompute every frame while the panel is
+   sliding (it has to resample everything behind it), which is the main
+   source of the janky/laggy open animation on mid-range phones. Keep it off
+   while .is-shown is still being applied (mid-transition) and only switch
+   it on once .anim-settled lands ~1 frame after the transition finishes. */
+.excursion-gallery-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 6vw; background: #fff; border-bottom: 1px solid rgba(23,35,42,.08); }
+.excursion-gallery-overlay.anim-settled .excursion-gallery-header { background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .excursion-gallery-title { font-family: "Poppins", Arial, sans-serif; font-size: 1.4rem; font-weight: 600; color: var(--ink); }
 .excursion-gallery-close { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 999px; border: 1px solid rgba(23,35,42,.18); background: #fff; color: var(--ink); cursor: pointer; transition: background .2s ease, transform .2s ease; }
 .excursion-gallery-close:hover { background: rgba(23,35,42,.06); transform: rotate(90deg); }
 .excursion-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: clamp(1rem, 2.2vw, 1.6rem); max-width: 1400px; margin: 0 auto; padding: clamp(1.8rem, 4vw, 2.8rem) 6vw clamp(3rem, 6vw, 4.5rem); }
-.excursion-gallery-grid .excursion-card { width: 100%; }
+.excursion-gallery-grid .excursion-card { width: 100%; content-visibility: auto; contain-intrinsic-size: 240px 320px; }
 
 /* ---------- "All Photos" gallery overlay: same slide-in/out treatment as
    the excursions "All Experiences" overlay, opened from the "View all"
    link under the curated 6-photo mosaic ---------- */
-.gallery-full-overlay { position: fixed; inset: 0; z-index: 190; display: none; overflow-y: auto; background: #fff; transform: translateX(-100%); transition: transform 2.5s ease; }
+.gallery-full-overlay { position: fixed; inset: 0; z-index: 190; display: none; overflow-y: auto; background: #fff; transform: translate3d(-100%,0,0); transition: transform .45s cubic-bezier(.4,0,.2,1); will-change: transform; backface-visibility: hidden; contain: layout style paint; }
 .gallery-full-overlay.is-visible { display: block; }
-.gallery-full-overlay.is-shown { transform: translateX(0); }
-.gallery-full-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 6vw; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(23,35,42,.08); }
+.gallery-full-overlay.is-shown { transform: translate3d(0,0,0); }
+/* same backdrop-filter fix as the excursion overlay above: no blur while
+   the slide-in transition is actually running, only once settled */
+.gallery-full-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 6vw; background: #fff; border-bottom: 1px solid rgba(23,35,42,.08); }
+.gallery-full-overlay.anim-settled .gallery-full-header { background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .gallery-full-title { font-family: "Poppins", Arial, sans-serif; font-size: 1.4rem; font-weight: 600; color: var(--ink); }
 .gallery-full-close { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 999px; border: 1px solid rgba(23,35,42,.18); background: #fff; color: var(--ink); cursor: pointer; transition: background .2s ease, transform .2s ease; }
 .gallery-full-close:hover { background: rgba(23,35,42,.06); transform: rotate(90deg); }
 .gallery-full-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: clamp(1rem, 2.2vw, 1.6rem); max-width: 1400px; margin: 0 auto; padding: clamp(1.8rem, 4vw, 2.8rem) 6vw clamp(3rem, 6vw, 4.5rem); }
-.gallery-full-grid .gallery-item { aspect-ratio: 1 / 1; border-radius: 14px; }
+.gallery-full-grid .gallery-item { aspect-ratio: 1 / 1; border-radius: 14px; content-visibility: auto; contain-intrinsic-size: 220px 220px; }
 @media (max-width: 640px) {
   .gallery-full-header { padding: 1.1rem 1.25rem; }
   .gallery-full-title { font-size: 1.1rem; }
@@ -1321,18 +1447,18 @@ body.highlight-expand-lock { overflow: hidden; }
    pill above would disappear against it — switch the pill itself to a dark
    glass so it stays visible, keeping the same liquid-glass highlight treatment */
 .site-header.is-scrolled .header-cta {
-  background: linear-gradient(160deg, rgba(28,36,39,.78), rgba(7,15,17,.62) 55%, rgba(20,26,28,.72)) !important;
-  border: 1px solid rgba(255,255,255,.18) !important;
+  background: linear-gradient(160deg, #d4a86a, #ba8d5c 55%, #a67b4d) !important;
+  border: 1px solid rgba(255,255,255,.3) !important;
   box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.25),
-    inset 0 -10px 14px -8px rgba(255,255,255,.1),
-    0 8px 22px rgba(9,30,33,.28) !important;
+    inset 0 1px 1px rgba(255,255,255,.4),
+    inset 0 -10px 14px -8px rgba(255,255,255,.18),
+    0 8px 22px rgba(140,100,50,.3) !important;
   color: #fff !important;
-  text-shadow: none !important;
+  text-shadow: 0 1px 6px rgba(70,45,15,.3) !important;
 }
 .site-header.is-scrolled .header-cta::before { opacity: .35; }
 .site-header.is-scrolled .header-cta:hover {
-  background: linear-gradient(160deg, rgba(38,48,52,.85), rgba(7,15,17,.7) 55%, rgba(28,36,39,.8)) !important;
+  background: linear-gradient(160deg, #e0b87d, #c49a6a 55%, #ba8d5c) !important;
   color: #fff !important;
 }
 

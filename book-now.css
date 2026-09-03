@@ -95,29 +95,7 @@
 .bk-hero-content p { max-width: 34rem; margin: 0 auto; color: rgba(255,255,255,.8); font-size: clamp(0.83rem, 1.3vw, 0.95rem); line-height: 1.6; }
 
 /* ---------- flow section ---------- */
-.bk-flow-section { position: relative; padding: clamp(6.5rem, 11vw, 9rem) 0 clamp(5rem, 9vw, 8rem); }
-.bk-flow-section::before,
-.bk-flow-section::after {
-  content: ""; position: absolute; z-index: -1; border-radius: 50%; pointer-events: none;
-  filter: blur(70px); opacity: .5;
-}
-.bk-flow-section::before {
-  top: -4rem; left: -10rem; width: 26rem; height: 26rem;
-  background: radial-gradient(circle, var(--teal) 0%, transparent 70%);
-  animation: bk-blob-float 16s ease-in-out infinite;
-}
-.bk-flow-section::after {
-  bottom: -2rem; right: -10rem; width: 30rem; height: 30rem;
-  background: radial-gradient(circle, var(--brass) 0%, transparent 70%);
-  animation: bk-blob-float 20s ease-in-out infinite reverse;
-}
-@keyframes bk-blob-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(30px, -22px) scale(1.1); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .bk-flow-section::before, .bk-flow-section::after { animation: none; }
-}
+.bk-flow-section { position: relative; z-index: 2; padding: clamp(6.5rem, 11vw, 9rem) 0 clamp(5rem, 9vw, 8rem); }
 .bk-rail-outer { display: flex; justify-content: center; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
 .bk-rail {
   position: relative; display: flex; align-items: center; gap: .2rem;
@@ -161,6 +139,13 @@
 
 .bk-grid { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 44rem; margin: 0 auto; align-items: start; }
 .bk-ticket-wrap { display: none !important; }
+/* "Choose your stay" needs more breathing room than the other steps —
+   the room photos were getting cramped/small inside the same 44rem column
+   every other step uses, so widen just this one step's container while
+   it's the active step (falls back gracefully to the normal 44rem in any
+   browser without :has() support, which is fine on the older/narrower
+   viewports where that support gap actually matters). */
+.bk-grid:has(.bk-step[data-step="2"].is-current) { max-width: 68rem; }
 
 /* ---------- form panel ---------- */
 .bk-panel {
@@ -296,30 +281,6 @@
 }
 @keyframes bk-day-pop { from { transform: scale(.55); } to { transform: scale(1); } }
 
-.bk-cal-time-row {
-  display: flex; align-items: center; justify-content: space-between; gap: .6rem;
-  margin-top: .9rem; padding-top: .8rem; border-top: 1px solid rgba(23,35,42,.1);
-}
-.bk-cal-time-label {
-  display: flex; align-items: center; gap: .4rem; font-size: 0.7rem; font-weight: 700;
-  color: var(--ink); letter-spacing: -.01em;
-}
-.bk-cal-time-label svg { width: 15px; height: 15px; color: var(--teal); }
-.bk-cal-time-controls { display: flex; align-items: center; gap: .3rem; }
-.bk-cal-hour-select,
-.bk-cal-minute-select,
-.bk-cal-period-select {
-  appearance: none; -webkit-appearance: none; border: 1px solid rgba(23,35,42,.16); background: #fff;
-  color: var(--ink); font-family: "DM Sans", sans-serif; font-size: 0.72rem; font-weight: 500;
-  border-radius: 7px; padding: .3rem .2rem; cursor: pointer; transition: border-color .18s ease;
-  text-align: center; width: 2.1rem;
-}
-.bk-cal-hour-select:hover,
-.bk-cal-minute-select:hover,
-.bk-cal-period-select:hover { border-color: var(--teal); }
-.bk-cal-period-select { width: 2.6rem; margin-left: .1rem; font-weight: 600; letter-spacing: .02em; }
-.bk-cal-time-colon { font-weight: 700; color: var(--muted-foreground); font-size: 0.72rem; }
-
 @media (prefers-reduced-motion: reduce) {
   .bk-date-panel { transition: opacity .01s linear, visibility 0s linear; }
   .bk-cal-day.is-selected, .bk-cal-day.is-range-start, .bk-cal-day.is-range-end { animation: none; }
@@ -327,7 +288,6 @@
 
 @media (max-width: 720px) {
   .bk-date-panel { width: 100%; max-width: none; left: 0; right: 0; }
-  .bk-cal-time-row { flex-wrap: wrap; }
 }
 
 .bk-stepper { display: inline-flex; align-items: center; gap: .4rem; min-height: 46px; padding: 0 .4rem; border: 1px solid rgba(23,35,42,.18); border-radius: 10px; width: fit-content; }
@@ -340,7 +300,29 @@
 .bk-room { position: relative; display: flex; flex-direction: column; border: 1.5px solid rgba(255,255,255,.5); border-radius: 16px; overflow: hidden; cursor: pointer; background: rgba(255,255,255,.45); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%); transition: border-color .25s ease, transform .25s var(--ease-out), box-shadow .25s ease; }
 .bk-room:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(17,30,34,.1); }
 .bk-room.is-selected { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(11,110,112,.14); }
-.bk-room-img { aspect-ratio: 4/3; background-size: cover; background-position: center; }
+.bk-room-media { position: relative; }
+.bk-room-img-wrap { position: relative; aspect-ratio: 16/9; overflow: hidden; cursor: pointer; }
+.bk-room-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .38s ease, transform .7s var(--ease-out), object-position .7s var(--ease-out); }
+/* TEMP DEMO ONLY — the 3 angle thumbnails currently reuse the same photo
+   as a placeholder, so switching angles wouldn't visibly do anything.
+   This fakes a different crop/zoom per angle just so the "click a
+   thumbnail → main photo changes" behaviour is visible in the meantime.
+   Delete this block (and the data-demo-angle attribute set in
+   book-now.js) once each angle has its own real uploaded photo. */
+.bk-room-photo[data-demo-angle="1"] { object-position: 78% 35%; transform: scale(1.22); }
+.bk-room-photo[data-demo-angle="2"] { object-position: 25% 70%; transform: scale(1.35); }
+#room-expand-img[data-demo-angle="1"] { object-position: 78% 35%; transform: scale(1.22); }
+#room-expand-img[data-demo-angle="2"] { object-position: 25% 70%; transform: scale(1.35); }
+.bk-room-img-wrap:hover .bk-room-photo { transform: scale(1.045); }
+.bk-room-photo.is-swapping { opacity: 0; }
+.bk-room-angles { position: absolute; top: 50%; right: .55rem; transform: translateY(-50%); display: flex; flex-direction: column; gap: .4rem; z-index: 2; }
+.bk-room-angle { width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,.7); background-size: cover; background-position: center; box-shadow: 0 4px 12px rgba(9,30,33,.28); cursor: pointer; padding: 0; opacity: .68; transition: opacity .2s ease, transform .2s var(--ease-out), border-color .2s ease; }
+.bk-room-angle:hover { opacity: .92; transform: translateX(-2px); }
+.bk-room-angle.is-active { opacity: 1; border-color: #fff; box-shadow: 0 0 0 2px var(--teal), 0 4px 12px rgba(9,30,33,.32); }
+@media (min-width: 900px) {
+  .bk-room-grid { gap: 1.6rem; }
+  .bk-room-img-wrap { aspect-ratio: 3/2; }
+}
 .bk-room-body { padding: 1rem 1.1rem 1.2rem; }
 .bk-room-body h3 { margin: 0 0 .3rem; font-size: 0.95rem; font-weight: 700; letter-spacing: -.02em; color: var(--ink); }
 .bk-room-body p { margin: 0 0 .7rem; color: var(--muted-foreground); font-size: 0.7rem; line-height: 1.5; }
@@ -538,6 +520,8 @@
 }
 @media (max-width: 720px) {
   .bk-room-grid { grid-template-columns: 1fr; }
+  .bk-room-angle { width: 26px; height: 26px; border-radius: 7px; }
+  .bk-room-angles { right: .4rem; gap: .32rem; }
   .bk-field-row { grid-template-columns: 1fr; }
   .bk-rail-outer { justify-content: flex-start; }
   .bk-rail { justify-content: flex-start; }
@@ -609,4 +593,120 @@
   .bk-panel { background: var(--paper); }
   .bk-ticket { background: var(--paper); }
   .bk-room { background: #fff; }
+}
+
+/* ==========================================================================
+   Room photo viewer layout — this only targets .room-gallery-panel (a
+   modifier class added just to the room viewer's own panel element), so it
+   layers on top of the shared .highlight-expand-* rules from style.css
+   without touching the index.html highlight/excursion/gallery viewers at
+   all. Repositions the prev/next arrows to sit centered on the left/right
+   edges of the photo (classic product-gallery style) and adds a row of
+   real clickable thumbnails under the title/description, instead of the
+   bottom-right icon pair + text-only "photo x of y" tag used elsewhere.
+   ========================================================================== */
+.room-gallery-panel .highlight-expand-nav {
+  left: 0;
+  right: 0;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  justify-content: space-between;
+  padding: 0 clamp(.7rem, 3vw, 2rem);
+  gap: 0;
+}
+.room-gallery-panel .highlight-expand-nav-btn {
+  background: var(--teal);
+  border-color: rgba(255,255,255,.55);
+  box-shadow: 0 10px 26px rgba(7,22,25,.35);
+}
+.room-gallery-panel .highlight-expand-nav-btn:hover { background: var(--teal-deep); transform: scale(1.06); }
+.room-gallery-panel .highlight-expand-nav-btn:active { transform: scale(.92); }
+
+.room-expand-thumbs { display: flex; gap: .55rem; flex-wrap: wrap; margin-top: .95rem; }
+.room-expand-thumb {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,.4);
+  background-size: cover;
+  background-position: center;
+  padding: 0;
+  cursor: pointer;
+  opacity: .68;
+  transition: opacity .2s ease, border-color .2s ease, transform .2s var(--ease-out);
+}
+.room-expand-thumb:hover { opacity: .9; transform: translateY(-2px); }
+.room-expand-thumb.is-active { opacity: 1; border-color: #fff; box-shadow: 0 0 0 2px var(--teal); }
+
+@media (max-width: 640px) {
+  .room-gallery-panel .highlight-expand-nav-btn { width: 38px; height: 38px; }
+  .room-gallery-panel .highlight-expand-nav { padding: 0 .5rem; }
+  .room-expand-thumb { width: 46px; height: 46px; border-radius: 8px; }
+  .room-expand-thumbs { gap: .4rem; margin-top: .8rem; }
+}
+
+/* ==========================================================================
+   Header contact bubble — replaces the "Book now" header CTA on this page
+   only (redundant once you're already on the booking page). Reuses the
+   exact .wa-bubble / .wa-bubble-btn / .wa-bubble-tooltip / .telegram-bubble
+   styling already defined in style.css for the floating index.html widget,
+   so the chat option buttons look identical; only the wrapper/trigger here
+   are new, since this version sits inline in the header and drops its menu
+   downward instead of floating fixed in the corner of the screen.
+   ========================================================================== */
+.header-contact-bubbles { position: relative; justify-self: end; display: inline-flex; align-items: center; }
+
+.header-contact-options {
+  position: absolute;
+  top: calc(100% + .8rem);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .6rem;
+}
+.header-contact-options .wa-bubble {
+  opacity: 0;
+  transform: translateY(-12px) scale(.85);
+  pointer-events: none;
+  transition: opacity .3s var(--ease-out), transform .3s var(--ease-out);
+}
+.header-contact-bubbles.is-open .header-contact-options .wa-bubble {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.header-contact-options .wa-bubble:nth-child(1) { transition-delay: 0s; }
+.header-contact-options .wa-bubble:nth-child(2) { transition-delay: .06s; }
+.header-contact-options .wa-bubble-btn { width: 46px; height: 46px; }
+.header-contact-options .wa-bubble-tooltip { font-size: .7rem; padding: .45rem .8rem; }
+
+.header-contact-trigger {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(155deg, var(--teal), var(--teal-deep));
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(11,110,112,.35), inset 0 1px 0 rgba(255,255,255,.25);
+  cursor: pointer;
+  transition: transform .2s var(--ease-out), box-shadow .2s ease;
+}
+.header-contact-trigger:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 14px 28px rgba(11,110,112,.42), inset 0 1px 0 rgba(255,255,255,.25); }
+.header-contact-trigger-icon { position: absolute; display: grid; place-items: center; transition: opacity .2s ease, transform .25s var(--ease-out); }
+.header-contact-trigger-icon-close { opacity: 0; transform: scale(.5) rotate(-45deg); }
+.header-contact-bubbles.is-open .header-contact-trigger-icon-open { opacity: 0; transform: scale(.5) rotate(45deg); }
+.header-contact-bubbles.is-open .header-contact-trigger-icon-close { opacity: 1; transform: scale(1) rotate(0deg); }
+
+@media (max-width: 900px) {
+  /* mirrors how .desktop-nav / .header-cta hide at this breakpoint on
+     every other page — the mobile menu keeps its own "Book now" button,
+     untouched, so this only affects the desktop header row */
+  .header-contact-bubbles { display: none; }
 }

@@ -43,6 +43,32 @@
     document.body.classList.remove("is-leaving");
   });
 
+  /* ==========================================================================
+     Smooth-but-quick fade-in for lazy-loaded images (gallery, highlights,
+     experience cards, room thumbnails, etc.) — otherwise they just abruptly
+     "pop" into place mid-scroll once the browser decides to load them. Kept
+     short (300ms) on purpose so it still reads as fast, not a loading delay.
+     Images already cached (img.complete on first check) skip the fade
+     entirely and just show immediately, no need to animate what's instant. */
+  (function () {
+    function initLazyFade() {
+      var lazyImgs = Array.prototype.slice.call(document.querySelectorAll('img[loading="lazy"], img.fade-load'));
+      lazyImgs.forEach(function (img) {
+        if (img.complete && img.naturalWidth > 0) {
+          img.classList.add("is-loaded");
+          return;
+        }
+        img.addEventListener("load", function () { img.classList.add("is-loaded"); }, { once: true });
+        img.addEventListener("error", function () { img.classList.add("is-loaded"); }, { once: true });
+      });
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initLazyFade);
+    } else {
+      initLazyFade();
+    }
+  })();
+
   var header = document.getElementById("site-header");
   var menu = document.getElementById("mobile-menu");
   var menuTrigger = document.getElementById("menu-trigger");
@@ -203,8 +229,53 @@
     var storyCollageBadge = heroSection.querySelector(".story-panel-frame .collage-badge");
     var prefersReducedMotionHero = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (storyScrollEl && storyPanels.length && !prefersReducedMotionHero) {
-      var STEP_MS = 700; /* must stay in sync with the .story-panel transition duration in the <style> block */
+    /* ---------- fanned Highlights card stack, right side of the settled
+       final chapter — auto-cycles like a slideshow, and whichever card
+       lands in front each tick also becomes the new full-bleed backdrop
+       photo (see the matching CSS for the fan's rotation/offset per
+       data-pos, and .frame-card-stack visibility). ---------- */
+    var frameCardStackEl = heroSection.querySelector(".frame-card-stack");
+    var frameCards = frameCardStackEl ? Array.prototype.slice.call(frameCardStackEl.querySelectorAll(".frame-card")) : [];
+    var frameCardOrder = frameCards.map(function (_, i) { return i; }); /* order[0] = whichever card index is currently front */
+    var frameCardTimer = null;
+    var FRAME_CARD_MS = 3200;
+
+    function renderFrameCardPositions() {
+      frameCardOrder.forEach(function (cardIndex, pos) {
+        frameCards[cardIndex].setAttribute("data-pos", String(pos));
+      });
+    }
+
+    function advanceFrameCards() {
+      frameCardOrder.push(frameCardOrder.shift()); /* front card cycles to the back of the fan */
+      renderFrameCardPositions();
+      var frontImg = frameCards[frameCardOrder[0]].querySelector("img");
+      var backdropImg = storyCollageMain ? storyCollageMain.querySelector("img") : null;
+      if (!backdropImg || !frontImg || backdropImg.src === frontImg.src) return;
+      backdropImg.style.transition = "opacity .5s ease";
+      backdropImg.style.opacity = "0";
+      window.setTimeout(function () {
+        backdropImg.src = frontImg.src;
+        backdropImg.style.opacity = "1";
+      }, 500);
+    }
+
+    function startFrameCardStack() {
+      /* auto-cycling removed on request — the fan now stays put as a clean,
+         static stack instead of looping through photos like a slideshow. */
+      return;
+    }
+    function stopFrameCardStack() {
+      if (frameCardTimer) { window.clearInterval(frameCardTimer); frameCardTimer = null; }
+    }
+    renderFrameCardPositions();
+
+    if (storyScrollEl && storyPanels.length) {
+      /* Reduced motion still gets the same full-screen pinned stepper as
+         everyone else (see the matching CSS media query) — chapters just
+         swap instantly (0ms) instead of animating, so we don't wait around
+         for a crossfade duration that no longer plays. */
+      var STEP_MS = prefersReducedMotionHero ? 0 : 700; /* must stay in sync with the .story-panel transition duration in the <style> block */
       var currentStep = 0;
       var lastStep = storyPanels.length - 1;
       var transitioning = false;
@@ -243,9 +314,16 @@
 
       function setBackdropForStep(step) {
         if (heroBackdropWrap && storyScrollEl.classList.contains("is-intro-done")) {
+          /* clear any inline transition left over from the "walking into the
+             hallway" exit beat below, so ordinary per-chapter steps always
+             animate on the normal, quicker 1.1s CSS transition */
+          heroBackdropWrap.style.transition = "";
           heroBackdropWrap.style.transform = "scale(" + (1 + step * 0.13).toFixed(3) + ")";
         }
-        if (storyShade) storyShade.style.opacity = String(Math.max(0.4, 1 - step * 0.3));
+        if (storyShade) {
+          storyShade.style.transition = "";
+          storyShade.style.opacity = String(Math.max(0.4, 1 - step * 0.3));
+        }
       }
 
       function goToStep(nextStep) {
@@ -280,24 +358,106 @@
         if (header) header.classList.remove("is-story-hidden");
       }
 
-      function resetToStart() {
-        if (currentStep === 0) return;
-        storyPanels.forEach(function (panel, i) {
-          panel.classList.remove("is-active", "is-exited");
-          if (i === 0) panel.classList.add("is-active");
-        });
-        currentStep = 0;
-        setBackdropForStep(0);
+      /* Bonus beat once you keep scrolling past the last chapter (the photo
+         frame): instead of handing off to normal scrolling immediately, play
+         one more "exit" animation first — circle + badge slide up and fade
+         out, the frame photo grows to fill the whole screen (see the
+         .is-frame-exiting CSS rules) — then release the lock once it's
+         finished. Only plays once per visit to this chapter; scrolling back
+         up and re-triggering the stepper (resetToEnd) resets it so it can
+         play again next time through. */
+      var frameExited = false;
+      var EXIT_ANIM_MS = prefersReducedMotionHero ? 0 : 2500; /* the hallway push-in itself: 2.5s, slow and deliberate (instant for reduced motion) */
+      /* Where the hallway doorway actually sits within home web.jpeg (roughly
+         center, a touch right and above vertical middle) — zooming from this
+         point instead of the default dead-center origin makes the push read
+         as walking toward that specific doorway rather than a generic
+         zoom-into-the-middle-of-the-screen. Only applied for this exit beat;
+         every other chapter keeps the normal centered zoom. */
+      var HALLWAY_FOCAL_POINT = "54% 33%";
+      var experienceSection = document.getElementById("experience");
+
+      function playFrameExitThenRelease() {
+        if (frameExited) { releaseLock(); return; }
+        frameExited = true;
+        transitioning = true;
+        storyPanels[lastStep].classList.add("is-frame-exiting");
+
+        /* Bring the navbar back in step with this final chapter's
+           badge/heading/copy/CTA reveal (rather than waiting for the whole
+           2.5s hallway push-in to finish) — a slow 2s "drawer" slide/fade,
+           synced to feel like part of the same reveal beat. */
+        if (header) {
+          header.classList.add("is-frame-reveal");
+          header.classList.remove("is-story-hidden");
+          window.setTimeout(function () {
+            header.classList.remove("is-frame-reveal");
+          }, 2000);
+        }
+
+        /* Same beat, but on the persistent hallway backdrop photo itself:
+           push the camera dramatically forward — as if walking through the
+           doorway — while the dark shade lifts so the warm light at the end
+           of the hallway brightens through. Slow, 2.5s push-in (set inline
+           so it isn't tied to the quicker per-chapter step zoom above). */
+        if (heroBackdropWrap) {
+          heroBackdropWrap.style.transformOrigin = HALLWAY_FOCAL_POINT;
+          heroBackdropWrap.style.transition = "transform " + EXIT_ANIM_MS + "ms cubic-bezier(.22, .68, 0, 1)";
+          heroBackdropWrap.style.transform = "scale(3.6)";
+        }
+        if (storyShade) {
+          storyShade.style.transition = "opacity " + EXIT_ANIM_MS + "ms ease";
+          storyShade.style.opacity = "0.05";
+        }
+
+        /* Let the full 2.5s push-in play out completely — THEN, once it's
+           done, snap straight to the Experience section in one sudden cut
+           (no smooth glide) so it reads as "walked into the hallway... and
+           suddenly you're at the activities" rather than a slow scroll. */
+        window.setTimeout(function () {
+          transitioning = false;
+          releaseLock();
+          startFrameCardStack();
+        }, EXIT_ANIM_MS);
       }
 
-      var justReengaged = false; /* true for the single event that re-locks, so it isn't ALSO treated as a step command (which would immediately release the lock again since we just reset to step 0) */
+      /* Re-engaging from a scroll-up should resume right where the user left
+         off (the last chapter), with every earlier chapter marked "exited"
+         underneath it — mirroring the state goToStep() would have left them
+         in. That way the very next scroll-up tick steps backward one chapter
+         at a time (bringing back what "disappeared") instead of snapping
+         straight past all of them to the first "Welcome" chapter. */
+      function resetToEnd() {
+        storyPanels.forEach(function (panel, i) {
+          panel.classList.remove("is-active", "is-exited", "is-frame-exiting");
+          panel.classList.add(i === lastStep ? "is-active" : "is-exited");
+        });
+        currentStep = lastStep;
+        frameExited = false;
+        stopFrameCardStack();
+        /* the card stack may have swapped this to a Highlights photo while
+           cycling — put the original shoreline shot back now that the
+           small collage box (not the full-bleed backdrop) is what's about
+           to reappear */
+        if (storyCollageMain) {
+          var backdropImgReset = storyCollageMain.querySelector("img");
+          if (backdropImgReset) { backdropImgReset.style.opacity = ""; backdropImgReset.src = "img/home/1.jpg"; }
+        }
+        frameCardOrder = frameCards.map(function (_, i) { return i; });
+        renderFrameCardPositions();
+        if (heroBackdropWrap) { heroBackdropWrap.style.transition = ""; heroBackdropWrap.style.transformOrigin = ""; }
+        if (storyShade) storyShade.style.transition = "";
+        setBackdropForStep(lastStep);
+      }
+
+      var justReengaged = false; /* true for the single event that re-locks, so it isn't ALSO treated as a step command (which would immediately step backward again since we just resumed on the last chapter) */
 
       function tryReengageLock(deltaY) {
         if (!locked && window.scrollY <= 4 && deltaY < 0) {
           locked = true;
           heroStoryPinnedActive = true;
           setLockClasses(true);
-          resetToStart(); /* replay the story from "Welcome" instead of resuming on the last chapter */
+          resetToEnd(); /* resume on the last chapter so scrolling up reveals the chapters in reverse, instead of jumping straight back to "Welcome" */
           setHeaderForStep(currentStep);
           justReengaged = true;
         }
@@ -313,7 +473,8 @@
             event.preventDefault();
             goToStep(currentStep + 1);
           } else {
-            releaseLock(); /* let this event (and the next ones) scroll the page normally */
+            event.preventDefault(); /* hold the lock through the exit-grow animation instead of scrolling away immediately */
+            playFrameExitThenRelease();
           }
         } else if (event.deltaY < 0) {
           if (currentStep > 0) {
@@ -346,7 +507,8 @@
             goToStep(currentStep + 1);
             touchStartY = event.touches[0].clientY;
           } else {
-            releaseLock();
+            event.preventDefault(); /* hold the lock through the exit-grow animation instead of scrolling away immediately */
+            playFrameExitThenRelease();
             touchActive = false;
           }
         } else {
@@ -379,7 +541,7 @@
         if (transitioning) return;
         if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " ") {
           if (currentStep < lastStep) { event.preventDefault(); goToStep(currentStep + 1); }
-          else releaseLock();
+          else { event.preventDefault(); playFrameExitThenRelease(); }
         } else if (event.key === "ArrowUp" || event.key === "PageUp") {
           if (currentStep > 0) { event.preventDefault(); goToStep(currentStep - 1); }
           else event.preventDefault(); /* already at the first chapter — nothing above it, so just stay put instead of releasing the lock */
@@ -414,6 +576,29 @@
           }
           window.setTimeout(function () { goToStep(1); }, 30);
         });
+      });
+
+      /* DEV/TESTING SHORTCUT — the hallway push-in beat is buried behind 3
+         chapters of stepping, which makes it slow to re-test every time you
+         tweak the zoom scale/focal point/timing. Skip straight to it: add
+         ?zoomtest to the URL, or press "Z" anywhere on the page, and it
+         jumps to the last chapter and immediately plays the push-in + jump
+         to Experience — no need to scroll through Welcome/About first.
+         Safe to leave in; it only fires on that explicit trigger. */
+      function jumpToHallwayZoomTest() {
+        window.scrollTo(0, 0);
+        locked = true;
+        heroStoryPinnedActive = true;
+        setLockClasses(true);
+        resetToEnd();
+        setHeaderForStep(currentStep);
+        window.setTimeout(function () { playFrameExitThenRelease(); }, 350);
+      }
+      if (window.location.search.indexOf("zoomtest") !== -1) {
+        window.setTimeout(jumpToHallwayZoomTest, 500);
+      }
+      window.addEventListener("keydown", function (event) {
+        if (event.key === "z" || event.key === "Z") jumpToHallwayZoomTest();
       });
     } else if (storyScrollEl && prefersReducedMotionHero) {
       /* reduced motion: CSS already lays every chapter out statically, one
@@ -470,6 +655,17 @@
     });
 
     startAutoplay();
+
+    /* pause the autoplay timer while the tab is backgrounded instead of
+       silently racking up missed intervals that would otherwise all fire
+       in a burst the moment the tab becomes visible again */
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
+    });
   }
 
   var islandVideo = document.getElementById("island-video");
@@ -559,6 +755,13 @@
 
   if (collageStage && collageMain && collageAccent && collageBadge && !prefersReducedMotion) {
     var collageScrollTicking = false;
+    /* This math (getBoundingClientRect + several style writes) used to run
+       on every scroll event for the entire site, even when this section
+       was nowhere near the viewport — wasted work on every scroll,
+       everywhere on the page. Gate it behind an IntersectionObserver with
+       generous margins so it only runs while the section is actually
+       approaching or on screen. */
+    var collageNearViewport = false;
 
     function updateCollageParallax() {
       try {
@@ -616,13 +819,29 @@
     }
 
     updateCollageParallax();
+
+    if ("IntersectionObserver" in window) {
+      var collageVisibilityObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          collageNearViewport = entry.isIntersecting;
+          if (collageNearViewport) updateCollageParallax();
+        });
+      }, { rootMargin: "50% 0px 50% 0px" });
+      collageVisibilityObserver.observe(collageStage);
+    } else {
+      collageNearViewport = true; /* very old browsers: fall back to always-on, as before */
+    }
+
     window.addEventListener("scroll", function () {
+      if (!collageNearViewport) return;
       if (!collageScrollTicking) {
         window.requestAnimationFrame(updateCollageParallax);
         collageScrollTicking = true;
       }
     }, { passive: true });
-    window.addEventListener("resize", updateCollageParallax, { passive: true });
+    window.addEventListener("resize", function () {
+      if (collageNearViewport) updateCollageParallax();
+    }, { passive: true });
   } else if (collageMain && collageAccent && collageBadge) {
     /* reduced motion: show the final composed state immediately, no animation */
     collageMain.style.opacity = collageAccent.style.opacity = collageBadge.style.opacity = "1";
@@ -678,14 +897,46 @@
     resumeTimer = setTimeout(function () { autoplayPaused = false; }, RESUME_DELAY);
   }
 
+  /* Was previously an unconditional requestAnimationFrame loop that ran
+     forever, once per frame, for the entire life of the page — even while
+     this carousel was scrolled far out of view or the browser tab was in
+     the background. That's constant work competing with every other
+     animation on the page (a big part of the site feeling laggy overall).
+     Now it only keeps ticking while the carousel is actually on screen
+     AND the tab is visible; it goes fully idle otherwise. */
+  var isInViewport = false;
+  var rafId = null;
+
   function tick() {
     if (!isDragging && !autoplayPaused) {
       pos -= speed();
       wrap();
       applyTransform();
     }
-    window.requestAnimationFrame(tick);
+    rafId = isInViewport && !document.hidden ? window.requestAnimationFrame(tick) : null;
   }
+
+  function startTickIfNeeded() {
+    if (rafId === null && isInViewport && !document.hidden) {
+      rafId = window.requestAnimationFrame(tick);
+    }
+  }
+
+  if ("IntersectionObserver" in window) {
+    var loopVisibilityObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        isInViewport = entry.isIntersecting;
+        if (isInViewport) startTickIfNeeded();
+      });
+    }, { threshold: 0 });
+    loopVisibilityObserver.observe(loop);
+  } else {
+    isInViewport = true; /* very old browsers: fall back to always-on, as before */
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) startTickIfNeeded();
+  });
 
   function onPointerDown(event) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -784,7 +1035,7 @@
     }
   }, true);
 
-  window.requestAnimationFrame(tick);
+  startTickIfNeeded();
 })();
 
 /* NOTE: card-detail opening (excursion cards, highlight cards, gallery
