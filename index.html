@@ -7,26 +7,26 @@
 <title>We'll be right back — Dhaankolhu Rasdhoo Island</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --teal: #0b6e70;
-    --teal-deep: #123d40;
-    --brass: #ba8d5c;
-    --ivory: #f5f1e8;
-    --ink: #17232a;
+    --ivory: #f6f1e7;
+    --mist: #cfd8dc;
+    --brass: #c9a063;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: "DM Sans", sans-serif;
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
     color: var(--ivory);
   }
   body {
+    min-height: 100vh;
     background-image:
-      linear-gradient(180deg, rgba(9, 21, 27, 0.72) 0%, rgba(9, 21, 27, 0.85) 100%),
+      linear-gradient(180deg, rgba(20,30,38,0.55) 0%, rgba(15,23,29,0.65) 100%),
       url("img/home%20web.jpeg");
     background-size: cover;
     background-position: center;
@@ -36,146 +36,178 @@
   @media (max-width: 768px) {
     body {
       background-image:
-        linear-gradient(180deg, rgba(9, 21, 27, 0.72) 0%, rgba(9, 21, 27, 0.85) 100%),
+        linear-gradient(180deg, rgba(20,30,38,0.55) 0%, rgba(15,23,29,0.68) 100%),
         url("img/home%20mobile.jpeg");
       background-attachment: scroll;
     }
   }
+
   .wrap {
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 2vh 6vw 2vh;
+    padding: 1vh 6vw 1.5vh;
   }
-  .content {
+
+  .core {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding-bottom: 3vh;
+    justify-content: flex-start;
+    padding-top: clamp(1.5vh, 6vh, 8vh);
+    width: 100%;
   }
-  .logo {
-    height: clamp(90px, 18vh, 220px);
+
+  .mark img {
+    height: clamp(140px, 28vh, 600px);
     width: auto;
-    margin-bottom: -2rem;
+    margin-bottom: clamp(0.8rem, 2.5vh, 2rem);
     opacity: 0.95;
   }
-  .badge {
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.68rem;
-    color: var(--brass);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
+
   h1 {
     font-family: "Poppins", sans-serif;
-    font-weight: 600;
-    font-size: clamp(1.3rem, 3vw, 2rem);
-    margin: 0 0 0.6rem;
-    letter-spacing: -0.01em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: clamp(1.4rem, 4.2vw, 3rem);
+    line-height: 1.15;
+    margin: 0 0 clamp(0.5rem, 1.6vh, 1.2rem);
+    color: var(--ivory);
   }
-  p {
-    max-width: 620px;
-    font-size: 0.88rem;
-    line-height: 1.6;
-    color: #cdd6e2;
-    margin: 0 auto 1.4rem;
-    white-space: nowrap;
+
+  p.lede {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.8rem, 1.6vw, 1.05rem);
+    color: var(--mist);
+    margin: 0 0 clamp(1.4rem, 4vh, 3.6rem);
   }
-  @media (max-width: 768px) {
-    p {
-      max-width: 420px;
-      white-space: normal;
-    }
-  }
-  .contact {
+
+  .cta {
     display: flex;
-    gap: 1.2rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 1.8rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid rgba(246,241,231,0.55);
+    border-radius: 999px;
+    padding: 0.25rem 0.25rem 0.25rem 1.2rem;
+    text-decoration: none;
+    color: var(--ivory);
+    margin-bottom: clamp(0.7rem, 2vh, 1.6rem);
+    transition: border-color 0.2s ease, background 0.2s ease;
   }
-  .contact a {
+  .cta:hover,
+  .cta:focus-visible {
+    border-color: var(--brass);
+    background: rgba(246,241,231,0.06);
+  }
+  .cta span.label {
+    font-size: clamp(0.78rem, 1.4vw, 0.95rem);
+    font-weight: 500;
+    text-align: left;
+  }
+  .cta span.arrow {
+    flex-shrink: 0;
+    width: clamp(32px, 4.5vh, 40px);
+    height: clamp(32px, 4.5vh, 40px);
+    border: 1px solid rgba(246,241,231,0.55);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cta span.arrow svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--ivory);
+  }
+
+  .secondary {
+    display: flex;
+    gap: 0.7rem;
+    justify-content: center;
+    margin-top: clamp(0.5rem, 1.6vh, 1rem);
+    margin-bottom: clamp(0.5rem, 1.6vh, 1rem);
+  }
+  .icon-link {
+    width: clamp(34px, 4.5vh, 42px);
+    height: clamp(34px, 4.5vh, 42px);
+    border: 1px solid rgba(246,241,231,0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--ivory);
     text-decoration: none;
-    font-size: 0.82rem;
-    padding: 0.55rem 1.1rem;
-    border: 1px solid rgba(245,241,232,0.25);
-    border-radius: 999px;
-    transition: background 0.2s ease, border-color 0.2s ease;
-    backdrop-filter: blur(4px);
-    background: rgba(9, 21, 27, 0.25);
+    transition: border-color 0.2s ease, background 0.2s ease;
   }
-  .contact a:hover {
-    background: rgba(245,241,232,0.12);
-    border-color: rgba(245,241,232,0.5);
+  .icon-link:hover,
+  .icon-link:focus-visible {
+    border-color: var(--brass);
+    background: rgba(246,241,231,0.06);
   }
+  .icon-link svg {
+    width: 17px;
+    height: 17px;
+    stroke: var(--ivory);
+    fill: none;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 3px;
+  }
+
   .foot {
-    font-size: 0.68rem;
-    color: #cdd6e2;
-    margin-top: 1.5rem;
+    font-size: clamp(0.62rem, 1.3vw, 0.78rem);
+    color: var(--mist);
+    opacity: 0.85;
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
   @media (max-width: 640px) {
-    .wrap {
-      padding: 3vh 7vw 2vh;
-    }
-    .content {
-      padding-bottom: 2vh;
-    }
-    .logo {
-      height: clamp(70px, 14vh, 140px);
-      margin-bottom: -1rem;
-    }
-    .badge {
-      font-size: 0.62rem;
-      letter-spacing: 0.1em;
-    }
-    h1 {
-      font-size: clamp(1.4rem, 6vw, 1.8rem);
-      line-height: 1.25;
-    }
-    p {
-      font-size: 0.82rem;
-      line-height: 1.55;
-      margin-bottom: 1.2rem;
-    }
-    .contact {
-      flex-direction: column;
-      gap: 0.7rem;
-      width: 100%;
-      margin-bottom: 1.4rem;
-    }
-    .contact a {
-      width: 100%;
-      font-size: 0.8rem;
-      padding: 0.65rem 1rem;
-    }
-    .foot {
-      font-size: 0.62rem;
-      margin-top: 1rem;
-    }
+    .cta { max-width: 100%; }
   }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="content">
-      <img class="logo" src="img/logo/logo%20white.png" alt="Dhaankolhu Rasdhoo Island logo" />
-      <div class="badge">Under Maintenance</div>
-      <h1>We're polishing things up.</h1>
-      <p>Our website is currently getting a quick refresh. We'll be back online shortly — thank you for your patience.</p>
-      <div class="contact">
-        <a href="https://wa.me/9609898130" target="_blank" rel="noopener">WhatsApp: +960 989 8130</a>
-        <a href="mailto:info@dhaankolhu.com">info@dhaankolhu.com</a>
+    <div class="core">
+      <div class="mark">
+        <img src="img/logo/logo%20white.png" alt="Dhaankolhu Rasdhoo Island" />
       </div>
+      <h1>We're building our website</h1>
+      <p class="lede">Reach us directly below. We'll be back online soon.</p>
+
+      <a class="cta" href="https://wa.me/9609898130" target="_blank" rel="noopener">
+        <span class="label">WhatsApp: +960 989 8130</span>
+        <span class="arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
     </div>
-    <div class="foot">&copy; 2026 Dhaankolhu Rasdhoo Island. All rights reserved.</div>
+
+    <div class="secondary">
+      <a class="icon-link" href="mailto:info@dhaankolhu.com" aria-label="Email info@dhaankolhu.com" title="info@dhaankolhu.com">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
+      </a>
+      <a class="icon-link" href="https://www.facebook.com/profile.php?id=61565172224877" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9h3V5h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V9a1 1 0 0 1 1-1z"/></svg>
+      </a>
+      <a class="icon-link" href="https://www.instagram.com/dhaankolhu/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+
+    <div class="foot">&copy; 2026 Dhaankolhu Rasdhoo Island. All Rights Reserved.</div>
   </div>
 </body>
 </html>
