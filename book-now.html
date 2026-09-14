@@ -8,60 +8,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0b6e70" />
   <meta name="description" content="Reserve your stay at Dhaankolhu Rasdhoo Island — a quiet stretch of the Indian Ocean, kept simple, kept beautiful." />
-  <link rel="icon" type="image/png" href="img/logo/favicon.png" />
+  <link rel="icon" type="image/png" href="img/logo/favicon-light-bg.png" />
+  <link rel="icon" type="image/png" href="img/logo/favicon-light-bg.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="img/logo/favicon-dark-bg.png" media="(prefers-color-scheme: dark)" />
+  <link rel="shortcut icon" type="image/png" href="img/logo/favicon-light-bg.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="book-now.css" />
-  <title>Book Now - haankolhu Rasdhoo</title>
+  <title>Book Now - Dhaankolhu Rasdhoo</title>
 </head>
 <body>
   <div class="site-shell">
     <header class="site-header" id="site-header">
-      <a class="brand-lockup" href="index.html" aria-label="Dhaankolhu Rasdhoo Island home"><img class="brand-mark" src="img/logo/logo%20black.png" alt="Dhaankolhu Rasdhoo Island logo" /></a>
-      <nav class="desktop-nav" aria-label="Primary navigation"><a href="index.html#about">About</a><a href="index.html#highlights">Highlights</a><a href="index.html#experience">Experience</a><a href="index.html#gallery">Gallery</a><a href="index.html#contact">Contact</a></nav>
-      <!-- "Book now" doesn't make sense in the header while you're already
-           on the booking page, so it's swapped for the same chat-bubble
-           contact trigger used as a floating widget on index.html — same
-           icons/options, just docked inline in the header instead of fixed
-           to the corner of the screen. -->
+      <a class="brand-lockup" href="index.html" aria-label="Dhaankolhu Rasdhoo Island home"><img class="brand-mark" src="img/logo/logo-white.png" alt="Dhaankolhu Rasdhoo Island logo" /></a>
+      <div class="header-nav-group">
+        <nav class="desktop-nav" aria-label="Primary navigation"><a href="index.html#about">About</a><a href="index.html#experience">Experience</a><div class="nav-dropdown"><a href="family-room.html" class="nav-dropdown-trigger">Accommodation<svg class="nav-dropdown-chevron" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><div class="nav-dropdown-panel"><a href="double-room.html">Double Room</a><a href="triple-room.html">Triple Room</a><a href="family-room.html">Family Room</a></div></div><a href="offers.html">Offers</a><div class="nav-dropdown"><a href="index.html#highlights" class="nav-dropdown-trigger" data-nav-noop>Others<svg class="nav-dropdown-chevron" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><div class="nav-dropdown-panel"><a href="index.html#highlights">Highlights</a><a href="index.html#gallery">Gallery</a></div></div></nav>
+        <!-- "Book now" doesn't make sense in the header while you're already
+             on the booking page, so the right slot is left to the chat-bubble
+             contact trigger (floating, docked separately below) instead of a CTA. -->
+        <button class="menu-trigger" id="menu-trigger" type="button" aria-label="Open menu" aria-expanded="false"><span class="hamburger-icon"><span class="line line1"></span><span class="line line2"></span><span class="line line3"></span></span></button>
+      </div>
+    </header>
       <div class="header-contact-bubbles" id="header-contact-bubbles">
         <div class="header-contact-options" id="header-contact-options">
-          <a class="wa-bubble telegram-bubble" href="https://t.me/+9609898130" target="_blank" rel="noopener" aria-label="Chat with us on Telegram">
-            <span class="wa-bubble-tooltip">Chat on Telegram</span>
-            <span class="wa-bubble-btn telegram-bubble-btn">
-              <img loading="lazy" decoding="async" src="img/telegram.webp" alt="" />
-            </span>
-          </a>
-          <a class="wa-bubble" href="https://wa.me/9609898130?text=Hi%20Dhaankolhu%20Rasdhoo%2C%20I%27d%20like%20to%20ask%20about%20a%20booking." target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
-            <span class="wa-bubble-tooltip">Chat with us</span>
-            <span class="wa-bubble-btn">
-              <img loading="lazy" decoding="async" src="img/whatsapp.webp" alt="" />
-            </span>
-          </a>
+          <div class="chat-widget-panel" id="header-chat-widget-panel" role="dialog" aria-modal="false" aria-label="Chat with Dhaankolhu Rasdhoo" aria-hidden="true">
+            <div class="chat-widget-header">
+              <span class="chat-widget-avatar"><img loading="lazy" decoding="async" src="img/logo/favicon-light-bg.png" alt="" /></span>
+              <span class="chat-widget-headtext">
+                <strong>Dhaankolhu Rasdhoo</strong>
+                <em>online</em>
+              </span>
+            </div>
+            <div class="chat-widget-body">
+              <div class="chat-widget-message">
+                <span class="chat-widget-message-avatar"><img loading="lazy" decoding="async" src="img/logo/favicon-light-bg.png" alt="" /></span>
+                <div class="chat-widget-bubble">Welcome to Dhaankolhu Rasdhoo! How can we help you?</div>
+              </div>
+            </div>
+            <form class="chat-widget-inputrow" id="header-chat-widget-form">
+              <input type="text" id="header-chat-widget-input" class="chat-widget-input" placeholder="Type here..." autocomplete="off" aria-label="Type your message" />
+              <button type="submit" class="chat-widget-send" aria-label="Send on WhatsApp">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </form>
+            <a class="chat-widget-telegram-link" href="https://t.me/+9609898130" target="_blank" rel="noopener">
+              <span class="chat-widget-telegram-icon"><img loading="lazy" decoding="async" src="img/telegram.webp" alt="" /></span>
+              Chat on Telegram instead
+            </a>
+          </div>
         </div>
         <button class="header-contact-trigger" id="header-contact-trigger" type="button" aria-expanded="false" aria-controls="header-contact-options" aria-label="Contact us">
           <span class="header-contact-trigger-icon header-contact-trigger-icon-open" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block;"><circle cx="12" cy="12" r="12" fill="#25d366"/><path fill="#fff" d="M12.04 5.5c-3.61 0-6.54 2.93-6.54 6.54 0 1.15.3 2.28.87 3.27L5.4 18.6l3.42-.9a6.53 6.53 0 0 0 3.22.85h.003c3.61 0 6.545-2.93 6.545-6.54 0-1.75-.68-3.39-1.918-4.628A6.506 6.506 0 0 0 12.04 5.5zm3.837 9.354c-.16.45-.93.86-1.28.912-.328.05-.74.07-1.194-.075-.275-.088-.629-.205-1.083-.401-1.906-.823-3.15-2.74-3.244-2.867-.094-.127-.774-1.03-.774-1.966 0-.936.492-1.396.666-1.587.175-.19.381-.238.508-.238l.365.007c.118.005.276-.044.431.328.16.383.541 1.323.589 1.42.048.095.08.207.016.334-.064.127-.096.207-.19.317-.096.111-.201.248-.287.334-.096.096-.195.2-.084.39.111.19.494.817 1.062 1.324.729.65 1.344.852 1.535.949.19.096.301.08.412-.048.111-.127.476-.556.603-.746.127-.19.254-.16.428-.096.175.064 1.109.523 1.298.618.19.096.317.144.363.223.048.08.048.462-.112.911z"/></svg>
           </span>
           <span class="header-contact-trigger-icon header-contact-trigger-icon-close" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </span>
         </button>
+        <span class="header-contact-trigger-badge" aria-hidden="true">1</span>
       </div>
-      <button class="menu-trigger" id="menu-trigger" type="button" aria-label="Open menu" aria-expanded="false"><span class="hamburger-icon"><span class="line line1"></span><span class="line line2"></span><span class="line line3"></span></span></button>
-    </header>
+
 
     <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
       <div class="mobile-menu-inner">
         <span class="eyebrow">The local island edit</span>
         <nav aria-label="Mobile navigation">
           <a href="index.html#about"><span>01</span>About</a>
-          <a href="index.html#highlights"><span>02</span>Highlights</a>
-          <a href="index.html#experience"><span>03</span>Experience</a>
-          <a href="index.html#gallery"><span>04</span>Gallery</a>
-          <a href="index.html#contact"><span>05</span>Contact</a>
+          <a href="index.html#experience"><span>02</span>Experience</a>
+          <a href="family-room.html"><span>03</span>Accommodation</a>
+          <a href="offers.html"><span>04</span>Offers</a>
+          <a href="index.html#highlights"><span>05</span>Highlights</a>
+          <a href="index.html#gallery"><span>06</span>Gallery</a>
         </nav>
         <div class="mobile-menu-divider"></div>
         <button class="mobile-book-now js-scroll-top" type="button">Book now</button>
@@ -183,54 +202,57 @@
                     <div class="bk-room-check">✓</div>
                     <div class="bk-room-media">
                       <div class="bk-room-img-wrap" data-room-gallery>
-                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/double.jpg" alt="Double Room" data-angles="img/room/double.jpg|img/room/double.jpg|img/room/double.jpg" />
+                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/double.webp" alt="Double Room" data-angles="img/room/double.webp|img/room/double.webp|img/room/double.webp" />
                       </div>
                       <div class="bk-room-angles" role="tablist" aria-label="Double Room angles">
-                        <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/double.jpg')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double.jpg')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double.jpg')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/double.webp')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
                       </div>
                     </div>
                     <div class="bk-room-body">
                       <h3>Double Room</h3>
                       <p>A relaxed room built for two, steps from the shoreline.</p>
-                      <div class="bk-room-price"><span>Per night</span><strong>$65<small>+TGST</small></strong></div>
+                      <div class="bk-room-price"><span>Per night</span><strong>$65<small>+tax</small></strong></div>
+                      <a class="bk-room-more-details" href="double-room.html">More Details <span aria-hidden="true">→</span></a>
                     </div>
                   </div>
                   <div class="bk-room" data-room="Triple Room" data-price="80" tabindex="0" role="button" aria-pressed="false">
                     <div class="bk-room-check">✓</div>
                     <div class="bk-room-media">
                       <div class="bk-room-img-wrap" data-room-gallery>
-                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/triple.jpg" alt="Triple Room" data-angles="img/room/triple.jpg|img/room/triple.jpg|img/room/triple.jpg" />
+                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/triple.webp" alt="Triple Room" data-angles="img/room/triple.webp|img/room/triple.webp|img/room/triple.webp" />
                       </div>
                       <div class="bk-room-angles" role="tablist" aria-label="Triple Room angles">
-                        <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/triple.jpg')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple.jpg')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple.jpg')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/triple.webp')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
                       </div>
                     </div>
                     <div class="bk-room-body">
                       <h3>Triple Room</h3>
                       <p>Extra space to spread out, ideal for three sharing the stay.</p>
-                      <div class="bk-room-price"><span>Per night</span><strong>$80<small>+TGST</small></strong></div>
+                      <div class="bk-room-price"><span>Per night</span><strong>$80<small>+tax</small></strong></div>
+                      <a class="bk-room-more-details" href="triple-room.html">More Details <span aria-hidden="true">→</span></a>
                     </div>
                   </div>
                   <div class="bk-room" data-room="Family Room" data-price="95" tabindex="0" role="button" aria-pressed="false">
                     <div class="bk-room-check">✓</div>
                     <div class="bk-room-media">
                       <div class="bk-room-img-wrap" data-room-gallery>
-                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/family%20room.jpg" alt="Family Room" data-angles="img/room/family%20room.jpg|img/room/family%20room.jpg|img/room/family%20room.jpg" />
+                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/family%20room.webp" alt="Family Room" data-angles="img/room/family%20room.webp|img/room/family%20room.webp|img/room/family%20room.webp" />
                       </div>
                       <div class="bk-room-angles" role="tablist" aria-label="Family Room angles">
-                        <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/family%20room.jpg')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family%20room.jpg')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family%20room.jpg')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/family%20room.webp')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family%20room.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family%20room.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
                       </div>
                     </div>
                     <div class="bk-room-body">
                       <h3>Family Room</h3>
                       <p>The largest of the three, with room enough for the whole family.</p>
-                      <div class="bk-room-price"><span>Per night</span><strong>$95<small>+TGST</small></strong></div>
+                      <div class="bk-room-price"><span>Per night</span><strong>$95<small>+tax</small></strong></div>
+                      <a class="bk-room-more-details" href="family-room.html">More Details <span aria-hidden="true">→</span></a>
                     </div>
                   </div>
                 </div>
@@ -303,7 +325,7 @@
 
               <div class="bk-actions" id="bk-actions">
                 <span class="bk-next-wrap">
-                  <button type="button" class="bk-btn bk-btn-primary" id="bk-next" disabled>Next step <span>→</span></button>
+                  <button type="button" class="bk-btn bk-btn-primary" id="bk-next" disabled>Next <span>→</span></button>
                   <span class="bk-download-cursor bk-next-cursor" id="bk-next-cursor" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 3.5 6 17.5 9.6 14.2 11.7 19.4 14 18.4 11.9 13.2 16.6 12.8 6 3.5Z" fill="#17232a" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
                   </span>
@@ -345,7 +367,7 @@
                 <div class="bk-ticket-row is-empty" data-field="nights"><span>Nights</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="guests"><span>Guests</span><span>5 guests</span></div>
                 <div class="bk-ticket-row is-empty" data-field="room"><span>Stay</span><span>Not chosen yet</span></div>
-                <div class="bk-ticket-row is-empty" data-field="name"><span>Traveller</span><span>—</span></div>
+                <div class="bk-ticket-row is-empty" data-field="name"><span>Name</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="phone"><span>Contact</span><span>—</span></div>
                 </div>
                 <div class="bk-ticket-total">
@@ -362,44 +384,26 @@
     </main>
 
     <footer id="contact" class="site-footer-v2">
-      <div class="footer-v2-grid">
-        <div class="footer-v2-col footer-v2-brand reveal">
-          <img loading="lazy" decoding="async" class="footer-mark" src="img/logo/logo%20white.png" alt="Dhaankolhu Rasdhoo Island logo" />
-          <h2>Dhaankolhu Rasdhoo Island</h2>
-          <span class="footer-v2-tag">Beach Resort</span>
-          <p>A peaceful beach destination where the ocean meets serenity. Relax, unwind, and create lasting memories by the sea.</p>
+      <div class="footer-v2-center reveal">
+        <div class="footer-v2-brand-row">
+          <img loading="lazy" decoding="async" class="footer-mark" src="img/logo/logo-white.png" alt="Dhaankolhu Rasdhoo Island logo" />
         </div>
-        <div class="footer-v2-col reveal">
-          <span class="footer-v2-heading">Quick Links</span>
-          <a href="index.html#about">About</a>
-          <a href="index.html#gallery">Gallery</a>
-          <a href="index.html#highlights">Highlights</a>
-          <a href="index.html#experience">Experience</a>
-          <a href="index.html#experience">Packages</a>
+        <span class="footer-v2-tag">Local Island</span>
+        <div class="footer-v2-socials">
+          <a class="footer-v2-social-btn" href="mailto:info@dhaankolhu.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4.5 7L12 12.5L19.5 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="footer-v2-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 8.5h2V5.6c-.35-.05-1.53-.15-2.9-.15-2.87 0-4.84 1.75-4.84 4.97v2.63H6.4v3.3h2.86V21h3.4v-4.65h2.75l.44-3.3h-3.19V10.8c0-.96.27-1.6 1.64-1.6Z" fill="currentColor"/></svg></a>
+          <a class="footer-v2-social-btn" href="https://www.instagram.com/dhaankolhu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg></a>
         </div>
-        <div class="footer-v2-col reveal">
-          <span class="footer-v2-heading">Contact Us</span>
-          <span class="footer-v2-label">Address</span>
-          <span class="footer-v2-value">South Ari Atoll, Maldives</span>
-          <span class="footer-v2-label">Phone</span>
-          <a class="footer-v2-value" href="tel:+9609898130">+960 989 8130</a>
-          <span class="footer-v2-label">Email</span>
-          <a class="footer-v2-value" href="mailto:info@dhaankolhu.com">info@dhaankolhu.com</a>
-          <span class="footer-v2-label">Hours</span>
-          <span class="footer-v2-value footer-v2-accent">Open daily, 6:00 AM – 8:00 PM</span>
-        </div>
-        <div class="footer-v2-col reveal">
-          <span class="footer-v2-heading">Stay in Touch</span>
-          <p>Subscribe to receive updates on seasonal promos, events, and new offerings at Dhaankolhu Rasdhoo Island.</p>
-          <form class="footer-v2-subscribe" onsubmit="event.preventDefault();">
-            <input type="email" required placeholder="Your email address" aria-label="Your email address" />
-            <button type="submit">Subscribe</button>
-          </form>
-        </div>
+        <p class="footer-v2-desc">A peaceful beach destination where the ocean meets serenity. Nestled along the turquoise shores of Rasdhoo, we offer an authentic taste of local island life paired with effortless comfort. Relax, unwind, and create lasting memories by the sea.</p>
+        <p class="footer-v2-address">South Ari Atoll, Maldives</p>
+        <p class="footer-v2-contact">
+          <a href="mailto:info@dhaankolhu.com">info@dhaankolhu.com</a><br />
+          <a href="tel:+9609898130">+960 989 8130</a>
+        </p>
       </div>
       <div class="footer-v2-bottom">
         <span>© 2026 Dhaankolhu Rasdhoo Island. All rights reserved.</span>
-        <div class="footer-v2-legal"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Sitemap</a></div>
+        <div class="footer-v2-legal"><span>Website Designed &amp; Developed by AdFlare</span></div>
       </div>
     </footer>
   </div>
@@ -436,13 +440,6 @@
     </div>
   </div>
 
-  <!-- floating WhatsApp chat bubble -->
-  <a class="wa-bubble" href="https://wa.me/9609898130?text=Hi%20Dhaankolhu%20Rasdhoo%2C%20I%27d%20like%20to%20ask%20about%20a%20booking." target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
-    <span class="wa-bubble-tooltip">Chat with us</span>
-    <span class="wa-bubble-btn">
-      <img loading="lazy" decoding="async" src="img/whatsapp.webp" alt="" />
-    </span>
-  </a>
 
   <script src="book-now.js"></script>
 </body>

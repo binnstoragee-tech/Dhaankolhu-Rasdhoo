@@ -45,7 +45,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; background: var(--ivory); overflow-x: hidden; }
+html { scroll-behavior: smooth; background: #fff; overflow-x: hidden; scrollbar-gutter: stable; }
 body {
   margin: 0;
   background: var(--ivory);
@@ -64,7 +64,7 @@ img { display: block; max-width: 100%; }
 ::selection { background: var(--teal); color: var(--ivory); }
 
 
-.site-shell { overflow: hidden; background: var(--ivory); }
+.site-shell { overflow: hidden; background: #fff; }
 
 /* ==========================================================================
    Smooth cross-page transitions (e.g. Home -> Book Now, like maafushi.com's
@@ -100,13 +100,13 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
   inset: 0 0 auto;
   z-index: 50;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   align-content: center;
   gap: 2rem;
   padding: 0 clamp(1.25rem, 4vw, 4.75rem);
   color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,.24);
+  border-bottom: none;
   overflow: visible;
   transition: background-color .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out), box-shadow .35s var(--ease-out), min-height .35s var(--ease-out), padding-top .35s var(--ease-out), padding-bottom .35s var(--ease-out), transform .5s var(--ease-out), opacity .5s var(--ease-out);
   will-change: min-height, padding-top, padding-bottom, background-color, transform, opacity;
@@ -137,22 +137,168 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
   box-shadow: 0 12px 36px rgba(23,35,42,.08);
   backdrop-filter: blur(16px);
 }
+.header-left { display: flex; align-items: center; gap: clamp(1rem, 2.6vw, 2rem); justify-self: start; }
 .brand-lockup { display: inline-flex; align-items: center; gap: .7rem; justify-self: start; }
-.brand-mark { width: 84px; height: 84px; object-fit: contain; filter: brightness(0) invert(1); transition: filter .35s var(--ease-out); transform: scale(2); transform-origin: right center; margin-left: 84px; }
-.site-header.is-scrolled .brand-mark { filter: none; }
+.brand-mark { width: 84px; height: 84px; object-fit: contain; filter: none; transition: filter .35s var(--ease-out); transform: scale(2); transform-origin: right center; margin-left: 84px; }
+.site-header.is-scrolled .brand-mark { filter: brightness(0); }
 .site-header.is-scrolled .header-cta { border-color: rgba(11,110,112,.22); background: linear-gradient(135deg, rgba(255,255,255,.86), rgba(208,232,230,.58)); box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 8px 25px rgba(11,110,112,.08); }
 .brand-type { display: grid; gap: 0; line-height: 1; }
 .brand-type strong { font-family: "Poppins", Arial, sans-serif; font-size: 1.12rem; font-weight: 600; letter-spacing: -.02em; }
 .brand-type small { margin-top: .25rem; font-size: .44rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; opacity: .72; }
+/* Groups the nav links + Book now button (+ mobile menu-trigger) together
+   as one right-hand cluster, so with .site-header's grid now split
+   auto / 1fr / auto, the empty 1fr middle column opens up as breathing
+   room between the logo and this group instead of the nav sitting
+   dead-center. */
+.header-nav-group { display: flex; align-items: center; gap: clamp(1.6rem, 3vw, 3.2rem); grid-column: 3; justify-self: end; }
 .desktop-nav { display: flex; align-items: center; justify-content: center; gap: clamp(1.2rem, 2.8vw, 3.1rem); }
+
+/* Accommodation nav dropdown — trigger keeps the same look as the other
+   desktop-nav links (it's a plain <a>, styled by .desktop-nav a above)
+   with a small chevron added; the panel opens on hover/focus below it,
+   listing the three room types with the first one picked out in brass
+   to match the reference screenshot's highlighted top row. */
+.nav-dropdown { position: relative; display: flex; align-items: center; }
+.nav-dropdown-trigger { display: inline-flex; align-items: center; gap: .38rem; }
+.nav-dropdown-chevron { width: 10px; height: 10px; flex-shrink: 0; transition: transform .25s var(--ease-out); }
+.nav-dropdown.is-open .nav-dropdown-chevron,
+.nav-dropdown:hover .nav-dropdown-chevron,
+.nav-dropdown:focus-within .nav-dropdown-chevron { transform: rotate(180deg); }
+
+.nav-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 1.1rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  min-width: 240px;
+  background: #fff;
+  box-shadow: 0 20px 44px rgba(23, 35, 42, .18);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .25s var(--ease-out), transform .25s var(--ease-out), visibility .25s;
+  z-index: 20;
+}
+/* Invisible "bridge" filling the 1.1rem gap between the trigger and the
+   panel above it — without this, moving the mouse from the trigger word
+   down to the panel crosses a dead strip with nothing rendered in it, so
+   the cursor drifts off ".nav-dropdown" mid-travel, the panel starts
+   fading out, and the click on Highlights/Gallery lands on a
+   closing/already-gone panel (feels "stuck"/unresponsive). Since this
+   sits inside .nav-dropdown-panel, hovering it still counts as hovering
+   a descendant of .nav-dropdown, so the panel stays open the whole way down. */
+.nav-dropdown-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 1.1rem;
+}
+/* Opens on hover — :focus-within is kept so keyboard/tab users can still
+   reach it; .is-open is kept as a harmless fallback in case anything
+   still toggles it. */
+.nav-dropdown.is-open .nav-dropdown-panel,
+.nav-dropdown:hover .nav-dropdown-panel,
+.nav-dropdown:focus-within .nav-dropdown-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+.nav-dropdown-panel a {
+  display: block;
+  /* .desktop-nav a further down (padding: .4rem 0) sits later in the
+     cascade at the SAME specificity as this rule, so it was silently
+     winning and zeroing out the left/right padding on every panel row —
+     invisible while the panel had a fixed 240px min-width to spare, but
+     as soon as the Others panel was shrunk to fit its own content, the
+     text had no breathing room and pressed right up against (and visually
+     "clipped" into) the box edge. ".nav-dropdown .nav-dropdown-panel a"
+     below bumps this one class higher in specificity so it wins instead. */
+  padding: .95rem 1.4rem;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+  font-size: .72rem;
+  font-weight: 400;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink);
+  opacity: 1;
+  transform: none;
+  transition: background .2s ease, color .2s ease;
+  white-space: nowrap;
+}
+.nav-dropdown-panel a::after { content: none; }
+.nav-dropdown .nav-dropdown-panel a { padding: .95rem 1.4rem; }
+/* The Others dropdown is the one closest to the right edge of the header
+   (last item before "Book now"), so centering its panel under the
+   trigger (left:50%/translateX(-50%)) could push it past the right edge
+   of the viewport on narrower desktop widths — most visible on
+   book-now.html, whose header has less room to the right. Right-align
+   that one panel to the trigger's right edge instead so it always stays
+   inside the viewport, however narrow. Accommodation (first dropdown)
+   has more room to its right and keeps the centered style above. */
+.nav-dropdown:last-of-type .nav-dropdown-panel {
+  left: auto;
+  right: 0;
+  /* "Others" only holds two short one-word rows (Highlights/Gallery), unlike
+     Accommodation's longer "Triple Room" etc. — the shared 240px min-width
+     above made this panel sprawl far past its own trigger, overlapping
+     "Offers" and reaching almost to "Accommodation". Shrink it to fit its
+     own content instead, so it visually sits under "Others" like the
+     trigger it belongs to. */
+  min-width: 0;
+  width: max-content;
+  transform: translateY(-8px);
+}
+.nav-dropdown:last-of-type.is-open .nav-dropdown-panel,
+.nav-dropdown:last-of-type:hover .nav-dropdown-panel,
+.nav-dropdown:last-of-type:focus-within .nav-dropdown-panel {
+  transform: translateY(0);
+}
+/* Thin divider between rows so the three room names don't run together —
+   skip it on the first row (nothing above it to separate from). */
+.nav-dropdown-panel a + a { border-top: 1px solid rgba(23, 35, 42, .1); }
+/* Each row highlights only while the cursor is actually over it — no
+   row stays highlighted by default. */
+.nav-dropdown-panel a:hover { background: var(--brass); color: #fff !important; }
+
+/* .desktop-nav a's transparent-over-hero / scrolled color rules (further
+   down this file) target every anchor inside .desktop-nav, including
+   these panel links — without this override the rows inherited white
+   text on the panel's white background and went invisible. The panel
+   itself is always solid white, so its links must always stay dark
+   regardless of header state — hence !important, since those header-
+   state rules sit later in the cascade at equal specificity. */
+.nav-dropdown-panel a { color: var(--ink) !important; }
+
+@media (max-width: 900px) {
+  .nav-dropdown-panel { display: none; }
+}
 .desktop-nav a { position: relative; padding: .4rem 0; font-size: .72rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; opacity: .82; transition: opacity .2s ease; }
 .desktop-nav a::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1px; background: currentColor; transition: right .3s var(--ease-out); }
 .desktop-nav a:hover { opacity: 1; }
 .desktop-nav a:hover::after { right: 0; }
-.header-cta { justify-self: end; display: inline-flex; align-items: center; justify-content: center; line-height: 1; gap: .4rem; min-height: 34px; padding: .5rem .82rem; border: 1px solid rgba(255,255,255,.44); border-radius: 999px; background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,.28)); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 28px rgba(3,22,26,.12); backdrop-filter: blur(18px) saturate(135%); -webkit-backdrop-filter: blur(18px) saturate(135%); font-size: .58rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; transition: transform .18s var(--ease-out), background .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease; }
-.header-cta:hover { border-color: rgba(255,255,255,.7); background: linear-gradient(135deg, rgba(255,255,255,.88), rgba(186,141,92,.72)); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 10px 28px rgba(3,22,26,.18); transform: translateY(-2px); }
+.header-cta { justify-self: end; display: inline-flex; align-items: center; justify-content: center; line-height: 1; gap: .4rem; min-height: 34px; padding: .5rem .82rem; border: 1px solid rgba(255,255,255,.44); border-radius: 0; background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,.28)); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 28px rgba(3,22,26,.12); backdrop-filter: blur(18px) saturate(135%); -webkit-backdrop-filter: blur(18px) saturate(135%); font-size: .58rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; transition: transform .18s var(--ease-out), background .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease; }
+.header-cta:hover { border-color: rgba(255,255,255,.7); background: linear-gradient(135deg, rgba(255,255,255,.88), rgba(186,141,92,.72)); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 10px 28px rgba(3,22,26,.18); }
 .header-cta:active, .button:active, .circle-link:active { transform: scale(.97); }
 .menu-trigger { display: none; justify-self: end; color: currentColor; background: transparent; }
+/* Hamburger icon lines — previously only defined in book-now.css, so the
+   button rendered with no visible icon on index.html and the room-detail
+   pages (family-room.html, double-room.html, triple-room.html), none of
+   which load book-now.css. Moved here into the shared stylesheet so the
+   icon actually shows up on every page. */
+#menu-trigger { position: relative !important; width: 40px !important; height: 40px !important; align-items: center !important; justify-content: center !important; }
+#menu-trigger .hamburger-icon { position: relative; width: 22px; height: 16px; display: inline-block; }
+#menu-trigger .hamburger-icon .line { position: absolute; left: 0; width: 100%; height: 2px; background: currentColor; border-radius: 2px; transition: transform .35s cubic-bezier(.65,0,.35,1), opacity .25s ease, top .35s cubic-bezier(.65,0,.35,1); }
+#menu-trigger .hamburger-icon .line1 { top: 0; }
+#menu-trigger .hamburger-icon .line2 { top: 7px; }
+#menu-trigger .hamburger-icon .line3 { top: 14px; }
+#menu-trigger[aria-expanded="true"] .hamburger-icon .line1 { top: 7px; transform: rotate(45deg); }
+#menu-trigger[aria-expanded="true"] .hamburger-icon .line2 { opacity: 0; transform: scaleX(0); }
+#menu-trigger[aria-expanded="true"] .hamburger-icon .line3 { top: 7px; transform: rotate(-45deg); }
+.site-shell:has(.mobile-menu.is-open) .site-header #menu-trigger { color: #12100d !important; z-index: 1002 !important; position: relative !important; }
 
 .mobile-menu { display: none; }
 .hero-section { position: relative; min-height: max(700px, 100svh); display: grid; place-items: center; isolation: isolate; color: #fff; background: var(--teal-deep); }
@@ -164,12 +310,23 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
    and the text rises up. The wrap handles ONLY this one-time zoom-out layer,
    so it doesn't fight with the existing continuous ambient drift/flip
    animation already living on .hero-backdrop itself. ---------- */
-.hero-backdrop-wrap { position: absolute; inset: 0; z-index: -3; overflow: hidden; transform: scale(1.32); transform-origin: center; transition: transform 3s cubic-bezier(.16,1,.3,1); }
+.hero-backdrop-wrap { position: absolute; inset: 0; z-index: -3; overflow: hidden; transform: scale(1.32) translateZ(0); transform-origin: center; transition: transform 3s cubic-bezier(.16,1,.3,1); will-change: transform; backface-visibility: hidden; }
+/* Loop-stutter fix: give the <video> itself its own compositor layer,
+   separate from the wrapper's scroll-driven scale transform above. Without
+   this, every scale() the stepper applies to .hero-backdrop-wrap forces the
+   browser to repaint the video's decoded frames on the main thread, and if
+   that repaint lands right on the loop boundary it shows up as a visible
+   pause/stutter before it restarts. translateZ(0) + will-change promotes the
+   video to the GPU so the wrapper's transform and the video's own decode/
+   loop timing stay independent. */
+.hero-backdrop { will-change: transform; backface-visibility: hidden; transform: translateZ(0); }
 .hero-section.is-intro-revealed .hero-backdrop-wrap { transform: scale(1); }
 .hero-backdrop, .hero-shade, .hero-grain { position: absolute; inset: 0; }
-.hero-backdrop { background-image: url('img/home%20web.jpeg'); background-position: center; background-size: cover; animation: none; }
+.hero-backdrop { animation: none; } /* now a <video> — framing/cover handled by the
+  object-fit/object-position rules in index.html's inline style block, not a
+  CSS background-image, so nothing to set here anymore. */
 .hero-section.is-intro-done .hero-backdrop { animation: hero-drift 16s ease-in-out infinite alternate; }
-.hero-shade { z-index: -2; background: linear-gradient(90deg, rgba(4,19,22,.72) 0%, rgba(3,24,25,.38) 48%, rgba(4,19,22,.18) 100%), linear-gradient(0deg, rgba(4,19,22,.46) 0%, transparent 42%, rgba(4,19,22,.28) 100%); }
+.hero-shade { z-index: -2; background: linear-gradient(90deg, rgba(4,19,22,.30) 0%, rgba(3,24,25,.14) 48%, rgba(4,19,22,.04) 100%), linear-gradient(0deg, rgba(4,19,22,.18) 0%, transparent 42%, rgba(4,19,22,.08) 100%); }
 .hero-grain { z-index: -1; pointer-events: none; opacity: .14; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E"); mix-blend-mode: soft-light; }
 .hero-content { width: min(100% - 2.5rem, 1080px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 0; text-align: center; }
 /* text rises up per WORD (see script.js splitIntoWords), staggered, once
@@ -182,13 +339,48 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
   .hero-backdrop-wrap { transition: none; transform: scale(1); }
   .word-rise { transition: none; opacity: 1; transform: none; }
   .site-header.is-intro-hidden { transition: none; opacity: 1; transform: none; }
+  .hero-explore-btn { transition: none !important; opacity: 1; transform: none; }
 }
-.hero-eyebrow { color: rgba(255,255,255,.8); }
+.hero-explore-btn { margin-top: 2.6rem; min-height: 50px; padding: .9rem 2.1rem; }
+/* Liquid-glass treatment matching the "Book your stay" CTA (.frame-cta-glass
+   in index.html's inline styles) — frosted, saturated blur with a crisp
+   border and soft outer glow. Tinted with the brand teal (not plain white)
+   so the glass reads as a solid, legible pill rather than a washed-out
+   sheet — plain white glass let the bright aerial photo bleed straight
+   through and killed the white text's contrast. The heavier blur is what
+   gives the "frosted" look in the reference screenshot: the photo behind
+   is still visible, just softened into a color wash instead of sharp detail. */
+.hero-explore-btn {
+  background: linear-gradient(135deg, rgba(11,110,112,.97), rgba(4,38,46,.97));
+  border: 1.5px solid rgba(255,255,255,.8);
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0,0,0,.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.35);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+}
+.hero-explore-btn:hover {
+  background: linear-gradient(135deg, rgba(11,110,112,1), rgba(4,38,46,1));
+  border-color: rgba(255,255,255,.95);
+  color: #fff;
+}
+/* the button rises up as one piece (not word-by-word like the eyebrow/title/
+   copy above it) — splitting its text into separate word spans would make
+   them flex-items inside .button's own "gap", which visibly shoved
+   "Explore" and "Rasdhoo" apart. Only the pre-reveal hidden state lives
+   here; the actual 2s reveal transition is applied temporarily via inline
+   style in script.js and cleared right after, so it doesn't permanently
+   override .button's own (much faster) hover/active transition — that
+   override was what made hovering/pressing the button feel broken. */
+.hero-explore-btn { opacity: 0; transform: translateY(30px); }
+.hero-explore-btn.is-shown { opacity: 1; transform: translateY(0); }
+.hero-explore-btn.is-shown { opacity: 1; transform: translateY(0); }
+.hero-eyebrow { color: rgba(255,255,255,.8); margin-bottom: .4rem; }
 .eyebrow { display: inline-block; color: var(--brass); font-size: .64rem; font-weight: 700; letter-spacing: .25em; line-height: 1.2; text-transform: uppercase; }
-.hero-title { max-width: 100%; margin: .9rem auto 1rem; font-family: "Poppins", Arial, sans-serif; font-size: clamp(2.8rem, 4.75vw, 4.9rem); font-weight: 500; letter-spacing: -.065em; line-height: .84; text-wrap: balance; }
+.hero-title { max-width: 100%; margin: 1.1rem auto 1.3rem; font-family: "Poppins", Arial, sans-serif; font-size: clamp(1.8rem, 2.8vw, 2.8rem); font-weight: 500; letter-spacing: -.065em; line-height: 1.15; text-wrap: balance; }
 .hero-title-break { display: none; }
-.hero-copy { max-width: 30rem; margin: 0 auto; font-size: clamp(.95rem, 1.35vw, 1.14rem); color: rgba(255,255,255,.83); }
-.hero-actions { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 2.2rem; }
+.hero-copy { max-width: 30rem; margin: .6rem auto 0; font-size: clamp(.95rem, 1.35vw, 1.14rem); color: rgba(255,255,255,.83); }
+.hero-actions { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 2.6rem; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; min-height: 45px; padding: .78rem 1.2rem; border: 1px solid rgba(255,255,255,.38); border-radius: 999px; background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.1)); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.48), 0 9px 25px rgba(3,22,26,.14); backdrop-filter: blur(18px) saturate(135%); -webkit-backdrop-filter: blur(18px) saturate(135%); font-size: .68rem; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase; transition: transform .18s var(--ease-out), background .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease; }
 .button:hover { transform: translateY(-2px); }
 .button-light { border-color: rgba(255,255,255,.72); background: linear-gradient(135deg, rgba(255,255,255,.82), rgba(255,255,255,.38)); color: var(--ink); }
@@ -236,7 +428,7 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 .play-button:hover { background: var(--brass); transform: scale(1.06); }
 .motion-caption { position: absolute; right: clamp(1.25rem, 4vw, 4.75rem); bottom: 2.2rem; color: rgba(255,255,255,.66); font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; }
 
-.highlights-section { padding-top: clamp(3rem, 6vw, 6rem); padding-bottom: clamp(7rem, 13vw, 13rem); }
+.highlights-section { padding-top: clamp(3rem, 6vw, 6rem); padding-bottom: clamp(3rem, 6vw, 6rem); }
 .instagram-cta { display: flex; justify-content: center; margin-top: clamp(2.2rem, 5vw, 3.4rem); }
 .instagram-link { --ig-color: var(--ink); display: inline-flex; align-items: center; gap: .5rem; position: relative; padding-bottom: .35rem; color: var(--ig-color); text-decoration: none; transition: transform .35s cubic-bezier(.22,1,.36,1); }
 .instagram-link-icon { display: flex; transition: transform .4s cubic-bezier(.22,1,.36,1), color .35s ease; color: var(--ig-color); }
@@ -255,8 +447,8 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 .stay-card.card-offset-2 { margin-top: clamp(2.5rem, 7vw, 7rem); }
 .stay-card.card-offset-3 { margin-top: clamp(1.2rem, 3vw, 3rem); }
 .card-image-wrap { position: relative; aspect-ratio: .78; overflow: hidden; background: var(--secondary); }
-.card-image-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease-out), filter .5s ease; }
-.stay-card:hover .card-image-wrap img { transform: scale(1.06); filter: saturate(1.08); }
+.card-image-wrap img { position: absolute; top: -9%; left: 0; width: 100%; height: 118%; object-fit: cover; transform: translate3d(0, var(--img-drift, 0px), 0) scale(var(--img-scale, 1)); transition: transform .25s var(--ease-out), filter .5s ease; will-change: transform; }
+.stay-card:hover .card-image-wrap img { --img-scale: 1.06; filter: saturate(1.08); }
 .card-image-wrap::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(7,22,25,.35), transparent 35%); pointer-events: none; }
 .card-number { position: absolute; z-index: 1; top: 1rem; left: 1rem; color: #fff; font-size: .62rem; font-weight: 700; letter-spacing: .15em; }
 .card-arrow { position: absolute; z-index: 1; right: 1rem; bottom: 1rem; display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; color: #fff; transition: background .25s ease, transform .25s var(--ease-out); }
@@ -284,10 +476,14 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
    the user swipes/drags left-right and resume afterwards. Cards are
    duplicated once in the markup so the track can wrap invisibly. ---------- */
 .excursions-section { padding: 0 0 clamp(4.5rem, 8vw, 7rem); background: #fff; overflow: hidden; }
-.excursions-section .section-heading-row { padding-top: clamp(2rem, 4vw, 3rem); margin-bottom: clamp(1.6rem, 3vw, 2.6rem); text-align: center; }
+.excursions-section .section-heading-row { padding-top: clamp(2rem, 4vw, 3rem); padding-bottom: 0; margin-bottom: clamp(2rem, 4vw, 3.2rem); text-align: center; }
 .excursions-section .eyebrow { color: var(--brass); margin-bottom: 1.1rem; }
 .excursions-section .display-heading { font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
 .excursions-section .section-lede { max-width: none; }
+#why-choose-us .section-lede { white-space: nowrap; }
+@media (max-width: 640px) {
+  #why-choose-us .section-lede { white-space: normal; }
+}
 /* NOTE: this used to have a mask-image edge-fade (transparent at the very
    left/right of the loop, like a classic carousel vignette). Because this
    loop scrolls continuously (marquee-style, never stops at fixed
@@ -297,126 +493,160 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
    some point, which is exactly the artifact reported. A moving belt and an
    edge-fade mask don't mix, so the fade is removed; cards now stay fully
    opaque the whole time they're on screen. */
-.excursion-loop { position: relative; width: 100%; overflow: hidden; }
-.excursion-track { display: flex; width: max-content; gap: clamp(1.1rem, 2vw, 1.6rem); touch-action: pan-y; cursor: grab; }
-.excursion-track.is-dragging { cursor: grabbing; }
-.excursion-card { position: relative; flex: 0 0 auto; width: clamp(210px, 22vw, 290px); aspect-ratio: 3 / 4; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 44px rgba(10,22,24,.18); }
-/* inside the auto-scrolling loop specifically, cards sit edge-to-edge with
-   no gap, no radius, and no drop-shadow: the individual-card shadow used
-   to blur outward into the narrow gap between cards and, sitting against
-   the light section background, read as an unwanted pale/white seam
-   splitting each photo from the next instead of a clean continuous strip */
-.excursion-track { gap: 0; }
-.excursion-track .excursion-card { border-radius: 0; box-shadow: none; }
-.excursion-card img { width: 100%; height: 100%; object-fit: cover; display: block; -webkit-user-drag: none; user-select: none; transition: transform .7s cubic-bezier(.16,1,.3,1); }
-.excursion-card:hover img { transform: scale(1.08); }
-.excursion-card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,22,24,0) 42%, rgba(8,18,20,.82) 100%); }
-.excursion-card-label { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.1rem 1.15rem; color: #fff; }
-.excursion-card-label span { display: block; margin-bottom: .3rem; font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; opacity: .72; }
-.excursion-card-label strong { display: block; font-family: "Poppins", Arial, sans-serif; font-size: 1.2rem; font-weight: 600; line-height: 1.2; letter-spacing: -.01em; }
-@media (max-width: 640px) {
-  .excursion-card { width: clamp(168px, 62vw, 220px); }
+
+/* ==========================================================================
+   Island Activities — flat, responsive card grid (replaces the old
+   horizontal auto-scroll/drag carousel above, .excursion-loop/-track/-card,
+   so every activity is visible at a glance instead of needing to swipe).
+   Reuses .offer-card, the same component used for the Double/Triple/Family
+   room cards below, and the same flex-wrap sizing approach used on the
+   "Explore Rasdhoo" page's Accommodation grid: fixed-size cards that wrap
+   3-up → 2-up → 1-up as the screen narrows, growing past 1400px on very
+   wide monitors instead of leaving big empty gutters.
+   ========================================================================== */
+.excursion-flat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1.4rem, 2.4vw, 2.2rem);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 3rem);
 }
-.excursion-view-all-row { display: flex; justify-content: center; margin-top: clamp(2rem, 4vw, 2.8rem); }
-.gallery-view-all-row { display: flex; justify-content: center; margin-top: clamp(1.5rem, 3vw, 2.2rem); }
-.excursion-view-all { background: none; border: none; border-bottom: 1px solid var(--brass); cursor: pointer; font-family: inherit; }
-.gallery-view-all { background: none; border: none; border-bottom: 1px solid var(--brass); cursor: pointer; font-family: inherit; }
-/* each excursion card rises up on its own as it scrolls into view, one after
-   another, over a slower 2s ease so it reads as a deliberate reveal rather
-   than the quick .8s fade used elsewhere on the page */
-.excursion-card.reveal { transition-duration: 2s; }
-.excursion-track .excursion-card.reveal:nth-of-type(1) { transition-delay: 0s; }
-.excursion-track .excursion-card.reveal:nth-of-type(2) { transition-delay: .15s; }
-.excursion-track .excursion-card.reveal:nth-of-type(3) { transition-delay: .3s; }
-.excursion-track .excursion-card.reveal:nth-of-type(4) { transition-delay: .45s; }
-.excursion-track .excursion-card.reveal:nth-of-type(5) { transition-delay: .6s; }
-.excursion-track .excursion-card.reveal:nth-of-type(6) { transition-delay: .75s; }
-@media (prefers-reduced-motion: reduce) {
-  .excursion-loop { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
-  .excursion-track { touch-action: auto; cursor: auto; }
+@media (min-width: 1600px) { .excursion-flat-grid { max-width: min(92vw, 1800px); } }
+@media (min-width: 2000px) { .excursion-flat-grid { max-width: min(93vw, 2200px); } }
+@media (min-width: 2400px) { .excursion-flat-grid { max-width: min(93vw, 2600px); } }
+
+.excursion-flat-grid .offer-card {
+  flex: 0 1 calc(33.333% - clamp(1.4rem, 2.4vw, 2.2rem) * 2 / 3);
+  min-width: 260px;
+}
+@media (max-width: 640px) {
+  .excursion-flat-grid .offer-card { flex: 1 1 100%; min-width: 0; }
 }
 
-/* ---------- "glimpse" collage: simple scroll-linked parallax (no 3D tilt) —
-   the circle photo drifts DOWN and the location badge drifts UP as the
-   section scrolls through view, at their own gentle speeds. ---------- */
+/* Same 2s left/right "assemble" scroll-reveal as the Accommodation cards
+   further down the page: each card slides in from an alternating side and
+   settles into place, instead of the old carousel's per-card fade-up. */
+#experience.excursions-section { overflow-x: hidden; }
+#experience .offer-card.reveal {
+  --assemble-x: -70px;
+  opacity: 0;
+  transform: translateX(var(--assemble-x));
+  transition: opacity 2s cubic-bezier(.22,.68,0,1), transform 2s cubic-bezier(.22,.68,0,1);
+  transition-delay: 0s;
+}
+#experience .excursion-flat-grid .offer-card.reveal:nth-child(2) { --assemble-x: 70px; transition-delay: .12s; }
+#experience .excursion-flat-grid .offer-card.reveal:nth-child(3) { --assemble-x: 70px; transition-delay: .24s; }
+#experience .excursion-flat-grid .offer-card.reveal:nth-child(4) { --assemble-x: -70px; transition-delay: .36s; }
+#experience .excursion-flat-grid .offer-card.reveal:nth-child(5) { --assemble-x: 70px; transition-delay: .48s; }
+#experience .offer-card.reveal.is-visible { opacity: 1; transform: translateX(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  #experience .offer-card.reveal { transition: none; opacity: 1; transform: none; }
+}
+
+/* ---------- "glimpse" collage: two square photo frames facing each other,
+   with the location badge centered in the gap between them. Left square
+   slides in from the left, right square slides in from the right (like
+   they're closing in to meet), badge grows into place last. ---------- */
 .collage-section { padding: 0 0 clamp(3rem, 6vw, 5rem); }
 .collage-heading { max-width: 34rem; margin: 0 auto clamp(2.5rem, 6vw, 4rem); text-align: center; }
 .collage-heading .eyebrow { display: block; margin-bottom: .9rem; color: var(--brass); }
 .collage-heading h2 { font-size: clamp(1.9rem, 4vw, 2.9rem); }
 .collage-stage { display: flex; justify-content: center; padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2.5rem, 6vw, 4.5rem); overflow: visible; }
-.collage-tilt { position: relative; width: min(92%, 800px); aspect-ratio: 16 / 9; }
-.collage-main {
-  position: absolute; inset: 0; margin: 0; border-radius: 22px; overflow: hidden;
-  box-shadow: 0 34px 70px rgba(10,22,24,.28);
-  opacity: 0; transform: scale(0.88) translateY(26px);
-  transition: opacity .8s cubic-bezier(.22,.68,0,1) .1s, transform .8s cubic-bezier(.22,.68,0,1) .1s, border-radius .9s cubic-bezier(.22,.68,0,1);
-  will-change: opacity, transform, left, right, border-radius;
+.collage-tilt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.4rem, 4vw, 2.6rem);
+  width: min(92%, 800px);
 }
-.collage-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* the circle "sunset" accent starts tiny and tucked up near the palm
-   fronds — like it's still a coconut on the tree — then drifts down and
-   grows into its resting spot on top of the main frame once this chapter
-   becomes active, giving the collage a gentle "assembling" reveal */
+.collage-main, .collage-accent {
+  position: relative; flex: 1 1 0; min-width: 0; margin: 0;
+  aspect-ratio: 1 / 1; border-radius: 22px; overflow: hidden;
+  box-shadow: 0 34px 70px rgba(10,22,24,.28);
+}
+.collage-main img, .collage-accent img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.collage-main {
+  opacity: 0; transform: translateX(-46px) scale(0.92);
+  transition: opacity .8s cubic-bezier(.22,.68,0,1) .1s, transform .8s cubic-bezier(.22,.68,0,1) .1s, border-radius .9s cubic-bezier(.22,.68,0,1);
+  will-change: opacity, transform, border-radius;
+}
 .collage-accent {
-  position: absolute; z-index: 2; right: -10%; top: -22%; width: 44%; aspect-ratio: 1 / 1; margin: 0;
-  border-radius: 50%; overflow: hidden; border: 6px solid var(--paper); box-shadow: 0 20px 44px rgba(10,22,24,.26);
-  opacity: 0; transform: translate(48%, -145%) scale(0.2);
-  transition: opacity .9s cubic-bezier(.22,.68,0,1), transform .9s cubic-bezier(.22,.68,0,1);
+  opacity: 0; transform: translateX(46px) scale(0.92);
+  transition: opacity .8s cubic-bezier(.22,.68,0,1) .15s, transform .8s cubic-bezier(.22,.68,0,1) .15s;
   will-change: opacity, transform;
 }
-.collage-accent img { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* the location badge starts collapsed near the sand line and slides/grows
-   up into place last, after the photo and circle have landed */
+/* the location badge sits centered over the gap between the two squares —
+   translate(-50%,-50%) is the permanent centering (always applied), the
+   scale is what animates in/out so the badge never loses its centered
+   position */
 .collage-badge {
-  position: absolute; z-index: 2; left: -2.5%; bottom: 12%; padding: .9rem 1.3rem; border-radius: 14px;
-  background: var(--ink); color: #fff; text-align: left; box-shadow: 0 22px 44px rgba(10,22,24,.3);
-  opacity: 0; transform: translate(-35%, 62%) scale(0.55);
+  position: absolute; z-index: 3; left: 50%; top: 50%; margin: 0;
+  width: max-content; max-width: 78%;
+  padding: .9rem 1.3rem; border-radius: 14px;
+  background: var(--ink); color: #fff; text-align: center;
+  box-shadow: 0 22px 44px rgba(10,22,24,.3);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
   transition: opacity .8s cubic-bezier(.22,.68,0,1) .3s, transform .8s cubic-bezier(.22,.68,0,1) .3s;
   will-change: opacity, transform;
 }
 .collage-badge-eyebrow { display: block; margin-bottom: .25rem; font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; opacity: .68; }
 .collage-badge strong { font-family: "Poppins", Arial, sans-serif; font-size: 1.15rem; font-weight: 600; letter-spacing: -.01em; }
-/* once the frame chapter is active, every piece flies/grows into its
-   final resting position — staggered so it reads as one piece settling
-   after another rather than all landing at once */
-.story-panel-frame.is-active .collage-main { opacity: 1; transform: none; }
-.story-panel-frame.is-active .collage-accent { opacity: 1; transform: none; transition-delay: .15s; }
-.story-panel-frame.is-active .collage-badge { opacity: 1; transform: none; transition-delay: .38s; }
+/* once the frame chapter is active, both squares slide to rest and the
+   badge grows in last, staggered so it reads as pieces arriving one after
+   another rather than all landing at once */
+.story-panel-frame.is-active .collage-main { opacity: 1; transform: translateX(0) scale(1); }
+.story-panel-frame.is-active .collage-accent { opacity: 1; transform: translateX(0) scale(1); transition-delay: .2s; }
+.story-panel-frame.is-active .collage-badge { opacity: 1; transform: translate(-50%, -50%) scale(1); transition-delay: .4s; }
 /* Bonus "exit" beat once you keep scrolling past this last chapter: the
-   circle photo and the location badge slide clear across/off the screen
-   and fade as they go (badge just a beat behind, so it reads as following
-   the circle out), while the main rectangular photo — the only thing left
+   right-hand square and the centered badge shrink and drift DOWN toward
+   where the 3-photo frame row (.frame-card-stack — bottom-right on
+   desktop, bottom-center on mobile) fades in, fading out as they go, so
+   it reads as one continuous motion "arriving" at those three frames
+   rather than just vanishing off the top. Timed to finish (~1.6s) right
+   around when .frame-card-stack finishes fading in (.5s delay + .8s
+   fade = 1.3s) for a smooth handoff instead of the two overlapping
+   mid-transition. Meanwhile the left-hand square — the only thing left
    — smoothly loses its rounded corners as it zooms in to fill the whole
    screen (the actual "zoom in and take over" scale-up lives on
-   .collage-main in the <style> block, since scaling just that photo —
-   not the shared .collage-tilt wrapper — keeps the circle/badge above
-   from being dragged along by the same zoom). */
+   .collage-main in the <style> block, since scaling just that square —
+   not the shared .collage-tilt wrapper — keeps its sibling above from
+   being dragged along by the same zoom). */
 .story-panel-frame.is-frame-exiting .collage-accent {
   opacity: 0;
-  transform: translateY(-130vh) scale(0.7);
-  transition: opacity 1.3s ease .5s, transform 2s cubic-bezier(.3,.7,.4,1);
+  transform: translate(18vw, 42vh) scale(0.32);
+  transition: opacity 1.6s cubic-bezier(.3,.7,.4,1) .1s, transform 1.6s cubic-bezier(.3,.7,.4,1);
 }
 .story-panel-frame.is-frame-exiting .collage-badge {
   opacity: 0;
-  transform: translateY(-130vh) scale(0.85);
-  transition: opacity 1.3s ease .58s, transform 2s cubic-bezier(.3,.7,.4,1) .08s;
+  transform: translate(-50%, -50%) translate(20vw, 46vh) scale(0.3);
+  transition: opacity 1.6s cubic-bezier(.3,.7,.4,1) .16s, transform 1.6s cubic-bezier(.3,.7,.4,1) .06s;
 }
 .story-panel-frame.is-frame-exiting .collage-main {
   border-radius: 0;
 }
 
 @media (max-width: 640px) {
-  .collage-tilt { width: 94%; aspect-ratio: 4 / 3; }
-  .collage-accent { width: 48%; right: -7%; top: -16%; }
-  .collage-badge { left: -1%; bottom: 8%; padding: .7rem 1rem; }
+  .collage-tilt { width: 94%; gap: 1rem; }
+  .collage-badge { padding: .7rem 1rem; max-width: 86%; }
   .collage-badge strong { font-size: .95rem; }
+  /* .frame-card-stack sits bottom-CENTER on phones (not bottom-right like
+     desktop), so the exit drift should head straight down with little/no
+     sideways pull, otherwise it overshoots past the mobile target. */
+  .story-panel-frame.is-frame-exiting .collage-accent { transform: translate(2vw, 40vh) scale(0.32); }
+  .story-panel-frame.is-frame-exiting .collage-badge { transform: translate(-50%, -50%) translate(2vw, 44vh) scale(0.3); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .collage-main, .collage-accent, .collage-badge { opacity: 1 !important; transform: none !important; }
+  .collage-main, .collage-accent { opacity: 1 !important; transform: none !important; }
+  .collage-badge { opacity: 1 !important; transform: translate(-50%, -50%) !important; }
   .collage-tilt { transform: none !important; }
 }
 
-.gallery-section { padding-bottom: clamp(7rem, 13vw, 13rem); }
+.gallery-section { padding-bottom: clamp(3.5rem, 6vw, 5.5rem); }
 .gallery-heading { padding: clamp(3rem, 6vw, 6rem) 0 clamp(3rem, 6vw, 5.5rem) clamp(12%, 17vw, 17rem); }
 .gallery-heading .eyebrow { color: var(--brass); }
 .gallery-heading h2 { max-width: 480px; margin: 1.1rem 0 1.5rem; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
@@ -424,13 +654,27 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 .gallery-grid { display: grid; grid-template-columns: 1.1fr .8fr 1.1fr; grid-template-rows: 250px 250px 250px; gap: 1.1rem; }
 .highlights-gallery-grid { margin-top: clamp(2.5rem, 5vw, 3.8rem); }
 .gallery-item { position: relative; margin: 0; overflow: hidden; background: var(--secondary); }
-.gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease-out), filter .6s ease; }
-.gallery-item:hover img { transform: scale(1.06); filter: saturate(1.08); }
+.gallery-item img { position: absolute; top: -9%; left: 0; width: 100%; height: 118%; object-fit: cover; transform: translate3d(0, var(--img-drift, 0px), 0) scale(var(--img-scale, 1)); transition: transform .25s var(--ease-out), filter .6s ease; will-change: transform; }
+.gallery-item:hover img { --img-scale: 1.06; filter: saturate(1.08); }
 .gallery-item::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(7,22,25,.38), transparent 45%); pointer-events: none; }
 .gallery-item figcaption { position: absolute; z-index: 1; left: 1rem; bottom: .8rem; color: #fff; font-size: .6rem; font-weight: 700; letter-spacing: .13em; }
 .gallery-tall { grid-row: span 2; }
 .gallery-wide { grid-column: span 2; }
 .gallery-square { grid-column: auto; }
+
+/* "View all" row under the gallery grid — was left with no real styling
+   of its own, so it fell back to the browser's default <button> look
+   (gray background, native padding/border) and just auto-placed itself
+   into whatever grid cell was next in the flow instead of sitting
+   centered under the whole grid. */
+.gallery-view-all-row { grid-column: 1 / -1; display: flex; justify-content: center; margin-top: .6rem; }
+.gallery-view-all {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--brass);
+  cursor: pointer;
+  font-family: inherit;
+}
 
 .story-section { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); gap: clamp(2.5rem, 9vw, 10rem); align-items: center; padding-bottom: clamp(8rem, 15vw, 15rem); }
 .story-image { position: relative; aspect-ratio: .84; overflow: hidden; }
@@ -468,7 +712,7 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 .footer-top { display: grid; grid-template-columns: 1fr 1.45fr; gap: 3rem; width: min(100%, 1280px); margin: 0 auto; padding-bottom: clamp(4rem, 8vw, 8rem); }
 .footer-brand { max-width: 340px; }
 .footer-v2-brand-row { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
-.footer-mark { width: auto; height: 40px; margin-bottom: 0; filter: brightness(0) invert(1); opacity: .9; flex-shrink: 0; }
+.footer-mark { width: auto; height: 40px; margin-bottom: 0; opacity: .9; flex-shrink: 0; }
 @media (max-width: 640px) {
   .footer-mark, .footer-mark-fallback { width: auto; height: 34px; margin-bottom: 0; }
   .footer-mark-fallback { font-size: 5.8rem; }
@@ -527,11 +771,28 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 @keyframes panel-in { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 @media (min-width: 1500px) {
-  .section-shell, .motion-content, .closing-content, .footer-top, .footer-bottom { max-width: 1440px; }
-  .hero-title { font-size: clamp(4.5rem, 5.5vw, 6.4rem); }
+  .hero-title { font-size: clamp(2.4rem, 3vw, 3.6rem); }
+}
+/* Every .section-shell-based section (Highlights, Gallery, Why Choose Us,
+   Room Offers heading, footer, etc.) should keep expanding to fill the
+   screen on bigger displays instead of sitting centered inside a fixed
+   1280/1440px column with big dead gutters on either side. Fluid,
+   viewport-based width with a generous ceiling, starting from common
+   laptop sizes and scaling further on large/ultrawide monitors.
+   NOTE: overriding `width` here (not just `max-width`) is required —
+   the base .section-shell rule sets `width: min(100% - 2.5rem, 1280px)`
+   directly, and a plain `max-width` bump can never grow a box past a
+   `width` that's already smaller than it. */
+@media (min-width: 1300px) {
+  .section-shell, .motion-content, .closing-content, .footer-top, .footer-bottom { width: min(92vw, 1600px); max-width: none; }
+}
+@media (min-width: 1700px) {
+  .section-shell, .motion-content, .closing-content, .footer-top, .footer-bottom { width: min(93vw, 2000px); max-width: none; }
+}
+@media (min-width: 2100px) {
+  .section-shell, .motion-content, .closing-content, .footer-top, .footer-bottom { width: min(93vw, 2400px); max-width: none; }
 }
 @media (max-width: 900px) {
-  .site-header { grid-template-columns: 1fr auto; }
   .desktop-nav, .header-cta { display: none; }
   .menu-trigger { display: grid; }
   /* Was animated via `max-height` (0 -> 28rem) over 1.5s — max-height is a
@@ -541,14 +802,29 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
      (already used for this same menu on book-now.html) so the whole open/
      close is handled by the compositor — no layout, no repaint — and cut
      the duration down to something that actually feels instant. */
-  .mobile-menu { position: fixed; z-index: 45; display: block; top: 4.6rem; left: 1rem; right: 1rem; overflow: hidden; visibility: hidden; border-radius: 18px; border: 1px solid rgba(255,255,255,.35); background: rgba(245,241,232,.55); color: var(--ink); box-shadow: 0 20px 45px rgba(23,35,42,.22); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); opacity: 0; transform-origin: top center; transform: scaleY(0); pointer-events: none; will-change: transform, opacity; transition: transform .4s cubic-bezier(.65,0,.35,1), opacity .3s ease, visibility .4s; }
-  .mobile-menu.is-open { visibility: visible; opacity: 1; transform: scaleY(1); pointer-events: auto; }
-  .mobile-menu-inner { display: block; min-height: 0; padding: 1.05rem 0; }
+  .mobile-menu { position: fixed; z-index: 45; display: block; top: 0; left: 0; right: 0; width: 100%; max-width: none; overflow: hidden; visibility: hidden; border: none; border-radius: 0 0 20px 20px; background: rgba(250,248,244,.96); color: var(--ink); box-shadow: 0 20px 45px rgba(23,35,42,.22); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); opacity: 0; transform-origin: top center; transform: scaleY(0); pointer-events: none; will-change: transform, opacity; transition: transform .45s cubic-bezier(.65,0,.35,1), opacity .35s ease, visibility .45s; }
+  .mobile-menu.is-open { visibility: visible; opacity: 1; transform: scaleY(1); pointer-events: auto; overflow-y: auto; transition: transform .45s cubic-bezier(.34,1.2,.4,1), opacity .3s ease; }
+  .mobile-menu-inner { display: block; min-height: 0; background: transparent; padding: 104px 0 8px; box-sizing: border-box; }
   .mobile-menu .eyebrow, .mobile-book { display: none; }
   .mobile-menu nav { display: flex; flex-direction: column; margin: 0; }
-  .mobile-menu nav a { display: flex; align-items: center; padding: 1.05rem 1.4rem; border-bottom: 1px solid rgba(23,35,42,.1); font-family: "DM Sans", Arial, Helvetica, sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0; line-height: 1; color: var(--ink); }
+  .mobile-menu nav a { display: flex; align-items: center; padding: 1.05rem 1.4rem; border-bottom: 1px solid rgba(20,18,14,.12); font-family: "DM Sans", Arial, Helvetica, sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0; line-height: 1; color: #12100d; background: transparent; }
+  .mobile-menu nav a:hover, .mobile-menu nav a:focus { background: rgba(20,18,14,.06); color: #000; }
   .mobile-menu nav a:last-child { border-bottom: 0; }
   .mobile-menu nav a span { display: none; }
+  .mobile-book-now { display: block; width: 100%; box-sizing: border-box; text-align: left; align-self: stretch; margin: 0; background: transparent; color: #12100d; border: none; border-top: 1px solid rgba(20,18,14,.12); box-shadow: none; border-radius: 0; padding: 16px 24px; font-family: "DM Sans", sans-serif; font-size: 1rem; font-weight: 400; cursor: pointer; text-decoration: none; }
+  .mobile-book-now:hover { background: rgba(20,18,14,.06); color: #000; }
+  /* Keep header logo + close icon dark, and the header bar pinned solid
+     white, while the menu is open (this dropdown sits directly under it). */
+  .site-shell:has(.mobile-menu.is-open) .site-header .brand-lockup,
+  .site-shell:has(.mobile-menu.is-open) .site-header .brand-type,
+  .site-shell:has(.mobile-menu.is-open) .site-header .brand-type strong { color: #12100d; opacity: 1; visibility: visible; }
+  .site-shell:has(.mobile-menu.is-open) .site-header .brand-mark { filter: brightness(0); }
+  .site-header.is-menu-open .brand-lockup,
+  .site-header.is-menu-open .brand-type,
+  .site-header.is-menu-open .brand-type strong { color: #12100d; opacity: 1; visibility: visible; }
+  .site-header.is-menu-open .brand-mark { filter: brightness(0); }
+  .site-shell:has(.mobile-menu.is-open) .site-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1001; background: rgba(250,248,244,.98); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); box-shadow: none; opacity: 1; visibility: visible; transform: none; }
+  .site-shell:has(.mobile-menu.is-open) .mobile-menu { position: fixed; top: 0; }
   .mobile-book { align-self: flex-start; }
   .hero-rail { display: none; }
   .intro-layout { grid-template-columns: 1fr; gap: 3rem; }
@@ -564,9 +840,7 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
   .brand-type strong { font-size: 1.1rem; }
   .hero-section { min-height: 760px; }
   .hero-content { width: min(100% - 2.5rem, 500px); padding-top: 1rem; }
-  .hero-backdrop { background-image: url('img/home%20mobile.jpeg'); background-position: right 60%; }
-  .hero-section.is-intro-done .hero-backdrop { animation-name: hero-drift-flipped; }
-  .hero-title { font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: .84; }
+  .hero-title { font-size: clamp(2rem, 8vw, 3rem); line-height: 1.55; margin-bottom: 1.6rem; }
   .hero-title-break { display: block; }
   .hero-copy { max-width: 17rem; font-size: .9rem; }
   .hero-actions { margin-top: 1.8rem; }
@@ -612,8 +886,8 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
   .offer-copy h2, .celebration-copy h2 { font-size: clamp(3.5rem, 16vw, 5.6rem); }
   .offer-note { right: 1.25rem; bottom: 1.35rem; max-width: 12rem; text-align: right; line-height: 1.4; }
   .gallery-heading { padding: 2.8rem 0 3.5rem; }
-  .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 190px); gap: .75rem; }
-  .gallery-tall, .gallery-wide, .gallery-square { grid-column: auto; grid-row: auto; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 170px; grid-auto-flow: dense; gap: .75rem; }
+  .gallery-view-all-row.gallery-view-all-cell { grid-column: auto; margin-top: 0; height: 100%; align-items: center; }
   .story-section { grid-template-columns: 1fr; gap: 3.8rem; }
   .story-image { aspect-ratio: 1.05; }
   .story-copy .section-index { margin-bottom: 2.8rem; }
@@ -671,7 +945,7 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 }
 
 /* Editorial Island Luxury: the navigation sits on plain white paper with dark ink contrast; the CTA remains frosted glass. */
-.site-header, .site-header.is-scrolled { background: #fff; color: var(--ink); border-bottom-color: rgba(23,35,42,.12); box-shadow: 0 8px 26px rgba(23,35,42,.06); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.site-header, .site-header.is-scrolled { background: #fff; color: var(--ink); border-bottom: none; box-shadow: 0 8px 26px rgba(23,35,42,.06); backdrop-filter: none; -webkit-backdrop-filter: none; }
 .site-header .brand-mark { filter: none; }
 .site-header .brand-mark-fallback { color: var(--teal); }
 .site-header .header-cta { border-color: rgba(11,110,112,.22); background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(208,232,230,.62)); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.98), 0 7px 20px rgba(11,110,112,.08); }
@@ -682,23 +956,29 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 .site-header .desktop-nav a, .site-header .brand-type { color: var(--ink); }
 
 /* Reference navbar behavior: transparent over the hero, solid white after the user scrolls. */
-.site-header:not(.is-scrolled) { background-color: transparent !important; background-image: none !important; color: #fff !important; border-bottom-color: rgba(255,255,255,.26); box-shadow: none; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.site-header:not(.is-scrolled) { background-color: transparent !important; background-image: none !important; color: #fff !important; border-bottom: none; box-shadow: none; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 .site-header:not(.is-scrolled) .desktop-nav a, .site-header:not(.is-scrolled) .brand-type { color: #fff; }
-.site-header:not(.is-scrolled) .brand-mark { filter: brightness(0) invert(1); }
+.site-header:not(.is-scrolled) .brand-mark { filter: none; }
 .site-header:not(.is-scrolled) .brand-mark-fallback { color: #fff; }
 .site-header:not(.is-scrolled) .header-cta { border-color: rgba(255,255,255,.5); background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,.25)); color: #fff; }
-.site-header.is-scrolled { background-color: #fff !important; color: var(--ink) !important; border-bottom-color: rgba(23,35,42,.12); box-shadow: 0 8px 26px rgba(23,35,42,.06); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.site-header.is-scrolled { background-color: #fff !important; color: var(--ink) !important; border-bottom: none; box-shadow: 0 8px 26px rgba(23,35,42,.06); backdrop-filter: none; -webkit-backdrop-filter: none; }
 .site-header.is-scrolled .desktop-nav a, .site-header.is-scrolled .brand-type { color: var(--ink); }
-.site-header.is-scrolled .brand-mark { filter: none; }
+.site-header.is-scrolled .brand-mark { filter: brightness(0); }
 .site-header.is-scrolled .brand-mark-fallback { color: var(--teal); }
 
 /* Editorial Island Luxury: gently lift the hero copy so its optical center sits above the image midpoint. */
-.hero-content { transform: translateY(-9vh); }
-@media (max-width: 640px) { .hero-content { transform: translateY(-7vh); } }
+.hero-content { transform: translateY(0); }
+@media (max-width: 640px) { .hero-content { transform: translateY(0); } }
 
 /* Editorial Island Luxury: the hero descriptor stays quiet and single-line on desktop, then wraps safely on compact screens. */
 .hero-copy { max-width: none; white-space: nowrap; font-size: clamp(.76rem, 1vw, .92rem); }
 @media (max-width: 640px) { .hero-copy { max-width: 18rem; white-space: normal; font-size: .84rem; } }
+/* on mobile the glass button's top inset highlight reads as an odd mirror-
+   like sheen across the pill — flatten it to a plain translucent fill with
+   just the outer drop shadow, no inset line, no gradient. */
+@media (max-width: 640px) {
+  .hero-explore-btn { background: linear-gradient(135deg, rgba(11,110,112,.97), rgba(4,38,46,.97)); border-color: rgba(255,255,255,.8); box-shadow: 0 9px 25px rgba(0,0,0,.5); backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%); }
+}
 
 /* Editorial Island Luxury: ocean-blue ink and sea-glass white define the palette across paper sections and CTAs. */
 :root { --ocean-blue: #0b6170; --ocean-deep: #073d4a; --ocean-mist: #e8f4f4; --ocean-line: #9bc5c7; }
@@ -754,11 +1034,37 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
 /* Editorial Island Luxury: sample-matched typography uses clean sans-serif geometry, bold display weight, and calm uppercase labels. */
 body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans", Arial, Helvetica, sans-serif; }
 .hero-title, .display-heading, .motion-content h2, .offer-copy h2, .story-copy h2, .closing-content h2, .footer-brand h2, .footer-brand h2 em, .card-copy h3 { font-family: "DM Sans", Arial, Helvetica, sans-serif; font-style: normal; font-weight: 700; letter-spacing: -.045em; line-height: 1.04; }
+.hero-title { line-height: 1.3; }
+/* Mobile: the custom Agraham display face has tall swashes/ascenders that
+   still crowd the two title lines together even at line-height 1.3 on
+   larger screens — mobile needs noticeably more room between "Dhaankolhu"
+   and "Rasdhoo", plus more breathing space before the subtitle below.
+   Placed after the unconditional rule above so it wins the cascade on
+   small screens without touching desktop spacing. */
+@media (max-width: 640px) {
+  .hero-title { line-height: 1.55; margin: .9rem auto 1.6rem; }
+}
 .hero-title em, .display-heading em, .motion-content h2 em, .offer-copy h2 em, .story-copy h2 em, .closing-content h2 em { font-family: inherit; font-style: normal; font-weight: 700; }
 .brand-type strong, .brand-type small, .desktop-nav a, .eyebrow, .button, .header-cta, .section-index, .card-number, .card-arrow, .footer-label, .footer-bottom { font-family: "DM Sans", Arial, Helvetica, sans-serif; }
 .eyebrow { font-weight: 700; letter-spacing: .22em; }
 .hero-eyebrow { color: rgba(255,255,255,.85) !important; }
 .hero-copy, .intro-body, .section-lede, .card-copy p, .offer-copy p, .story-copy p, .footer-brand p, .footer-columns, .motion-content p { font-family: "DM Sans", Arial, Helvetica, sans-serif; font-style: normal; }
+
+/* Luxury resort touch: page headers get an elegant serif display face instead
+   of the site's default geometric sans, giving them a more premium,
+   resort-editorial feel. Body copy/descriptions stay on the sans-serif font. */
+.display-heading, .motion-content h2, .offer-copy h2, .story-copy h2, .closing-content h2, .footer-brand h2, .card-copy h3, .celebration-copy h2, .excursion-row-copy h3 { font-family: "Playfair Display", Georgia, serif; font-weight: 600; letter-spacing: -.02em; line-height: 1.18; }
+/* Custom luxury display font (client-supplied, commercially licensed) —
+   used on the hero header only; every other heading keeps Playfair Display. */
+@font-face {
+  font-family: "Agraham";
+  src: url("fonts/Agraham.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+.hero-title { font-family: "Agraham", "Playfair Display", Georgia, serif; font-weight: 400; letter-spacing: 0; }
+.hero-title em, .display-heading em, .motion-content h2 em, .offer-copy h2 em, .story-copy h2 em, .closing-content h2 em, .footer-brand h2 em { font-family: inherit; font-weight: 600; }
 
 /* Uniform small text sizing for header nav and footer content, as requested. */
 .brand-type strong { font-size: .95rem; }
@@ -797,6 +1103,9 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 .video-play-button { position: absolute; right: 1.5rem; bottom: 1.5rem; display: grid; place-items: center; width: 52px; height: 52px; padding-left: 3px; border: 1px solid rgba(255,255,255,.35); border-radius: 12px; color: #fff; background: rgba(20,20,20,.55); backdrop-filter: blur(10px); font-size: .95rem; transition: background .25s ease, transform .2s var(--ease-out); }
 .video-play-button:hover { background: var(--brass); transform: scale(1.05); }
 .video-caption { max-width: 640px; margin: clamp(1.6rem, 3vw, 2.2rem) auto 0; color: var(--muted-foreground); font-size: .9rem; line-height: 1.7; }
+.video-credit { max-width: 640px; margin: .6rem auto 0; color: var(--muted-foreground); opacity: .7; font-size: .78rem; line-height: 1.6; }
+.video-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.video-credit a:hover { color: var(--ink); }
 
 /* --- Video frame: ambient glow + viewfinder corners + location badge --- */
 .video-frame-wrap { position: relative; max-width: 900px; margin: 0 auto; }
@@ -859,12 +1168,115 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 .highlights-heading { max-width: 900px; white-space: normal; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
 
 /* Redesign the highlight cards: rounded images, left-aligned titles and copy, no number/arrow overlay. */
-.card-image-wrap { border-radius: 14px; aspect-ratio: 16 / 9; }
+.card-image-wrap { border-radius: 0; aspect-ratio: 16 / 9; }
 .card-image-wrap::after { display: none; }
 .card-copy { text-align: left; padding: 1.1rem 0 0; }
 .card-copy h3 { font-size: 1.35rem; }
 .card-copy p { max-width: none; text-align: left; }
 .highlights-section .card-copy, .highlights-section .card-copy h3, .highlights-section .card-copy p { text-align: left; }
+
+/* ==========================================================================
+   Highlights cards (Sunset Swing / Island From Above / Snorkeling the
+   Lagoon) — the title now sits baked onto the photo itself instead of as
+   plain text underneath it, and hovering smoothly darkens the photo and
+   reveals the description + a "Find Out More" cta beneath the title —
+   same idea as the Adaaran-style highlight tiles. Scoped to
+   .highlights-section .stay-card specifically (and carries higher
+   specificity than the unscoped .card-image-wrap/.card-copy rules just
+   above) so "Why Choose Us" further down, which reuses the exact same
+   .stay-card markup, is untouched and keeps its plain photo-then-text
+   layout.
+   ========================================================================== */
+.highlights-section .stay-card { position: relative; }
+.highlights-section .stay-card .card-image-wrap { aspect-ratio: .82; }
+.highlights-section .stay-card .card-image-wrap::after {
+  display: block;
+  background: linear-gradient(0deg, rgba(7,22,25,.82) 0%, rgba(7,22,25,.38) 42%, rgba(7,22,25,0) 70%);
+  transition: background .5s var(--ease-out);
+}
+.highlights-section .stay-card:hover .card-image-wrap::after,
+.highlights-section .stay-card:focus-within .card-image-wrap::after {
+  background: linear-gradient(0deg, rgba(7,22,25,.92) 0%, rgba(7,22,25,.6) 55%, rgba(7,22,25,.05) 100%);
+}
+
+.highlights-section .stay-card .card-copy {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(1.3rem, 2.4vw, 1.9rem) clamp(1.2rem, 2.2vw, 1.7rem) clamp(1.5rem, 2.6vw, 2rem);
+  color: #fff;
+}
+.highlights-section .stay-card .card-tag {
+  display: block;
+  margin-bottom: .5rem;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+  font-size: .66rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.82);
+}
+.highlights-section .stay-card .card-copy h3 { margin: 0; color: #fff; font-size: clamp(1.3rem, 2.2vw, 1.6rem); }
+
+/* The description + cta live inside a grid row that's collapsed to 0fr by
+   default and expands to 1fr on hover — a pure-CSS height animation
+   (no fixed max-height guess needed) that reads as the panel "growing"
+   open, pushing the title up slightly as it does. */
+.highlights-section .stay-card .card-hover-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  opacity: 0;
+  transition: grid-template-rows .5s var(--ease-out), opacity .4s ease;
+}
+.highlights-section .stay-card:hover .card-hover-reveal,
+.highlights-section .stay-card:focus-within .card-hover-reveal {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.highlights-section .stay-card .card-hover-reveal-inner { overflow: hidden; }
+.highlights-section .stay-card .card-copy p {
+  margin: .85rem 0 0;
+  max-width: none;
+  color: rgba(255,255,255,.88);
+  font-size: .82rem;
+  line-height: 1.6;
+}
+.highlights-section .stay-card .card-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.1rem;
+  padding: .6rem 1.25rem;
+  background: var(--brass);
+  color: #fff;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  transition: background .2s ease, transform .2s var(--ease-out);
+}
+.highlights-section .stay-card:hover .card-cta,
+.highlights-section .stay-card:focus-within .card-cta { transform: translateY(-1px); }
+
+/* Touch devices can't hover, so show the description + cta right away
+   instead of hiding content behind an interaction that can't happen there
+   — tapping the card still opens the full detail view as normal. */
+@media (hover: none) {
+  .highlights-section .stay-card .card-hover-reveal { grid-template-rows: 1fr; opacity: 1; }
+  .highlights-section .stay-card .card-image-wrap::after { background: linear-gradient(0deg, rgba(7,22,25,.88) 0%, rgba(7,22,25,.45) 50%, rgba(7,22,25,.05) 100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlights-section .stay-card .card-image-wrap::after,
+  .highlights-section .stay-card .card-hover-reveal,
+  .highlights-section .stay-card .card-cta { transition: none; }
+}
 
 /* Even out the highlight cards so all three sit at the same height, no staggered offsets. */
 .stay-card.card-offset-2, .stay-card.card-offset-3 { margin-top: 0; }
@@ -878,13 +1290,14 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 .location-section .section-heading-row { padding-top: clamp(2rem, 4vw, 3rem); margin-bottom: clamp(1.6rem, 3vw, 2.6rem); text-align: center; }
 .location-section .eyebrow { color: var(--brass); margin-bottom: 1.1rem; }
 .location-section .display-heading { font-size: clamp(1.5rem, 2.6vw, 2.1rem); white-space: nowrap; }
-.location-section .section-lede { max-width: none; margin: 0 auto; }
-.location-frame { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+.location-section .section-lede { max-width: none; margin: .9rem auto 0; }
+.location-frame { position: relative; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; }
 .location-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
 .location-cta-row { margin-top: clamp(1.8rem, 3.5vw, 2.6rem); text-align: center; }
 @media (max-width: 640px) {
   .location-section .display-heading { white-space: normal; font-size: clamp(1.5rem, 7vw, 2.1rem); }
-  .location-frame { height: 100svh; }
+  .location-frame { height: 100vh; height: 100dvh; } /* dvh, not svh — svh freezes at the
+    smallest possible height, leaving a gap once the address bar auto-hides */
 }
 /* heading row was removed from this section (no title/eyebrow above the
    slideshow anymore) — add back a bit of breathing room above it since it
@@ -901,17 +1314,52 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 .slide-content p { max-width: 30rem; margin: 0 0 .8rem; color: rgba(255,255,255,.82); font-size: .82rem; line-height: 1.5; }
 .slide-cta { display: inline-flex; align-items: center; min-height: 36px; padding: 0 1.15rem; border: 0; border-radius: 999px; background: #fff; color: var(--ink); font-size: .74rem; font-weight: 700; transition: transform .18s var(--ease-out), background .2s ease; }
 .slide-cta:hover { background: var(--brass); color: #fff; transform: translateY(-2px); }
-.slideshow-dots { position: absolute; left: 50%; bottom: 1.3rem; z-index: 2; display: flex; align-items: center; justify-content: center; gap: .5rem; transform: translateX(-50%); }
-.dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,.42); overflow: hidden; transition: width .25s var(--ease-out), background .25s ease; }
-.dot.is-active { width: 26px; background: rgba(255,255,255,.32); }
-.dot-progress { position: absolute; inset: 0; width: 0%; background: #fff; border-radius: inherit; }
-.dot.is-active .dot-progress { animation: dotProgress 6s linear forwards; }
-@keyframes dotProgress {
-  from { width: 0%; }
-  to   { width: 100%; }
+/* Dots + line loader now sit together, bottom-left, instead of the dots
+   being centered — .slideshow-dots is no longer absolutely positioned on
+   its own; it's a normal flex child of .slideshow-nav-left below. */
+.slideshow-nav-left { position: absolute; left: clamp(1.2rem, 3vw, 2rem); bottom: 1.3rem; z-index: 2; display: flex; align-items: center; }
+.slideshow-dots { position: static; display: flex; align-items: center; gap: .5rem; transform: none; }
+/* Full-width loading line across the very top of the slideshow, filling
+   left-to-right over each slide's 6s dwell time and resetting on every
+   slide change (restarted in script.js). */
+.slideshow-top-loader { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; z-index: 2; background: rgba(255,255,255,.25); overflow: hidden; }
+.slideshow-top-loader-fill { position: absolute; inset: 0 auto 0 0; width: 0%; height: 100%; background: #fff; }
+/* Dots are now a plain, simple on/off switch — no per-dot progress ring —
+   just a smooth width/opacity/background transition between states. */
+.dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,.42); opacity: .8; transition: width .35s var(--ease-out), background .35s ease, opacity .35s ease; }
+.dot.is-active { width: 22px; background: #fff; opacity: 1; }
+.dot:hover, .dot:focus-visible { opacity: 1; }
+/* Centered "Discover the Island" caption over the slideshow photos. */
+.slideshow-center-text { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 0 1.5rem; pointer-events: none; font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: clamp(1.9rem, 4.2vw, 3.2rem); color: #fff; text-align: center; text-shadow: 0 2px 22px rgba(0,0,0,.5); }
+@media (max-width: 640px) { .slideshow-nav-left { left: clamp(1rem, 4vw, 1.4rem); bottom: 1.1rem; } }
+/* "Explore Rasdhoo" CTA, overlaid inside the slideshow photos (not tied to
+   any one slide — sits above all 3 so it reads correctly regardless of
+   which photo is currently showing). Right-aligned so it never collides
+   with the centered dots. Pulsing "wave" rings (like sonar/ripples)
+   expand outward from the pill on a loop to draw the eye to it. */
+.slideshow-explore-cta { position: absolute; right: clamp(1.2rem, 3vw, 2rem); bottom: 1.3rem; z-index: 2; }
+.slideshow-explore-cta::before,
+.slideshow-explore-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid rgba(255,255,255,.85);
+  pointer-events: none;
+  animation: slideshowCtaWave 2.6s ease-out infinite;
+}
+.slideshow-explore-cta::after { animation-delay: 1.3s; }
+@keyframes slideshowCtaWave {
+  0%   { transform: scale(1);    opacity: .65; }
+  70%  { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .dot-progress { animation: none !important; width: 100% !important; }
+  .slideshow-explore-cta::before, .slideshow-explore-cta::after { animation: none; display: none; }
+}
+@media (max-width: 640px) { .slideshow-explore-cta { right: clamp(1rem, 4vw, 1.4rem); bottom: 1.1rem; } }
+@media (prefers-reduced-motion: reduce) {
+  .slideshow-top-loader-fill { transition: none !important; width: 100% !important; }
 }
 @media (max-width: 640px) {
   .slideshow-track { min-height: 312px; border-radius: 12px; }
@@ -922,9 +1370,9 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 .brand-type strong { font-size: 1.02rem; font-weight: 700; letter-spacing: -.02em; }
 .brand-type small { margin-top: .25rem; font-size: .46rem; letter-spacing: .16em; color: var(--brass); opacity: 1; }
 .desktop-nav { gap: clamp(1.3rem, 2.6vw, 2.2rem); }
-.desktop-nav a { font-size: .82rem; font-weight: 500; letter-spacing: 0; text-transform: none; opacity: .85; }
+.desktop-nav a { font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .85; }
 .desktop-nav a:hover { opacity: 1; }
-.header-cta { min-height: 36px; padding: .55rem 1rem; border-radius: 999px; border: 0; background: var(--ink); background-image: none; color: #fff; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; font-size: .72rem; font-weight: 700; letter-spacing: .01em; text-transform: none; }
+.header-cta { min-height: 36px; padding: .6rem 1.2rem; border-radius: 0; border: 0; background: var(--ink); background-image: none; color: #fff; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .header-cta:hover { background: var(--teal); color: #fff; box-shadow: none; }
 .site-header.is-scrolled .header-cta { background: var(--ink); background-image: none; color: #fff; box-shadow: none; }
 .site-header.is-scrolled .header-cta:hover { background: var(--teal); }
@@ -933,8 +1381,8 @@ body, .site-shell, .site-header, button, input, textarea { font-family: "DM Sans
 .site-header:not(.is-scrolled) { min-height: 76px; padding-top: .6rem; padding-bottom: .6rem; }
 .site-header.is-scrolled { min-height: 64px; padding-top: .35rem; padding-bottom: .35rem; }
 @media (max-width: 640px) {
-  .site-header:not(.is-scrolled) { min-height: 70px; }
-  .site-header.is-scrolled { min-height: 58px; }
+  .site-header:not(.is-scrolled) { min-height: 76px; }
+  .site-header.is-scrolled { min-height: 64px; }
 }
 
 /* ---------- hero "scroll down" cue: mirrors the contact bubble on the
@@ -1000,53 +1448,186 @@ html.story-scroll-lock .hero-scroll-cue {
   flex-direction: column;
   align-items: flex-end;
   gap: .7rem;
+  /* the column's own box spans the full height of its children — including
+     the chat panel and telegram bubble even while they're invisible/closed
+     (opacity:0) — so without this, that empty space silently blocked
+     clicks on whatever sat underneath it (e.g. the "View all" link) */
+  pointer-events: none;
 }
 .contact-bubble-options {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: .7rem;
-}
-.contact-bubble-options .wa-bubble {
-  opacity: 0;
-  transform: translateY(14px) scale(.85);
   pointer-events: none;
-  transition: opacity .3s var(--ease-out, ease), transform .3s var(--ease-out, ease);
 }
-.contact-bubbles.is-open .contact-bubble-options .wa-bubble {
+.contact-trigger-row, .contact-trigger-wrap, .contact-trigger { pointer-events: auto; }
+/* ---------- chat widget popup (styled like a live-chat box, but the
+   send button just opens WhatsApp with the typed message) ---------- */
+.chat-widget-panel {
+  width: min(320px, calc(100vw - 2.4rem));
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(9,30,33,.28), 0 4px 14px rgba(9,30,33,.12);
+  opacity: 0;
+  transform: translateY(18px) scale(.92);
+  transform-origin: bottom right;
+  pointer-events: none;
+  transition: opacity .28s var(--ease-out, ease), transform .28s var(--ease-out, ease);
+}
+.contact-bubbles.is-open .chat-widget-panel {
   opacity: 1;
   transform: none;
   pointer-events: auto;
 }
-/* stagger: Telegram (first child) pops in slightly after WhatsApp (second child),
-   so the reveal reads top-to-bottom as it rises from the trigger */
-.contact-bubble-options .wa-bubble:nth-child(2) { transition-delay: 0s; }
-.contact-bubble-options .wa-bubble:nth-child(1) { transition-delay: .06s; }
-.contact-trigger {
-  position: relative;
+.chat-widget-header {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(155deg, #25d366, #128c7e);
+  color: #fff;
+}
+.chat-widget-avatar {
+  flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 58px;
-  height: 58px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fff;
+  overflow: hidden;
+}
+.chat-widget-avatar img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.chat-widget-headtext { display: flex; flex-direction: column; gap: .12rem; line-height: 1.2; }
+.chat-widget-headtext strong { display: inline-flex; align-items: center; gap: .3rem; font-family: "DM Sans", Arial, Helvetica, sans-serif; font-size: .95rem; font-weight: 700; color: #fff; }
+.chat-widget-verified { flex-shrink: 0; display: inline-grid; place-items: center; width: 15px; height: 15px; }
+.chat-widget-verified svg { width: 100%; height: 100%; display: block; }
+.chat-widget-headtext em { font-style: italic; font-size: .78rem; color: rgba(255,255,255,.85); }
+.chat-widget-body {
+  padding: 1.2rem 1.1rem 1rem;
+  background: var(--ivory, #f6f1e8);
+}
+.chat-widget-message { display: flex; align-items: flex-end; gap: .5rem; }
+.chat-widget-message-avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgba(23,35,42,.1);
+  overflow: hidden;
+}
+.chat-widget-message-avatar img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.chat-widget-bubble {
+  position: relative;
+  max-width: 88%;
+  padding: .8rem 1rem;
+  border-radius: 16px 16px 16px 4px;
+  background: #fff;
+  color: var(--ink, #17232a);
+  font-size: .88rem;
+  line-height: 1.45;
+  box-shadow: 0 6px 18px rgba(9,30,33,.08);
+}
+.chat-widget-inputrow {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: 0 1rem 1.1rem;
+  background: var(--ivory, #f6f1e8);
+}
+.chat-widget-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  padding: 0 1rem;
+  border: 1px solid rgba(23,35,42,.12);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink, #17232a);
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+  font-size: .85rem;
+}
+.chat-widget-input::placeholder { color: rgba(23,35,42,.42); }
+.chat-widget-input:focus { outline: none; border-color: #25d366; box-shadow: 0 0 0 3px rgba(37,211,102,.14); }
+.chat-widget-send {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
   border: 0;
   border-radius: 50%;
-  background: linear-gradient(155deg, var(--teal, #0b6e70), var(--teal-deep, #073f40));
+  background: linear-gradient(155deg, #25d366, #128c7e);
   color: #fff;
-  box-shadow: 0 14px 30px rgba(11,110,112,.4), inset 0 1px 0 rgba(255,255,255,.25);
   cursor: pointer;
   transition: transform .2s var(--ease-out, ease), box-shadow .2s ease;
+  box-shadow: 0 8px 18px rgba(37,211,102,.35);
 }
-.contact-trigger:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 18px 36px rgba(11,110,112,.48), inset 0 1px 0 rgba(255,255,255,.25); }
-.contact-trigger-icon { position: absolute; display: grid; place-items: center; transition: opacity .2s ease, transform .25s var(--ease-out, ease); }
-.contact-trigger-icon-close { opacity: 0; transform: scale(.5) rotate(-45deg); }
-.contact-bubbles.is-open .contact-trigger-icon-open { opacity: 0; transform: scale(.5) rotate(45deg); }
-.contact-bubbles.is-open .contact-trigger-icon-close { opacity: 1; transform: scale(1) rotate(0deg); }
-.wa-bubble {
+.chat-widget-send:hover { transform: translateY(-2px) scale(1.05); }
+.chat-widget-telegram-link {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .85rem 1.1rem;
+  background: #fff;
+  border-top: 1px solid rgba(23,35,42,.08);
+  color: var(--ink, #17232a);
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+  font-size: .82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .2s ease;
+}
+.chat-widget-telegram-link:hover { background: var(--ivory, #f6f1e8); }
+.chat-widget-telegram-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(155deg, #4bc3ec, #229ed9);
+}
+.chat-widget-telegram-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* row holding the small Telegram shortcut beside the main trigger/close button */
+.contact-trigger-row {
   display: flex;
   align-items: center;
   gap: .6rem;
 }
-.wa-bubble-tooltip {
+.telegram-fab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #4bc3ec, #229ed9);
+  box-shadow: 0 12px 26px rgba(34,158,217,.4), inset 0 1px 0 rgba(255,255,255,.3);
+  opacity: 0;
+  transform: translateY(10px) scale(.85);
+  pointer-events: none;
+  transition: opacity .26s var(--ease-out, ease) .04s, transform .26s var(--ease-out, ease) .04s, box-shadow .2s ease;
+  overflow: hidden;
+}
+.contact-bubbles.is-open .telegram-fab {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.telegram-fab img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.telegram-fab:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 16px 32px rgba(34,158,217,.48), inset 0 1px 0 rgba(255,255,255,.3); }
+.telegram-fab-tooltip {
+  position: absolute;
+  right: calc(100% + .6rem);
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
   padding: .55rem .95rem;
   background: var(--ink, #17232a);
   color: #fff;
@@ -1056,38 +1637,45 @@ html.story-scroll-lock .hero-scroll-cue {
   white-space: nowrap;
   box-shadow: 0 10px 24px rgba(17,30,34,.18);
   opacity: 0;
-  transform: translateX(8px);
   pointer-events: none;
   transition: opacity .22s ease, transform .22s ease;
 }
-.wa-bubble:hover .wa-bubble-tooltip,
-.wa-bubble:focus-within .wa-bubble-tooltip {
+.telegram-fab:hover .telegram-fab-tooltip,
+.telegram-fab:focus-visible .telegram-fab-tooltip {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(-50%) translateX(0);
 }
-.wa-bubble-btn {
+.contact-trigger {
   position: relative;
   display: grid;
   place-items: center;
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  background: linear-gradient(155deg, #2fd66b, #1fa855);
-  color: #fff;
-  box-shadow: 0 14px 30px rgba(31,168,85,.38), inset 0 1px 0 rgba(255,255,255,.3);
-  transition: transform .2s var(--ease-out, ease), box-shadow .2s ease;
-  flex-shrink: 0;
   overflow: hidden;
+  background: transparent;
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(0,0,0,.3);
+  cursor: pointer;
+  transition: transform .2s var(--ease-out, ease), box-shadow .2s ease;
 }
-.wa-bubble-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 18px 36px rgba(31,168,85,.46), inset 0 1px 0 rgba(255,255,255,.3); }
-.wa-bubble-btn img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; transform: scale(1.55); }
-.telegram-bubble-btn { background: linear-gradient(155deg, #4bc3ec, #229ed9); box-shadow: 0 14px 30px rgba(34,158,217,.4), inset 0 1px 0 rgba(255,255,255,.3); }
-.telegram-bubble-btn:hover { box-shadow: 0 18px 36px rgba(34,158,217,.48), inset 0 1px 0 rgba(255,255,255,.3); }
-.telegram-bubble-btn img { transform: scale(1); }
+.contact-trigger:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 18px 36px rgba(0,0,0,.36); }
+.contact-trigger-wrap { position: relative; display: inline-flex; }
+.contact-trigger-badge { position: absolute; top: -2px; right: -2px; z-index: 3; display: grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: #e14b3f; color: #fff; font-family: "DM Sans", Arial, Helvetica, sans-serif; font-size: .6rem; font-weight: 700; line-height: 1; box-shadow: 0 0 0 2px #fff, 0 3px 8px rgba(0,0,0,.25); transition: opacity .2s ease, transform .2s ease; }
+.contact-bubbles.is-open .contact-trigger-badge { opacity: 0; transform: scale(.5); pointer-events: none; }
+.contact-trigger-icon { position: absolute; display: grid; place-items: center; transition: opacity .2s ease, transform .25s var(--ease-out, ease); }
+.contact-trigger-icon-open { inset: 0; }
+.contact-trigger-icon-open svg { display: block; }
+.contact-trigger-icon-close { opacity: 0; transform: scale(.5) rotate(-45deg); }
+.contact-bubbles.is-open .contact-trigger-icon-open { opacity: 0; transform: scale(.5) rotate(45deg); }
+.contact-bubbles.is-open .contact-trigger-icon-close { opacity: 1; transform: scale(1) rotate(0deg); }
 @media (max-width: 640px) {
-  .wa-bubble-tooltip { display: none; }
-  .wa-bubble-btn { width: 52px; height: 52px; }
-  .contact-trigger { width: 52px; height: 52px; }
+  .telegram-fab-tooltip { display: none; }
+  .telegram-fab { width: 40px; height: 40px; }
+  .contact-trigger { width: 48px; height: 48px; }
+  .chat-widget-panel { width: min(300px, calc(100vw - 2rem)); }
 }
 
 /* ==========================================================================
@@ -1180,8 +1768,17 @@ html.story-scroll-lock .hero-scroll-cue {
 .excursion-gallery-title { font-family: "Poppins", Arial, sans-serif; font-size: 1.4rem; font-weight: 600; color: var(--ink); }
 .excursion-gallery-close { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 999px; border: 1px solid rgba(23,35,42,.18); background: #fff; color: var(--ink); cursor: pointer; transition: background .2s ease, transform .2s ease; }
 .excursion-gallery-close:hover { background: rgba(23,35,42,.06); transform: rotate(90deg); }
-.excursion-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: clamp(1rem, 2.2vw, 1.6rem); max-width: 1400px; margin: 0 auto; padding: clamp(1.8rem, 4vw, 2.8rem) 6vw clamp(3rem, 6vw, 4.5rem); }
-.excursion-gallery-grid .excursion-card { width: 100%; content-visibility: auto; contain-intrinsic-size: 240px 320px; }
+.excursion-gallery-grid { display: flex; flex-direction: column; gap: 0; max-width: 1400px; padding: clamp(1.8rem, 4vw, 2.8rem) 6vw clamp(3rem, 6vw, 4.5rem); }
+.excursion-row { display: grid; grid-template-columns: 380px 1fr; align-items: center; gap: clamp(1.6rem, 3.5vw, 3rem); cursor: pointer; padding: clamp(1.6rem, 3vw, 2.2rem) 0; border-bottom: 1px solid rgba(23,35,42,.08); }
+.excursion-row:first-child { padding-top: 0; }
+.excursion-row:last-child { border-bottom: none; padding-bottom: 0; }
+.excursion-row-media { position: relative; aspect-ratio: 4 / 3; border-radius: 0; overflow: hidden; box-shadow: 0 8px 24px rgba(23,35,42,.1); }
+.excursion-row-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.16,1,.3,1); }
+.excursion-row:hover .excursion-row-media img { transform: scale(1.06); }
+.excursion-row-copy { max-width: 520px; }
+.excursion-row-eyebrow { display: block; text-transform: uppercase; font-size: .72rem; letter-spacing: .08em; color: var(--brass, #b98a4d); font-weight: 600; }
+.excursion-row-copy h3 { font-family: "Poppins", Arial, sans-serif; font-size: clamp(1.15rem, 2vw, 1.45rem); font-weight: 600; color: var(--ink); margin: .35rem 0 .5rem; }
+.excursion-row-copy p { font-size: .92rem; line-height: 1.7; color: #5a6570; margin: 0; }
 
 /* ---------- "All Photos" gallery overlay: same slide-in/out treatment as
    the excursions "All Experiences" overlay, opened from the "View all"
@@ -1191,25 +1788,55 @@ html.story-scroll-lock .hero-scroll-cue {
 .gallery-full-overlay.is-shown { transform: translate3d(0,0,0); }
 /* same backdrop-filter fix as the excursion overlay above: no blur while
    the slide-in transition is actually running, only once settled */
-.gallery-full-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 6vw; background: #fff; border-bottom: 1px solid rgba(23,35,42,.08); }
+.gallery-full-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem clamp(1.25rem, 2.5vw, 2.5rem); background: #fff; border-bottom: 1px solid rgba(23,35,42,.08); }
 .gallery-full-overlay.anim-settled .gallery-full-header { background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .gallery-full-title { font-family: "Poppins", Arial, sans-serif; font-size: 1.4rem; font-weight: 600; color: var(--ink); }
 .gallery-full-close { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 999px; border: 1px solid rgba(23,35,42,.18); background: #fff; color: var(--ink); cursor: pointer; transition: background .2s ease, transform .2s ease; }
 .gallery-full-close:hover { background: rgba(23,35,42,.06); transform: rotate(90deg); }
-.gallery-full-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: clamp(1rem, 2.2vw, 1.6rem); max-width: 1400px; margin: 0 auto; padding: clamp(1.8rem, 4vw, 2.8rem) 6vw clamp(3rem, 6vw, 4.5rem); }
-.gallery-full-grid .gallery-item { aspect-ratio: 1 / 1; border-radius: 14px; content-visibility: auto; contain-intrinsic-size: 220px 220px; }
+.gallery-full-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: clamp(1.2rem, 2.4vw, 2rem); max-width: min(97vw, 1600px); margin: 0 auto; padding: clamp(1.8rem, 4vw, 2.8rem) clamp(1.25rem, 2.5vw, 2.5rem) clamp(3rem, 6vw, 4.5rem); }
+/* On big/ultrawide monitors, let the grid keep growing past 1600px
+   instead of staying capped there with a big empty gutter down the sides
+   — same widening breakpoints already used elsewhere on the site
+   (Discover page grid, room carousel). auto-fill + minmax already adds
+   more columns as width grows, so the grid genuinely fills the extra
+   space instead of just centering with wasted margin. */
+@media (min-width: 1800px) {
+  .gallery-full-grid { max-width: min(97vw, 2000px); }
+}
+@media (min-width: 2200px) {
+  .gallery-full-grid { max-width: min(97vw, 2400px); }
+}
+@media (min-width: 2600px) {
+  .gallery-full-grid { max-width: min(97vw, 2900px); }
+}
+.gallery-full-grid .gallery-item { aspect-ratio: 1 / 1; border-radius: 0; content-visibility: auto; contain-intrinsic-size: 320px 320px; }
+/* Captioned variant (used for the "All Photos" gallery overlay): the photo
+   keeps its square crop inside .gallery-item-media, but the figure itself
+   grows to fit a short caption underneath instead of overlaying text on
+   top of the image. Overrides the base .gallery-item's on-image caption
+   treatment (the dark gradient + absolutely-positioned white text). */
+.gallery-full-grid-captioned .gallery-item { aspect-ratio: auto; display: flex; flex-direction: column; background: none; }
+.gallery-full-grid-captioned .gallery-item::after { display: none; }
+.gallery-full-grid-captioned .gallery-item-media { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: var(--secondary); }
+.gallery-full-grid-captioned .gallery-item-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-full-grid-captioned .gallery-item figcaption { position: static; margin: .6rem 0 0; padding: 0; color: var(--muted-foreground, #5a6a70); font-size: .74rem; font-weight: 500; letter-spacing: 0; line-height: 1.4; text-align: left; }
 @media (max-width: 640px) {
   .gallery-full-header { padding: 1.1rem 1.25rem; }
   .gallery-full-title { font-size: 1.1rem; }
   .gallery-full-grid { grid-template-columns: repeat(2, 1fr); gap: .8rem; padding: 1.4rem 1.25rem 2.8rem; }
 }
+@media (max-width: 900px) {
+  .excursion-row { grid-template-columns: 300px 1fr; }
+}
 @media (max-width: 640px) {
   .excursion-gallery-header { padding: 1.1rem 1.25rem; }
   .excursion-gallery-title { font-size: 1.1rem; }
-  .excursion-gallery-grid { grid-template-columns: repeat(2, 1fr); gap: .8rem; padding: 1.4rem 1.25rem 2.8rem; }
-  .excursion-gallery-grid .excursion-card-label { padding: .75rem .8rem; }
-  .excursion-gallery-grid .excursion-card-label span { font-size: .52rem; margin-bottom: .2rem; }
-  .excursion-gallery-grid .excursion-card-label strong { font-size: .92rem; line-height: 1.15; }
+  .excursion-gallery-grid { padding: 1.4rem 1.25rem 2.8rem; }
+  .excursion-row { grid-template-columns: 1fr; gap: .9rem; align-items: start; padding: 1.2rem 0; }
+  .excursion-row-media { aspect-ratio: 16 / 10; border-radius: 0; }
+  .excursion-row-eyebrow { font-size: .6rem; }
+  .excursion-row-copy h3 { font-size: 1.05rem; margin: .2rem 0 .3rem; }
+  .excursion-row-copy p { font-size: .82rem; line-height: 1.55; }
 }
 
 .highlight-expand-backdrop {
@@ -1393,114 +2020,56 @@ body.highlight-expand-lock { overflow: hidden; }
    states), so the look stays consistent everywhere the pill or bubble
    appears instead of getting overridden state-by-state.
    ========================================================================== */
+/* reference "BOOK NOW": a quiet outlined rectangle, no fill — reads clean
+   against the transparent hero header, then flips to a dark-ink outline
+   once the header goes solid white on scroll. */
 .header-cta {
-  position: relative !important;
-  overflow: hidden !important;
-  isolation: isolate !important;
-  background: linear-gradient(160deg, rgba(255,255,255,.32), rgba(255,255,255,.06) 55%, rgba(255,255,255,.14)) !important;
-  border: 1px solid rgba(255,255,255,.55) !important;
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.9),
-    inset 0 -10px 14px -8px rgba(255,255,255,.35),
-    inset 0 -1px 6px rgba(0,0,0,.06),
-    0 10px 28px rgba(9,30,33,.22) !important;
-  backdrop-filter: blur(26px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(200%) !important;
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,.85) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   color: #fff !important;
-  text-shadow: 0 1px 6px rgba(9,30,33,.35) !important;
-  transition: transform .18s var(--ease-out, ease), background .25s ease, box-shadow .25s ease !important;
-}
-.header-cta::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: -55%;
-  left: 6%;
-  right: 6%;
-  height: 85%;
-  border-radius: 999px;
-  background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.85), rgba(255,255,255,0) 72%);
-  filter: blur(2px);
-  opacity: .8;
-  pointer-events: none;
-}
-.header-cta::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 -1px 1px rgba(255,255,255,.4);
-  pointer-events: none;
+  text-shadow: none !important;
+  transition: transform .18s var(--ease-out, ease), background .25s ease, border-color .25s ease, color .25s ease !important;
 }
 .header-cta:hover {
-  background: linear-gradient(160deg, rgba(255,255,255,.42), rgba(255,255,255,.1) 55%, rgba(255,255,255,.2)) !important;
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.95),
-    inset 0 -10px 14px -8px rgba(255,255,255,.45),
-    0 14px 34px rgba(9,30,33,.3) !important;
+  background: rgba(255,255,255,.14) !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
   color: #fff !important;
-  transform: translateY(-2px);
 }
 
-/* once the header has scrolled to its compact white bar, the frosted-white
-   pill above would disappear against it — switch the pill itself to a dark
-   glass so it stays visible, keeping the same liquid-glass highlight treatment */
+/* same outline treatment, dark-on-white once the header has scrolled to
+   its compact solid bar */
 .site-header.is-scrolled .header-cta {
-  background: linear-gradient(160deg, #d4a86a, #ba8d5c 55%, #a67b4d) !important;
-  border: 1px solid rgba(255,255,255,.3) !important;
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.4),
-    inset 0 -10px 14px -8px rgba(255,255,255,.18),
-    0 8px 22px rgba(140,100,50,.3) !important;
-  color: #fff !important;
-  text-shadow: 0 1px 6px rgba(70,45,15,.3) !important;
+  background: transparent !important;
+  border: 1px solid rgba(23,35,42,.4) !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+  text-shadow: none !important;
 }
-.site-header.is-scrolled .header-cta::before { opacity: .35; }
 .site-header.is-scrolled .header-cta:hover {
-  background: linear-gradient(160deg, #e0b87d, #c49a6a 55%, #ba8d5c) !important;
-  color: #fff !important;
+  background: rgba(23,35,42,.06) !important;
+  border-color: var(--ink) !important;
+  color: var(--ink) !important;
 }
 
 .contact-trigger {
   position: relative !important;
   overflow: hidden !important;
   isolation: isolate !important;
-  background: linear-gradient(160deg, rgba(255,255,255,.38), rgba(255,255,255,.1) 55%, rgba(255,255,255,.2)) !important;
-  border: 1px solid rgba(255,255,255,.6) !important;
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.9),
-    inset 0 -10px 14px -8px rgba(255,255,255,.4),
-    0 14px 32px rgba(9,30,33,.24) !important;
-  backdrop-filter: blur(24px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,.3) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   color: #fff !important;
-  transition: transform .2s var(--ease-out, ease), box-shadow .2s ease, color .25s ease !important;
+  transition: transform .2s var(--ease-out, ease), box-shadow .2s ease !important;
 }
-/* once the bubble drifts over a light section of the page (ivory/white
-   content, not a dark hero/photo panel), flip the icon to black so it
-   stays readable against the lighter backdrop behind the glass */
-.contact-bubbles.is-on-light .contact-trigger { color: var(--ink, #17232a) !important; }
-.contact-trigger::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: -30%;
-  left: 12%;
-  right: 12%;
-  height: 65%;
-  border-radius: 999px;
-  background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.9), rgba(255,255,255,0) 72%);
-  filter: blur(1.5px);
-  opacity: .85;
-  pointer-events: none;
-}
+.contact-trigger::before { content: none; }
 .contact-trigger:hover {
-  background: linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,.16) 55%, rgba(255,255,255,.28)) !important;
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,1),
-    inset 0 -10px 14px -8px rgba(255,255,255,.5),
-    0 18px 38px rgba(9,30,33,.3) !important;
+  box-shadow: 0 18px 36px rgba(0,0,0,.36) !important;
 }
 
 @media (prefers-contrast: more) {
@@ -1532,3 +2101,300 @@ body.highlight-expand-lock { overflow: hidden; }
 /* [data-expand] cards (excursion cards, highlight cards, gallery photos)
    open via the "highlight-expand" overlay defined inline in index.html. */
 [data-expand] { cursor: pointer; }
+
+/* ==========================================================================
+   Room Offers — auto-looping carousel (Double / Triple / Family) instead of
+   the old static 2-up grid + separate Family promo panel below it. See
+   ".room-carousel" block further down for the carousel itself; this first
+   part just keeps the section heading/shell rules that still apply.
+   ========================================================================== */
+.room-offers-section, .other-offers-section { padding-bottom: clamp(3.5rem, 7vw, 6.5rem); }
+.other-offers-heading-row { display: block; text-align: center; padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem) 0; margin-bottom: clamp(1.6rem, 3vw, 2.6rem); }
+.other-offers-heading-row .eyebrow { display: block; margin-bottom: 1.1rem; }
+.other-offers-heading-row .display-heading { font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
+
+/* Room Offers breaks out of the shared 1280/1440/etc.-capped .section-shell
+   entirely and runs the full width of the page, instead of sitting centered
+   in a narrow strip with big empty gutters on large screens. */
+.room-offers-section.section-shell { max-width: none; width: 100%; }
+
+.offer-card { display: flex; flex-direction: column; background: #f3efe6; overflow: hidden; width: 100%; }
+/* Reference-style card: full-width landscape photo on top, centered
+   content below with a thin divider under the title. */
+.offer-card-media { position: relative; overflow: hidden; width: 100%; aspect-ratio: 3 / 2; }
+.offer-card-media img { position: absolute; top: -9%; left: 0; width: 100%; height: 118%; object-fit: cover; display: block; -webkit-user-drag: none; user-drag: none; pointer-events: none; will-change: transform; transform: translate3d(0, var(--img-drift, 0px), 0) scale(var(--img-scale, 1)); transition: transform .25s var(--ease-out), filter .5s ease; }
+.offer-card:hover .offer-card-media img { --img-scale: 1.06; filter: saturate(1.08); }
+.offer-card-body { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .85rem; padding: clamp(1.7rem, 2.8vw, 2.4rem) clamp(1.6rem, 3vw, 2.4rem) clamp(2rem, 3.4vw, 2.6rem); }
+.offer-card-body h3 { width: 100%; margin: 0 0 .85rem; padding-bottom: .9rem; border-bottom: 1px solid rgba(23,35,42,.14); font-family: "Poppins", Arial, sans-serif; font-size: clamp(1.15rem, 1.7vw, 1.4rem); font-weight: 500; letter-spacing: -.02em; line-height: 1.1; color: var(--ink); }
+.offer-card-body p { margin: 0; color: var(--muted-foreground, #5a6a70); font-size: .84rem; line-height: 1.55; }
+.offer-card-price { display: flex; align-items: baseline; justify-content: center; gap: .4rem; }
+.offer-card-price span { font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground, #5a6a70); }
+.offer-card-price strong { font-family: "Poppins", Arial, sans-serif; font-size: 1.15rem; color: var(--ink); }
+.offer-card-price strong small { font-size: .58rem; font-weight: 500; color: var(--muted-foreground, #5a6a70); margin-left: .2rem; text-transform: uppercase; }
+.offer-card-actions { display: flex; align-items: center; justify-content: center; gap: .7rem; margin-top: .4rem; }
+.offer-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: .55rem 1.2rem; border-radius: 2px; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; line-height: 1; cursor: pointer; transition: transform .18s var(--ease-out, ease), background .25s ease, color .25s ease, border-color .25s ease; text-decoration: none; }
+.offer-btn-outline { background: transparent; border: 1px solid var(--brass); color: var(--ink); }
+.offer-btn-outline:hover { background: rgba(186,141,92,.1); }
+.offer-btn-solid { background: var(--brass); border: 1px solid var(--brass); color: #fff; }
+.offer-btn-solid:hover { background: #a67c4d; border-color: #a67c4d; transform: translateY(-1px); }
+
+@media (max-width: 640px) {
+  .offer-card-actions { flex-wrap: wrap; }
+}
+
+/* ==========================================================================
+   Room Offers carousel — Double / Triple / Family, one photo-left/copy-right
+   slide at a time (two slides visible side by side on desktop), sliding
+   automatically every 4s and looping seamlessly forever. Round prev/next
+   arrows sit outside the viewport; dots below show which room is active.
+
+   Looping mechanic: the track holds the 3 real slides plus one clone of the
+   last slide prepended and one clone of the first slide appended
+   (Family-clone, Double, Triple, Family, Double-clone). JS always animates
+   forward/back by exactly one slide; the instant a clone finishes sliding
+   fully into view, JS snaps the track back to the matching real slide with
+   transitions switched off for that one frame — invisible to the eye, but
+   it means autoplay/arrows can keep moving the same direction forever
+   without ever visually "rewinding" across all the slides.
+   ========================================================================== */
+.room-offers-section { overflow-x: hidden; }
+
+.room-carousel { position: relative; display: flex; align-items: center; gap: clamp(.6rem, 1.8vw, 1.6rem); max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 3vw, 2rem); }
+.room-carousel-viewport { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+
+/* On big/ultrawide monitors, let the carousel keep growing past 1500px
+   instead of staying capped there with empty gutters on either side —
+   same widening breakpoints already used for the Discover page's flat
+   grid (offers.css). Since .room-carousel-media img is
+   position:absolute + width/height:100%, the photo itself scales up to
+   fill however large the card gets, instead of staying a fixed size. */
+@media (min-width: 1600px) {
+  .room-carousel { max-width: min(92vw, 1800px); }
+}
+@media (min-width: 2000px) {
+  .room-carousel { max-width: min(93vw, 2200px); }
+}
+@media (min-width: 2400px) {
+  .room-carousel { max-width: min(93vw, 2600px); }
+}
+.room-carousel-track { display: flex; transition: transform .7s cubic-bezier(.65,0,.35,1); }
+.room-carousel-track.is-jumping { transition: none !important; }
+.room-carousel-slide { flex: 0 0 auto; box-sizing: border-box; padding: 0 clamp(.5rem, 1.2vw, .9rem); }
+
+.room-carousel-slide-inner { display: grid; grid-template-columns: 3fr 2fr; align-items: stretch; height: 100%; min-height: 560px; background: #f3efe6; }
+.room-carousel-media { position: relative; overflow: hidden; }
+.room-carousel-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; -webkit-user-drag: none; user-drag: none; }
+.room-carousel-copy { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: .8rem; padding: clamp(1.8rem, 3vw, 2.8rem); text-align: left; }
+.room-carousel-copy .eyebrow { color: var(--brass); }
+.room-carousel-copy h3 { margin: 0; font-family: "Cormorant Garamond", serif; font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 500; color: var(--ink); }
+.room-carousel-copy p { margin: 0; max-width: 26rem; color: var(--muted-foreground, #5a6a70); font-size: .9rem; line-height: 1.65; }
+.room-carousel-copy .offer-card-price { justify-content: flex-start; margin: .1rem 0 .2rem; }
+.room-carousel-copy .offer-card-price span { text-align: left; }
+
+.room-carousel-arrow { flex: 0 0 auto; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(23,35,42,.28); background: transparent; color: var(--ink); cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s var(--ease-out); }
+.room-carousel-arrow svg { width: 18px; height: 18px; }
+.room-carousel-arrow:hover { background: var(--brass); border-color: var(--brass); color: #fff; }
+.room-carousel-arrow:active { transform: scale(.94); }
+
+.room-carousel-dots { display: flex; align-items: center; justify-content: center; gap: .55rem; margin: clamp(1.6rem, 3vw, 2.4rem) auto 0; }
+.room-carousel-dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(23,35,42,.22); cursor: pointer; transition: width .35s var(--ease-out), background .35s ease; }
+.room-carousel-dot.is-active { width: 22px; background: var(--brass); }
+
+@media (max-width: 860px) {
+  /* Stop equal-height stretching on mobile: the track is a flex row with
+     the browser default align-items:stretch, so every slide (including
+     off-screen ones) gets forced to the height of the tallest slide's
+     natural content — e.g. Family Room's longer copy makes Double/Triple
+     taller than their own content needs. On desktop this is invisible
+     (image + copy sit side-by-side and the image just crops taller), but
+     once stacked into 2 rows on mobile, that forced extra height lands as
+     a big empty gap between the image and the text below it. Sizing each
+     slide to its own content here removes that gap. */
+  .room-carousel-track { align-items: flex-start; }
+  .room-carousel-slide-inner { grid-template-columns: 1fr; height: auto; min-height: 0; }
+  .room-carousel-media { aspect-ratio: 3 / 2; }
+  .room-carousel-copy { align-items: center; justify-content: flex-start; text-align: center; padding: clamp(1.6rem, 3vw, 2.2rem); }
+  .room-carousel-copy .offer-card-price, .room-carousel-copy .offer-card-actions { justify-content: center; }
+  .room-carousel-copy .offer-card-price span { text-align: center; }
+}
+
+@media (max-width: 640px) {
+  .room-carousel { gap: .4rem; padding: 0 .5rem; }
+  .room-carousel-arrow { width: 36px; height: 36px; }
+  .room-carousel-arrow svg { width: 15px; height: 15px; }
+}
+
+/* Whole carousel + dots fade/rise in together on scroll (plain .reveal
+   timing is fine here — no need for the old per-card stagger since it's
+   one moving unit now, not separate static cards). */
+.room-offers-section .room-carousel.reveal,
+.room-offers-section .room-carousel-dots.reveal { opacity: 0; transform: translateY(26px); transition: opacity 1.3s var(--ease-out), transform 1.3s var(--ease-out); }
+.room-offers-section .room-carousel-dots.reveal { transition-delay: .12s; }
+.room-offers-section .room-carousel.reveal.is-visible,
+.room-offers-section .room-carousel-dots.reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .room-carousel-track { transition: none !important; }
+  .room-offers-section .room-carousel.reveal,
+  .room-offers-section .room-carousel-dots.reveal { transition: none; opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   Highlights ("What Awaits You…") + Why Choose Us cards (both use the
+   shared .stay-card-grid), and the main Gallery ("Joy, Laughter…") grid —
+   same left/right "assemble" scroll-reveal as the accommodation cards
+   above: each piece slides in from an alternating side over 2s and
+   settles into place, instead of the site's plain fade-up. Selectors
+   carry extra specificity so they cleanly override both the base .reveal
+   timing and the cascading fade-up delays set for these same elements
+   further up in this file, without touching .reveal anywhere else.
+   ========================================================================== */
+.highlights-section, .excursions-section, .gallery-section { overflow-x: hidden; }
+
+.stay-card-grid .stay-card.reveal {
+  --assemble-x: -70px;
+  opacity: 0;
+  transform: translateX(var(--assemble-x));
+  transition: opacity 2s cubic-bezier(.22,.68,0,1), transform 2s cubic-bezier(.22,.68,0,1);
+}
+.stay-card-grid .stay-card.reveal.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* alternating stagger: card 1 (left column) slides in from the left,
+   card 3 (right column) slides in from the right, card 2 (center
+   column) rises up from below instead of sliding sideways — matches
+   each card's actual position instead of alternating regardless of it. */
+.stay-card-grid .stay-card.reveal:nth-child(1) { transition-delay: 0s; }
+.stay-card-grid .stay-card.reveal:nth-child(2) {
+  --assemble-x: 0px;
+  transform: translateY(34px);
+  transition-delay: .12s;
+}
+.stay-card-grid .stay-card.reveal:nth-child(2).is-visible { transform: translateY(0); }
+.stay-card-grid .stay-card.reveal:nth-child(3) { --assemble-x: 70px; transition-delay: .24s; }
+
+.gallery-section .gallery-grid .gallery-item.reveal {
+  --assemble-x: -70px;
+  opacity: 0;
+  transform: translateX(var(--assemble-x));
+  transition: opacity 2s cubic-bezier(.22,.68,0,1), transform 2s cubic-bezier(.22,.68,0,1);
+}
+.gallery-section .gallery-grid .gallery-item.reveal.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.gallery-section .gallery-grid .gallery-item.reveal:nth-child(1) { transition-delay: 0s; }
+.gallery-section .gallery-grid .gallery-item.reveal:nth-child(2) { --assemble-x: 70px; transition-delay: .1s; }
+.gallery-section .gallery-grid .gallery-item.reveal:nth-child(3) { transition-delay: .2s; }
+.gallery-section .gallery-grid .gallery-item.reveal:nth-child(4) { --assemble-x: 70px; transition-delay: .3s; }
+.gallery-section .gallery-grid .gallery-item.reveal:nth-child(5) { transition-delay: .4s; }
+.gallery-section .gallery-grid .gallery-item.reveal:nth-child(6) { --assemble-x: 70px; transition-delay: .5s; }
+
+/* On phones .stay-card-grid becomes a horizontal snap-scroll strip, so a
+   left/right slide fights the swipe direction — drop to a simple rise
+   from below instead (still a 2s assemble, just vertical). */
+@media (max-width: 640px) {
+  .stay-card-grid .stay-card.reveal,
+  .gallery-section .gallery-grid .gallery-item.reveal {
+    --assemble-x: 0px;
+    transform: translateY(34px);
+  }
+  .stay-card-grid .stay-card.reveal.is-visible,
+  .gallery-section .gallery-grid .gallery-item.reveal.is-visible {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stay-card-grid .stay-card.reveal,
+  .gallery-section .gallery-grid .gallery-item.reveal {
+    transition: none; opacity: 1; transform: none;
+  }
+}
+
+/* ==========================================================================
+   "Explore Rasdhoo" hero CTA — restyled to match the "Explore Maafushi"
+   reference: a quiet outlined rectangle (not a pill) with a soft frosted
+   fill, a slim white border, gently rounded ("semi-curved") corners, and
+   the text set in the site's serif for a calmer, more editorial feel
+   than the old all-caps glass pill. Same look on web and mobile.
+   ========================================================================== */
+.hero-explore-btn {
+  min-height: 38px;
+  padding: .55rem 1.5rem;
+  border-radius: 8px;
+  border: 1.3px solid rgba(255,255,255,.85);
+  background: rgba(20,38,40,.28);
+  box-shadow: 0 6px 18px rgba(0,0,0,.2);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: .82rem;
+  letter-spacing: .01em;
+  text-transform: none;
+}
+.hero-explore-btn:hover {
+  background: rgba(20,38,40,.4);
+  border-color: #fff;
+  box-shadow: 0 8px 22px rgba(0,0,0,.26);
+}
+@media (max-width: 640px) {
+  .hero-explore-btn { min-height: 34px; padding: .48rem 1.2rem; font-size: .76rem; border-radius: 7px; }
+}
+
+/* ==========================================================================
+   "Book Now" / "More Details" CTAs — back to the sharp-cornered rectangle
+   (the 10px curved treatment below is disabled again per feedback), and
+   forced to a single line: at the room-carousel's taller card width the
+   "MORE DETAILS" label was narrow enough to wrap onto 2 lines.
+   ========================================================================== */
+.offer-btn { border-radius: 2px; white-space: nowrap; }
+/* reference "BOOK NOW" reads as a sharp-cornered outline, not the rounded
+   pill used elsewhere on the site — keep the header CTA squared off. */
+.header-cta { border-radius: 0 !important; }
+
+/* ==========================================================================
+   Force-center text: Hero (Welcome to Dhaankolhu Rasdhoo), the About
+   chapter, and the collage "Local Island / South Ari Atoll" badge —
+   on both desktop and mobile, regardless of any earlier rule.
+   ========================================================================== */
+.hero-content,
+.hero-content .eyebrow,
+.hero-content .hero-eyebrow,
+.hero-content .hero-title,
+.hero-content .hero-copy,
+.story-panel-about,
+.story-panel-about .story-panel-inner,
+.story-panel-about .eyebrow,
+.story-panel-about h2,
+.story-panel-about p,
+.collage-badge,
+.collage-badge-eyebrow,
+.collage-badge strong {
+  text-align: center !important;
+}
+.hero-content { display: flex !important; flex-direction: column !important; align-items: center !important; }
+.story-panel-about .story-panel-inner { margin-left: auto !important; margin-right: auto !important; }
+.collage-badge { left: 50% !important; transform: translate(-50%, -50%) !important; }
+
+@media (max-width: 640px) {
+  .hero-content,
+  .hero-content .eyebrow,
+  .hero-content .hero-eyebrow,
+  .hero-content .hero-title,
+  .hero-content .hero-copy,
+  .story-panel-about,
+  .story-panel-about .story-panel-inner,
+  .story-panel-about .eyebrow,
+  .story-panel-about h2,
+  .story-panel-about p,
+  .collage-badge,
+  .collage-badge-eyebrow,
+  .collage-badge strong {
+    text-align: center !important;
+  }
+  .hero-content { align-items: center !important; }
+}

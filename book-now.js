@@ -64,6 +64,10 @@
     menu.setAttribute("aria-hidden", String(!open));
     menuTrigger.setAttribute("aria-expanded", String(open));
     menuTrigger.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    /* explicit class toggle (backup for the CSS :has() selector, which
+       some browsers/webviews don't support) so the logo reliably flips
+       to black against the mobile menu's light background */
+    if (header) header.classList.toggle("is-menu-open", open);
   }
 
   /* No hero image on this page anymore, so the header should always use its solid
@@ -569,12 +573,14 @@
 
   /* ---------- room selection ---------- */
   roomGrid.addEventListener("click", function (event) {
+    if (event.target.closest("a")) return; /* "More Details" link — let it navigate instead of selecting the room */
     var card = event.target.closest(".bk-room");
     if (!card) return;
     selectRoom(card);
   });
   roomGrid.addEventListener("keydown", function (event) {
     if (event.key !== "Enter" && event.key !== " ") return;
+    if (event.target.closest("a")) return; /* let Enter on "More Details" follow the link normally */
     var card = event.target.closest(".bk-room");
     if (!card) return;
     event.preventDefault();
@@ -844,7 +850,7 @@
     if (!which || which === "total") {
       var hasRoom = !!(state.room && state.price);
       var total = hasRoom && nights() ? state.price * nights() : 0;
-      ticketTotalEl.textContent = hasRoom ? "$" + total.toLocaleString() + " +TGST" : "—";
+      ticketTotalEl.textContent = hasRoom ? "$" + total.toLocaleString() + " +tax" : "—";
       popValue(ticketTotalEl);
     }
   }
@@ -929,6 +935,11 @@
     if (!btn || btn.disabled) return;
     var target = Number(btn.getAttribute("data-step"));
     if (target === 5 || target === currentStep) return;
+    /* Block jumping ahead to a later step while the current one isn't
+       filled out yet — without this, a step you'd already visited once
+       (and which raised maxStepReached) stayed clickable forever, even
+       after going back and clearing its required fields. */
+    if (target > currentStep && !validateStep()) return;
     hideHeaderForStep();
     if (currentStep === 5) {
       successView.classList.remove("is-current", "bk-anim-in-start", "bk-anim-out");
@@ -943,14 +954,14 @@
     var n = nights();
     var total = state.price && n ? state.price * n : 0;
     var rows = [
-      ["Dates", state.arrival && state.departure ? formatDateTime(state.arrival, state.arrivalTime) + " – " + formatDateTime(state.departure, state.departureTime) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"],
+      ["Name", state.name || "—"],
       ["Guests", state.guests + (state.guests === 1 ? " guest" : " guests")],
+      ["Dates", state.arrival && state.departure ? formatDateTime(state.arrival, state.arrivalTime) + " – " + formatDateTime(state.departure, state.departureTime) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"],
       ["Stay", state.room || "—"],
-      ["Traveller", state.name || "—"],
       ["Email", state.email || "—"],
       ["Contact number", state.phone || "—"]
     ];
-    rows.push(["Estimated total", "$" + total.toLocaleString() + " +TGST"]);
+    rows.push(["Estimated total", "$" + total.toLocaleString() + " +tax"]);
     reviewList.innerHTML = rows.map(function (r) {
       return '<div class="bk-review-row"><span>' + r[0] + "</span><span>" + r[1] + "</span></div>";
     }).join("");
@@ -1032,7 +1043,7 @@
       currentStep = target;
       if (target > maxStepReached) maxStepReached = target;
       updateRail(target);
-      nextBtn.textContent = target === TOTAL_STEPS ? "Send via WhatsApp" : "Next step";
+      nextBtn.textContent = target === TOTAL_STEPS ? "Send via WhatsApp" : "Next";
       if (!nextBtn.querySelector("span")) nextBtn.innerHTML = nextBtn.textContent + " <span>→</span>";
       if (target === TOTAL_STEPS) buildReview();
       else {
@@ -1057,7 +1068,7 @@
      downloadable PDF (jsPDF needs image data ready synchronously at draw time). */
   var bkLogoDataUrl = null;
   var bkLogoAspect = 1;
-  fetch("img/logo/logo%20black.png").then(function (res) { return res.blob(); }).then(function (blob) {
+  fetch("img/logo/DHAANKOLHU_text_black_transparent.png").then(function (res) { return res.blob(); }).then(function (blob) {
     var reader = new FileReader();
     reader.onload = function () {
       var rawDataUrl = reader.result;
@@ -1093,19 +1104,10 @@
   }).catch(function () { /* logo optional — PDF still renders without it */ });
 
   function buildInquiryMessage() {
-    var n = nights();
-    var total = state.price && n ? state.price * n : 0;
-    var lines = [
-      "Hi! I'd like to inquire about a stay at Dhaankolhu Rasdhoo Island.",
-      "Dates: " + (state.arrival && state.departure ? formatDateTime(state.arrival, state.arrivalTime) + " - " + formatDateTime(state.departure, state.departureTime) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"),
-      "Guests: " + state.guests,
-      "Stay: " + (state.room || "—"),
-      "Estimated total: $" + total.toLocaleString() + " +TGST",
-      "Name: " + (state.name || "—"),
-      "Email: " + (state.email || "—")
-    ];
-    if (state.phone) lines.push("Phone: " + state.phone);
-    return lines.join("\n");
+    var firstName = (state.name || "").trim().split(/\s+/)[0];
+    return "Hi! I'd like to inquire about a stay at Dhaankolhu Rasdhoo Island."
+      + (firstName ? " This is " + firstName + "." : "")
+      + " I've attached my booking details PDF here.";
   }
 
   /* ---------- build the booking summary as a clean, simple A4 PDF (jsPDF):
@@ -1175,16 +1177,16 @@
 
     /* table rows: label left cell, value right cell */
     var rows = [
+      ["Name", state.name || "\u2014"],
+      ["Guests", state.guests + (state.guests === 1 ? " guest" : " guests")],
       ["Check-in", state.arrival ? formatDateTime(state.arrival, state.arrivalTime) : "\u2014"],
       ["Check-out", state.departure ? formatDateTime(state.departure, state.departureTime) : "\u2014"],
       ["Nights", state.arrival && state.departure && n > 0 ? String(n) : "\u2014"],
-      ["Guests", state.guests + (state.guests === 1 ? " guest" : " guests")],
       ["Stay", state.room || "\u2014"],
-      ["Traveller", state.name || "\u2014"],
       ["Email", state.email || "\u2014"]
     ];
     if (state.phone) rows.push(["Contact", state.phone]);
-    rows.push(["Estimated total", "$" + total.toLocaleString() + " +TGST"]);
+    rows.push(["Estimated total", "$" + total.toLocaleString() + " +tax"]);
 
     var labelColW = contentW * 0.34;
     var valueColW = contentW - labelColW;
@@ -1384,7 +1386,7 @@
         target.classList.add("is-current");
       }
       currentStep = savedStep;
-      nextBtn.textContent = savedStep === TOTAL_STEPS ? "Send via WhatsApp" : "Next step";
+      nextBtn.textContent = savedStep === TOTAL_STEPS ? "Send via WhatsApp" : "Next";
       if (!nextBtn.querySelector("span")) nextBtn.innerHTML = nextBtn.textContent + " <span>→</span>";
       if (savedStep === TOTAL_STEPS) buildReview();
     }
@@ -1655,6 +1657,12 @@
   function setOpen(open) {
     wrap.classList.toggle("is-open", open);
     trigger.setAttribute("aria-expanded", open ? "true" : "false");
+    var panel = document.getElementById("header-chat-widget-panel");
+    if (panel) panel.setAttribute("aria-hidden", String(!open));
+    if (open) {
+      var input = document.getElementById("header-chat-widget-input");
+      if (input) setTimeout(function () { input.focus(); }, 250);
+    }
   }
 
   trigger.addEventListener("click", function () {
@@ -1667,5 +1675,68 @@
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") setOpen(false);
+  });
+
+  /* same "chat widget that actually just opens WhatsApp" front door as the
+     floating widget on index.html — typing a message and hitting send
+     pre-fills that text into a WhatsApp chat with the same phone number
+     used everywhere else on this page. */
+  var chatForm = document.getElementById("header-chat-widget-form");
+  var chatInput = document.getElementById("header-chat-widget-input");
+  if (chatForm && chatInput) {
+    chatForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var msg = chatInput.value.trim() || "Hi Dhaankolhu Rasdhoo, I'd like to ask about a booking.";
+      var url = "https://wa.me/9609898130?text=" + encodeURIComponent(msg);
+      window.open(url, "_blank", "noopener");
+      chatInput.value = "";
+    });
+  }
+})();
+
+/* ---------- Nav dropdowns (Accommodation + Others) ----------
+   The panel now opens purely on hover (see style.css ":hover"), plus
+   ":focus-within" for keyboard/tab users — no click-to-toggle JS needed
+   for opening/closing any more. Click behavior differs per trigger:
+   - Accommodation: a real link (now points straight to
+     family-room.html), so it's left alone and just navigates normally.
+   - Others: has no page to go to, so its click is swallowed
+     (event.preventDefault, no navigation) via [data-nav-noop] on the
+     trigger in the HTML. */
+(function () {
+  var noopTriggers = document.querySelectorAll(".nav-dropdown-trigger[data-nav-noop]");
+  noopTriggers.forEach(function (trigger) {
+    trigger.setAttribute("aria-haspopup", "true");
+    trigger.addEventListener("click", function (event) {
+      event.preventDefault();
+    });
+  });
+})();
+
+/* ---------- Nav dropdown hover grace period (mirrors script.js) ----------
+   Pure CSS ":hover" drops the panel the instant the pointer leaves
+   ".nav-dropdown" by even a pixel — real mouse movement isn't perfectly
+   straight, so tracking down to a lower row (e.g. Family Room) can nudge
+   the cursor off the hoverable area for a frame and snap the panel shut
+   before the click lands. Driving the open state from JS with a short
+   close delay (cancelled if the pointer comes back before it fires)
+   gives the panel some forgiveness, reusing the existing ".is-open" CSS
+   hook — the ":hover"/":focus-within" CSS rules stay as a fallback. */
+(function () {
+  var dropdowns = document.querySelectorAll(".nav-dropdown");
+  var CLOSE_DELAY_MS = 300;
+  dropdowns.forEach(function (dropdown) {
+    var closeTimer = null;
+    dropdown.addEventListener("mouseenter", function () {
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      dropdown.classList.add("is-open");
+    });
+    dropdown.addEventListener("mouseleave", function () {
+      if (closeTimer) clearTimeout(closeTimer);
+      closeTimer = setTimeout(function () {
+        dropdown.classList.remove("is-open");
+        closeTimer = null;
+      }, CLOSE_DELAY_MS);
+    });
   });
 })();

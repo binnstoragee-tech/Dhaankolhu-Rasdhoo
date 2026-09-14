@@ -1,0 +1,157 @@
+/* ==========================================================================
+   explore-rasdhoo.html — full-page video, header/nav/chat float on top of
+   it (transparent-over-hero header rules already live in style.css).
+   ========================================================================== */
+
+.discover-video-hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 560px;
+  overflow: hidden;
+  background: #0b1517;
+}
+
+.discover-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.discover-video.is-ready { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .discover-video { transition: none; }
+}
+
+.discover-video-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 25, 27, .32) 0%, rgba(11, 25, 27, .08) 32%, rgba(11, 25, 27, .18) 55%, rgba(11, 25, 27, .72) 100%);
+  pointer-events: none;
+}
+
+.discover-video-caption {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .9rem;
+  padding: 0 1.5rem;
+  text-align: center;
+  color: #fff;
+}
+
+.discover-video-caption .eyebrow {
+  color: rgba(255, 255, 255, .85);
+}
+
+.discover-video-caption h1 {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 500;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, .5);
+}
+
+@media (max-width: 640px) {
+  .discover-video-hero { height: 100svh; min-height: 480px; }
+}
+
+/* ==========================================================================
+   Discover page: Island Activities + Accommodation — both are now the same
+   flat, responsive card grid (reusing .offer-card, the same component used
+   for Double/Triple/Family on the homepage), instead of Activities using
+   its own image-left/copy-right row layout. Both sections break out of
+   .section-shell's centered max-width so the grid runs the full page width
+   instead of sitting in a narrower centered strip.
+   ========================================================================== */
+#discover-activities.section-shell,
+#discover-accommodation.section-shell { max-width: none; width: 100%; }
+
+.discover-flat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1.4rem, 2.4vw, 2.2rem);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 3rem);
+}
+
+/* On big/ultrawide monitors, keep growing past 1400px so the Accommodation
+   cards themselves get larger and fill more of the screen instead of
+   staying a fixed size with big empty gutters on either side — matches
+   the same widening breakpoints already used site-wide (.section-shell
+   etc.) for large screens. */
+@media (min-width: 1600px) {
+  .discover-flat-grid { max-width: min(92vw, 1800px); }
+}
+@media (min-width: 2000px) {
+  .discover-flat-grid { max-width: min(93vw, 2200px); }
+}
+@media (min-width: 2400px) {
+  .discover-flat-grid { max-width: min(93vw, 2600px); }
+}
+
+/* flex (not grid) on purpose: when a row doesn't divide evenly into 3, grid
+   leaves the unused column(s) as dead blank space. Cards keep a fixed,
+   consistent size (no grow) so they never look stretched/oversized —
+   instead, justify-content: center on the row means a shorter last row is
+   simply centered under the full rows above it, which reads as
+   intentional rather than empty or blown up. min-width lets rows
+   naturally drop to 2-up then 1-up on narrower screens without a separate
+   breakpoint rule for each. */
+.discover-flat-grid .offer-card {
+  flex: 0 1 calc(33.333% - clamp(1.4rem, 2.4vw, 2.2rem) * 2 / 3);
+  min-width: 260px;
+}
+
+/* On phones, match index.html's mobile Accommodation layout: one full-width
+   card per row (not the 260px min-width used for desktop's 3-up row),
+   otherwise the card itself gets narrower than the site's other mobile
+   cards — not enough room for "More Details" + "Book Now" to sit side by
+   side, so they wrapped onto stacked, oddly-wide separate lines. */
+@media (max-width: 640px) {
+  .discover-flat-grid .offer-card { flex: 1 1 100%; min-width: 0; }
+}
+
+/* Activities + Accommodation cards "assemble" in from alternating sides as
+   the section scrolls into view — card 1 from the left, card 2 from the
+   right, and so on — so each row reads as pieces converging into place.
+   Single transform+opacity transition per card (2s, smooth ease-out) keeps
+   it light and jank-free; a wrapper overflow guard stops the off-canvas
+   start position from creating a horizontal scrollbar mid-animation. */
+#discover-activities.section-shell,
+#discover-accommodation.section-shell { overflow-x: hidden; }
+
+#discover-activities .offer-card.reveal,
+#discover-accommodation .offer-card.reveal {
+  --assemble-x: -70px;
+  opacity: 0;
+  transform: translateX(var(--assemble-x));
+  transition: opacity 2s cubic-bezier(.22,.68,0,1), transform 2s cubic-bezier(.22,.68,0,1);
+  transition-delay: 0s;
+}
+#discover-activities .discover-flat-grid .offer-card.reveal:nth-child(2),
+#discover-accommodation .discover-flat-grid .offer-card.reveal:nth-child(2) { --assemble-x: 70px; transition-delay: .12s; }
+#discover-activities .discover-flat-grid .offer-card.reveal:nth-child(3),
+#discover-accommodation .discover-flat-grid .offer-card.reveal:nth-child(3) { --assemble-x: 70px; transition-delay: .24s; }
+#discover-activities .discover-flat-grid .offer-card.reveal:nth-child(4) { --assemble-x: -70px; transition-delay: .36s; }
+#discover-activities .discover-flat-grid .offer-card.reveal:nth-child(5) { --assemble-x: 70px; transition-delay: .48s; }
+#discover-activities .offer-card.reveal.is-visible,
+#discover-accommodation .offer-card.reveal.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #discover-activities .offer-card.reveal,
+  #discover-accommodation .offer-card.reveal { transition: none; opacity: 1; transform: none; }
+}
