@@ -495,61 +495,61 @@ img[loading="lazy"].is-loaded, img.fade-load.is-loaded { opacity: 1; }
    opaque the whole time they're on screen. */
 
 /* ==========================================================================
-   Island Activities — auto-looping single-card carousel (Snorkeling /
-   Fishing / Dolphin / Turtle / Sharks), matching the reference mobile
-   layout: one .offer-card centered at a time, prev/next arrows together
-   in their own row BELOW the card (not left/right of it), dots, then a
-   "View All Activities" button. Same clone-slide seamless-loop mechanic
-   as the Accommodation carousel further down (see its comment block for
-   how that works); this section shares that JS via initCardCarousel().
+   Island Activities — flat, responsive card grid (Snorkeling / Fishing /
+   Dolphin / Turtle / Sharks), matching the same .discover-flat-grid
+   component used on offers.html / explore-rasdhoo.html: cards "assemble"
+   in from alternating left/right sides as the section scrolls into view,
+   instead of the old single-card auto-looping carousel.
    ========================================================================== */
 #experience.excursions-section { overflow-x: hidden; }
 
-.experience-carousel { position: relative; max-width: 440px; margin: 0 auto; padding: 0 clamp(1rem, 3vw, 2rem); }
-.experience-carousel-viewport { overflow: hidden; }
-.experience-carousel-track { display: flex; transition: transform .7s cubic-bezier(.65,0,.35,1); }
-.experience-carousel-track.is-jumping { transition: none !important; }
-.experience-carousel-slide { flex: 0 0 auto; box-sizing: border-box; padding: 0 clamp(.4rem, 1vw, .7rem); }
+#experience .discover-flat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1.4rem, 2.4vw, 2.2rem);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 3rem);
+}
 
-.experience-carousel-arrows { display: flex; align-items: center; justify-content: center; gap: .8rem; margin: clamp(1.2rem, 2.4vw, 1.8rem) auto 0; }
-.experience-carousel-arrow { flex: 0 0 auto; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(23,35,42,.28); background: transparent; color: var(--ink); cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s var(--ease-out); }
-.experience-carousel-arrow svg { width: 18px; height: 18px; }
-.experience-carousel-arrow:hover { background: var(--brass); border-color: var(--brass); color: #fff; }
-.experience-carousel-arrow:active { transform: scale(.94); }
+@media (min-width: 1600px) { #experience .discover-flat-grid { max-width: min(92vw, 1800px); } }
+@media (min-width: 2000px) { #experience .discover-flat-grid { max-width: min(93vw, 2200px); } }
+@media (min-width: 2400px) { #experience .discover-flat-grid { max-width: min(93vw, 2600px); } }
 
-.experience-carousel-dots { display: flex; align-items: center; justify-content: center; gap: .55rem; margin: clamp(1rem, 2vw, 1.4rem) auto 0; }
-.experience-carousel-dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(23,35,42,.22); cursor: pointer; transition: width .35s var(--ease-out), background .35s ease; }
-.experience-carousel-dot.is-active { width: 22px; background: var(--brass); }
+#experience .discover-flat-grid .offer-card {
+  flex: 0 1 calc(33.333% - clamp(1.4rem, 2.4vw, 2.2rem) * 2 / 3);
+  min-width: 260px;
+}
+
+@media (max-width: 640px) {
+  #experience .discover-flat-grid .offer-card { flex: 1 1 100%; min-width: 0; }
+}
 
 .experience-carousel-view-all-row { display: flex; justify-content: center; margin: clamp(1.4rem, 2.6vw, 2rem) auto 0; }
 
-@media (min-width: 540px) { .experience-carousel { max-width: 480px; } }
-
-@media (max-width: 640px) {
-  .experience-carousel { padding: 0 .5rem; }
-  .experience-carousel-arrow { width: 36px; height: 36px; }
-  .experience-carousel-arrow svg { width: 15px; height: 15px; }
+/* Cards assemble in from alternating sides as the grid scrolls into view —
+   card 1 from the left, card 2 from the right, and so on. */
+#experience .offer-card.reveal {
+  --assemble-x: -70px;
+  opacity: 0;
+  transform: translateX(var(--assemble-x));
+  transition: opacity 2s cubic-bezier(.22,.68,0,1), transform 2s cubic-bezier(.22,.68,0,1);
+  transition-delay: 0s;
 }
+#experience .discover-flat-grid .offer-card.reveal:nth-child(2) { --assemble-x: 70px; transition-delay: .12s; }
+#experience .discover-flat-grid .offer-card.reveal:nth-child(3) { --assemble-x: 70px; transition-delay: .24s; }
+#experience .discover-flat-grid .offer-card.reveal:nth-child(4) { --assemble-x: -70px; transition-delay: .36s; }
+#experience .discover-flat-grid .offer-card.reveal:nth-child(5) { --assemble-x: 70px; transition-delay: .48s; }
+#experience .offer-card.reveal.is-visible { opacity: 1; transform: translateX(0); }
 
-/* Whole carousel + arrows + dots + view-all fade/rise in together on
-   scroll, same timing pattern as the Accommodation carousel below. */
-.excursions-section .experience-carousel.reveal,
-.excursions-section .experience-carousel-arrows.reveal,
-.excursions-section .experience-carousel-dots.reveal,
-.excursions-section .experience-carousel-view-all-row.reveal { opacity: 0; transform: translateY(26px); transition: opacity 1.3s var(--ease-out), transform 1.3s var(--ease-out); }
-.excursions-section .experience-carousel-arrows.reveal { transition-delay: .08s; }
-.excursions-section .experience-carousel-dots.reveal { transition-delay: .16s; }
-.excursions-section .experience-carousel-view-all-row.reveal { transition-delay: .24s; }
-.excursions-section .experience-carousel.reveal.is-visible,
-.excursions-section .experience-carousel-arrows.reveal.is-visible,
-.excursions-section .experience-carousel-dots.reveal.is-visible,
+/* View-all button fades/rises in on scroll, same timing pattern used
+   elsewhere on the page. */
+.excursions-section .experience-carousel-view-all-row.reveal { opacity: 0; transform: translateY(26px); transition: opacity 1.3s var(--ease-out), transform 1.3s var(--ease-out); transition-delay: .24s; }
 .excursions-section .experience-carousel-view-all-row.reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 @media (prefers-reduced-motion: reduce) {
-  .experience-carousel-track { transition: none !important; }
-  .excursions-section .experience-carousel.reveal,
-  .excursions-section .experience-carousel-arrows.reveal,
-  .excursions-section .experience-carousel-dots.reveal,
+  #experience .offer-card.reveal,
   .excursions-section .experience-carousel-view-all-row.reveal { transition: none; opacity: 1; transform: none; }
 }
 

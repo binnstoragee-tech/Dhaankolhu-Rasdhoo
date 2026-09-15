@@ -1514,13 +1514,13 @@ initImageDrift(".highlights-gallery-grid .gallery-item", 110);
 })();
 
 /* ==========================================================================
-   Card carousels — Accommodation (Double / Triple / Family) and Island
-   Activities (Snorkeling / Fishing / Dolphin / Turtle / Sharks) both use
-   this same auto-looping "one centered card at a time" mechanic, auto-
-   advancing every 4s and looping forever. See the ".room-carousel" /
-   ".experience-carousel" comment blocks in style.css for how the seamless
-   loop (clone slides + instant snap-back) works; this is the shared JS
-   half of that mechanic, instantiated once per carousel below.
+   Card carousel — Accommodation (Double / Triple / Family) uses this
+   auto-looping "one centered card at a time" mechanic, auto-advancing
+   every 4s and looping forever. See the ".room-carousel" comment block
+   in style.css for how the seamless loop (clone slides + instant
+   snap-back) works; this is the shared JS half of that mechanic.
+   (Island Activities used to share this same mechanic but now uses the
+   flat assemble-in grid instead — see the #experience rules in style.css.)
 
    Autoplay switches slides every 4s (a normal, readable dwell time).
    TRANSITION_MS (the slide-glide duration, must stay in sync with the CSS
@@ -1667,4 +1667,3 @@ function initCardCarousel(config) {
 }
 
 initCardCarousel({ trackId: "room-carousel-track", prevId: "room-carousel-prev", nextId: "room-carousel-next", dotsId: "room-carousel-dots", carouselId: "room-carousel", viewAllId: "room-carousel-view-all-link", roomPages: ["double-room.html", "triple-room.html", "family-room.html"], roomLabels: ["View Double Room", "View Triple Room", "View Family Room"] });
-initCardCarousel({ trackId: "experience-carousel-track", prevId: "experience-carousel-prev", nextId: "experience-carousel-next", dotsId: "experience-carousel-dots", carouselId: "experience-carousel" });
