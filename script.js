@@ -1514,59 +1514,54 @@ initImageDrift(".highlights-gallery-grid .gallery-item", 110);
 })();
 
 /* ==========================================================================
-   Accommodation carousel (Double / Triple / Family) — shows one centered
-   card at a time and auto-advances every 3s, looping forever. See the
-   ".room-carousel" comment block in style.css for how the seamless loop
-   (clone slides + instant snap-back) works; this is the JS half of that
-   same mechanic.
+   Card carousels — Accommodation (Double / Triple / Family) and Island
+   Activities (Snorkeling / Fishing / Dolphin / Turtle / Sharks) both use
+   this same auto-looping "one centered card at a time" mechanic, auto-
+   advancing every 4s and looping forever. See the ".room-carousel" /
+   ".experience-carousel" comment blocks in style.css for how the seamless
+   loop (clone slides + instant snap-back) works; this is the shared JS
+   half of that mechanic, instantiated once per carousel below.
+
+   Autoplay switches slides every 4s (a normal, readable dwell time).
+   TRANSITION_MS (the slide-glide duration, must stay in sync with the CSS
+   transition on each carousel's -track class) is kept noticeably shorter
+   than AUTOPLAY_MS on purpose: if the two are equal, the setInterval tick
+   and the CSS transitionend event land at almost the exact same
+   millisecond, and whichever one wins that race governs — half the time
+   the tick fires a hair before "isAnimating" gets cleared and goTo()
+   silently no-ops, so it visibly switches on some other cadence than
+   intended. A 700ms glide leaves a clean gap before the next tick, so
+   there's no race and every switch reliably lands on schedule.
    ========================================================================== */
-(function () {
-  var track = document.getElementById("room-carousel-track");
+function initCardCarousel(config) {
+  var track = document.getElementById(config.trackId);
   var viewport = track ? track.parentElement : null;
-  var prevBtn = document.getElementById("room-carousel-prev");
-  var nextBtn = document.getElementById("room-carousel-next");
-  var dotsWrap = document.getElementById("room-carousel-dots");
-  var carousel = document.getElementById("room-carousel");
+  var prevBtn = document.getElementById(config.prevId);
+  var nextBtn = document.getElementById(config.nextId);
+  var dotsWrap = config.dotsId ? document.getElementById(config.dotsId) : null;
+  var carousel = config.carouselId ? document.getElementById(config.carouselId) : null;
+  var viewAllLink = config.viewAllId ? document.getElementById(config.viewAllId) : null;
   if (!track || !viewport || !prevBtn || !nextBtn) return;
 
   var slides = Array.prototype.slice.call(track.children);
   var realSlides = slides.filter(function (slide) { return !slide.hasAttribute("data-clone"); });
-  var REAL_COUNT = realSlides.length; /* 3: Double, Triple, Family */
+  var REAL_COUNT = realSlides.length;
   if (REAL_COUNT < 1) return;
 
-  var dots = dotsWrap ? Array.prototype.slice.call(dotsWrap.querySelectorAll(".room-carousel-dot")) : [];
-  /* Autoplay switches to the next room every 4s (a normal, readable dwell
-     time — matches the pace of the other slideshows on the site instead of
-     the rapid-fire 1.5s it was switching at before). TRANSITION_MS (the
-     slide-glide duration, must stay in sync with the CSS transition on
-     .room-carousel-track in style.css) is kept noticeably shorter than
-     AUTOPLAY_MS on purpose: if the two are equal, the setInterval tick and
-     the CSS transitionend event land at almost the exact same millisecond,
-     and whichever one wins that race governs — half the time the tick
-     fires a hair before "isAnimating" gets cleared and goTo() silently
-     no-ops, so it visibly switches on some other cadence than intended. A
-     700ms glide leaves a clean gap before the next tick, so there's no
-     race and every switch reliably lands on schedule. */
+  var dots = dotsWrap ? Array.prototype.slice.call(dotsWrap.children) : [];
   var AUTOPLAY_MS = 4000;
   var TRANSITION_MS = 700;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  var position = 1; /* index 1 in the track = the first real slide (Double) */
+  var position = 1; /* index 1 in the track = the first real slide */
   var slideWidth = 0;
   var timer = null;
   var resizeT = null;
   var isAnimating = false;
   var fallbackT = null;
 
-  /* Always show a single, centered card per slide (used to show 2 side by
-     side above 860px) so each Double/Triple/Family room gets the full
-     spotlight one at a time as the carousel auto-advances. */
-  function visibleCount() {
-    return 1;
-  }
-
   function layout() {
-    slideWidth = viewport.clientWidth / visibleCount();
+    slideWidth = viewport.clientWidth;
     slides.forEach(function (slide) { slide.style.width = slideWidth + "px"; });
     render(false);
   }
@@ -1578,9 +1573,21 @@ initImageDrift(".highlights-gallery-grid .gallery-item", 110);
   }
 
   function updateDots() {
-    if (!dots.length) return;
     var realIndex = ((position - 1) % REAL_COUNT + REAL_COUNT) % REAL_COUNT;
-    dots.forEach(function (dot, i) { dot.classList.toggle("is-active", i === realIndex); });
+    if (dots.length) {
+      dots.forEach(function (dot, i) { dot.classList.toggle("is-active", i === realIndex); });
+    }
+    /* "View All Rooms" below the carousel actually points at whichever
+       room is currently showing (config.roomPages/roomLabels, indexed to
+       match each slide's data-room), not a static "see everything" page —
+       so pressing it while Triple Room is centered goes to
+       triple-room.html, not always the same destination. */
+    if (viewAllLink && config.roomPages && config.roomPages[realIndex]) {
+      viewAllLink.setAttribute("href", config.roomPages[realIndex]);
+      if (config.roomLabels && config.roomLabels[realIndex]) {
+        viewAllLink.textContent = config.roomLabels[realIndex];
+      }
+    }
   }
 
   /* Snap the clone the track just finished sliding to back to its matching
@@ -1657,4 +1664,7 @@ initImageDrift(".highlights-gallery-grid .gallery-item", 110);
 
   layout();
   startAutoplay();
-})();
+}
+
+initCardCarousel({ trackId: "room-carousel-track", prevId: "room-carousel-prev", nextId: "room-carousel-next", dotsId: "room-carousel-dots", carouselId: "room-carousel", viewAllId: "room-carousel-view-all-link", roomPages: ["double-room.html", "triple-room.html", "family-room.html"], roomLabels: ["View Double Room", "View Triple Room", "View Family Room"] });
+initCardCarousel({ trackId: "experience-carousel-track", prevId: "experience-carousel-prev", nextId: "experience-carousel-next", dotsId: "experience-carousel-dots", carouselId: "experience-carousel" });

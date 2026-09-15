@@ -1,12 +1,19 @@
 /* Room Detail pages (double-room.html / triple-room.html / family-room.html)
    — header/menu/transitions match script.js on the main site; adds a small
    gallery rotator for the 3-photo strip. */
+
+/* Declared here (file scope, not inside either IIFE below) because both the
+   click-intercept IIFE right below and the "Other Rooms" clickable-card
+   IIFE near the bottom of this file need it. It used to be declared only
+   inside the first IIFE, so the second IIFE's use of it threw
+   "PAGE_TRANSITION_MS is not defined" the moment anyone clicked (or
+   Enter-keyed) an "Other Rooms" card. */
+var PAGE_TRANSITION_MS = 380;
+
 (function () {
   "use strict";
 
   /* ---------- smooth cross-page transitions (same as script.js) ---------- */
-  var PAGE_TRANSITION_MS = 380;
-
   window.requestAnimationFrame(function () {
     window.requestAnimationFrame(function () {
       document.documentElement.classList.remove("is-preload");
@@ -313,12 +320,68 @@ function initRoomDetailImageDrift(selector, driftPx) {
   });
 }
 
-/* Accommodation cards on Offers / Explore Rasdhoo. */
-initRoomDetailImageDrift("#discover-accommodation .offer-card-media", 60);
+/* Parallax/scroll-drift on the Accommodation cards (Offers / Explore
+   Rasdhoo) removed per request — the photos now stay static, no drift. */
 /* Room hero photo (double/triple/family-room.html) — biggest drift range
-   since it's the biggest, most prominent image on the page. */
-initRoomDetailImageDrift(".room-hero", 80);
+   since it's the biggest, most prominent image on the page. Bumped from
+   80 to 180 (±90px total swing) — paired with the wider 160%/-30% image
+   buffer in room-detail.css above — for a proper, clearly visible
+   parallax feel as the page scrolls past this hero, instead of the
+   original barely-there ±40px shift. */
+initRoomDetailImageDrift(".room-hero", 180);
 /* 3-photo gallery strip. */
 initRoomDetailImageDrift(".room-gallery-frame", 55);
 /* "Other Rooms" cards at the bottom of each room-detail page. */
 initRoomDetailImageDrift(".room-offers-grid .offer-card-media", 60);
+
+/* ==========================================================================
+   Make room offer-cards fully clickable — the "Other Rooms" cards at the
+   bottom of each room-detail page (Double/Triple/Family), and the
+   Accommodation cards on Offers / Explore Rasdhoo. Previously only the
+   "More Details" text button itself was a link, so tapping the photo,
+   room name, description, or price did nothing. Scoped to
+   .room-offers-grid and #discover-accommodation only — Island Activities
+   cards (Sharks, Snorkeling, ...) on Explore Rasdhoo are left alone since
+   those don't link anywhere.
+
+   Navigates with the exact same three lines the generic click handler
+   above uses for every other link on the site (fade class, timeout, plain
+   `window.location.href = ...` assignment) instead of dispatching a
+   synthetic click on the hidden "More Details" link. Both approaches end
+   up calling the same assignment, but doing it directly here removes any
+   dependence on that click event correctly bubbling back up through this
+   handler and into the generic document listener — this is a normal
+   forward navigation exactly like clicking a real link, so the browser's
+   own Back button already returns to whatever page was actually visited
+   before this one (Double, Triple, Family, or wherever), never forced
+   back to the homepage. Clicks that land on an actual link inside the
+   card (More Details / Book Now) are left alone so they still fire
+   through the generic handler normally and don't double-navigate. */
+(function () {
+  var cards = document.querySelectorAll(".room-offers-grid .offer-card, #discover-accommodation .offer-card");
+  cards.forEach(function (card) {
+    var detailsLink = card.querySelector(".offer-card-actions .offer-btn-outline");
+    if (!detailsLink) return;
+    var href = detailsLink.getAttribute("href");
+    card.classList.add("offer-card-clickable");
+    card.setAttribute("role", "link");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", detailsLink.textContent.trim() + " — " + (card.querySelector("h3") ? card.querySelector("h3").textContent.trim() : ""));
+
+    function go() {
+      document.body.classList.add("is-leaving");
+      window.setTimeout(function () { window.location.href = href; }, PAGE_TRANSITION_MS);
+    }
+
+    card.addEventListener("click", function (event) {
+      if (event.target.closest("a")) return;
+      go();
+    });
+    card.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter") return;
+      if (event.target.closest("a")) return;
+      event.preventDefault();
+      go();
+    });
+  });
+})();

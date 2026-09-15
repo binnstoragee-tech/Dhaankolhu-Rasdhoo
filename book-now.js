@@ -183,8 +183,6 @@
   var departureInput = document.getElementById("bk-departure");
   var arrivalTimeInput = document.getElementById("bk-arrival-time");
   var departureTimeInput = document.getElementById("bk-departure-time");
-  var stepper = document.querySelector(".bk-stepper");
-  var stepperCount = stepper.querySelector("span");
   var roomGrid = document.getElementById("bk-room-grid");
   var nameInput = document.getElementById("bk-name");
   var emailInput = document.getElementById("bk-email");
@@ -193,7 +191,7 @@
   var ticketTotalEl = document.getElementById("bk-ticket-total");
   var ticketCodeEl = document.getElementById("bk-ticket-code");
 
-  var state = { arrival: "", departure: "", arrivalTime: "14:00", departureTime: "12:00", guests: 5, room: null, price: 0, name: "", email: "", phone: "", country: "" };
+  var state = { arrival: "", departure: "", arrivalTime: "14:00", departureTime: "12:00", room: null, price: 0, name: "", email: "", phone: "", country: "" };
   var currentStep = 1;
   var TOTAL_STEPS = 4;
   var pdfDownloaded = false;
@@ -229,17 +227,6 @@
 
   /* today as the earliest selectable date */
   var todayStr = new Date().toISOString().slice(0, 10);
-
-  /* ---------- guest stepper ---------- */
-  stepper.addEventListener("click", function (event) {
-    var btn = event.target.closest("button");
-    if (!btn) return;
-    var delta = btn.getAttribute("data-action") === "increase" ? 1 : -1;
-    state.guests = Math.min(10, Math.max(1, state.guests + delta));
-    stepperCount.textContent = state.guests;
-    updateTicket("guests");
-    saveDraft();
-  });
 
   /* ---------- dates ---------- */
   arrivalInput.addEventListener("change", function () {
@@ -835,9 +822,6 @@
         setTicketRow("nights", "—", false);
       }
     }
-    if (!which || which === "guests") {
-      setTicketRow("guests", state.guests + (state.guests === 1 ? " guest" : " guests"), true);
-    }
     if (!which || which === "room") {
       setTicketRow("room", state.room || "Not chosen yet", !!state.room);
     }
@@ -955,7 +939,6 @@
     var total = state.price && n ? state.price * n : 0;
     var rows = [
       ["Name", state.name || "—"],
-      ["Guests", state.guests + (state.guests === 1 ? " guest" : " guests")],
       ["Dates", state.arrival && state.departure ? formatDateTime(state.arrival, state.arrivalTime) + " – " + formatDateTime(state.departure, state.departureTime) + " (" + n + (n === 1 ? " night" : " nights") + ")" : "—"],
       ["Stay", state.room || "—"],
       ["Email", state.email || "—"],
@@ -1178,7 +1161,6 @@
     /* table rows: label left cell, value right cell */
     var rows = [
       ["Name", state.name || "\u2014"],
-      ["Guests", state.guests + (state.guests === 1 ? " guest" : " guests")],
       ["Check-in", state.arrival ? formatDateTime(state.arrival, state.arrivalTime) : "\u2014"],
       ["Check-out", state.departure ? formatDateTime(state.departure, state.departureTime) : "\u2014"],
       ["Nights", state.arrival && state.departure && n > 0 ? String(n) : "\u2014"],
@@ -1336,9 +1318,6 @@
         if (selectWrap) selectWrap.classList.add("has-date");
       }
     });
-
-    /* guests */
-    stepperCount.textContent = state.guests;
 
     /* stay/room */
     if (state.room) {
