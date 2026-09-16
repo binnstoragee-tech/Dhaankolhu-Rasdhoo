@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>We'll be right back — Dhaankolhu Rasdhoo Island</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ivory: #f6f1e7;
+    --mist: #cfd8dc;
+    --brass: #c9a063;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
+    color: var(--ivory);
+  }
+  body {
+    min-height: 100vh;
+    background-image:
+      linear-gradient(180deg, rgba(20,30,38,0.55) 0%, rgba(15,23,29,0.65) 100%),
+      url("img/home%20web.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  @media (max-width: 768px) {
+    body {
+      background-image:
+        linear-gradient(180deg, rgba(20,30,38,0.55) 0%, rgba(15,23,29,0.68) 100%),
+        url("img/home%20mobile.jpeg");
+      background-attachment: scroll;
+    }
+  }
+
+  .wrap {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1vh 6vw 1.5vh;
+  }
+
+  .core {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: clamp(1.5vh, 6vh, 8vh);
+    width: 100%;
+  }
+
+  .mark img {
+    height: clamp(140px, 28vh, 600px);
+    width: auto;
+    margin-bottom: clamp(0.8rem, 2.5vh, 2rem);
+    opacity: 0.95;
+  }
+
+  h1 {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: clamp(1.4rem, 4.2vw, 3rem);
+    line-height: 1.15;
+    margin: 0 0 clamp(0.5rem, 1.6vh, 1.2rem);
+    color: var(--ivory);
+  }
+
+  p.lede {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.8rem, 1.6vw, 1.05rem);
+    color: var(--mist);
+    margin: 0 0 clamp(1.4rem, 4vh, 3.6rem);
+  }
+
+  .cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid rgba(246,241,231,0.55);
+    border-radius: 999px;
+    padding: 0.25rem 0.25rem 0.25rem 1.2rem;
+    text-decoration: none;
+    color: var(--ivory);
+    margin-bottom: clamp(0.7rem, 2vh, 1.6rem);
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .cta:hover,
+  .cta:focus-visible {
+    border-color: var(--brass);
+    background: rgba(246,241,231,0.06);
+  }
+  .cta span.label {
+    font-size: clamp(0.78rem, 1.4vw, 0.95rem);
+    font-weight: 500;
+    text-align: left;
+  }
+  .cta span.arrow {
+    flex-shrink: 0;
+    width: clamp(32px, 4.5vh, 40px);
+    height: clamp(32px, 4.5vh, 40px);
+    border: 1px solid rgba(246,241,231,0.55);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cta span.arrow svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--ivory);
+  }
+
+  .secondary {
+    display: flex;
+    gap: 0.7rem;
+    justify-content: center;
+    margin-top: clamp(0.5rem, 1.6vh, 1rem);
+    margin-bottom: clamp(0.5rem, 1.6vh, 1rem);
+  }
+  .icon-link {
+    width: clamp(34px, 4.5vh, 42px);
+    height: clamp(34px, 4.5vh, 42px);
+    border: 1px solid rgba(246,241,231,0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ivory);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .icon-link:hover,
+  .icon-link:focus-visible {
+    border-color: var(--brass);
+    background: rgba(246,241,231,0.06);
+  }
+  .icon-link svg {
+    width: 17px;
+    height: 17px;
+    stroke: var(--ivory);
+    fill: none;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 3px;
+  }
+
+  .foot {
+    font-size: clamp(0.62rem, 1.3vw, 0.78rem);
+    color: var(--mist);
+    opacity: 0.85;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  @media (max-width: 640px) {
+    .cta { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="core">
+      <div class="mark">
+        <img src="img/logo/logo%20white.png" alt="Dhaankolhu Rasdhoo Island" />
+      </div>
+      <h1>We're building our website</h1>
+      <p class="lede">Reach us directly below. We'll be back online soon.</p>
+
+      <a class="cta" href="https://wa.me/9609898130" target="_blank" rel="noopener">
+        <span class="label">WhatsApp: +960 989 8130</span>
+        <span class="arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+    </div>
+
+    <div class="secondary">
+      <a class="icon-link" href="mailto:info@dhaankolhu.com" aria-label="Email info@dhaankolhu.com" title="info@dhaankolhu.com">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
+      </a>
+      <a class="icon-link" href="https://www.facebook.com/profile.php?id=61565172224877" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9h3V5h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V9a1 1 0 0 1 1-1z"/></svg>
+      </a>
+      <a class="icon-link" href="https://www.instagram.com/dhaankolhu/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+
+    <div class="foot">&copy; 2026 Dhaankolhu Rasdhoo Island. All Rights Reserved.</div>
+  </div>
+</body>
+</html>
