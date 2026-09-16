@@ -1075,7 +1075,7 @@
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor.apply(doc, MUTED);
-    doc.text("Local island \u00B7 South Ari Atoll, Maldives", margin + contentW, y + 14, { align: "right" });
+    doc.text("Local island \u00B7 North Ari Atoll, Maldives", margin + contentW, y + 14, { align: "right" });
     doc.text("+960 989 8130", margin + contentW, y + 28, { align: "right" });
     doc.text("info@dhaankolhu.com", margin + contentW, y + 42, { align: "right" });
 

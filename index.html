@@ -454,11 +454,13 @@
        Rasdhoo / ..." block up so it reads centered instead of low. */
     .story-panel-welcome { padding-bottom: clamp(1.5rem, 6vh, 4rem); }
     .story-panel-welcome .hero-content { width: min(100% - 2.5rem, 1080px); }
-    /* Desktop: push the welcome text further up off dead-center — on wide/
-       tall desktop viewports the flex-centered block was reading too low
-       against the aerial photo. */
+    /* Desktop (laptop through big PC monitors): a single FIXED nudge, not
+       vh-based — vh scaling was the actual bug (it pushed the text higher
+       and higher as the screen got taller, so laptop and a big monitor
+       never matched). A flat rem value looks the same, correctly
+       centered, on every desktop size. */
     @media (min-width: 641px) {
-      .story-panel-welcome { padding-bottom: clamp(10rem, 30vh, 20rem); }
+      .story-panel-welcome { padding-bottom: 3rem; }
     }
 
     .story-panel-about .story-panel-inner { width: min(100% - 2rem, 720px); margin: 0 auto; text-align: center; }
@@ -468,11 +470,11 @@
        for. Extra bottom padding on the flex-centered panel shifts the
        whole block up to compensate. */
     .story-panel-about { padding-bottom: clamp(2rem, 10vh, 6rem); }
-    /* Desktop: push the "About" copy up off dead-center, same treatment
-       as the welcome chapter above — on wide/tall desktop viewports the
-       flex-centered block was reading too low against the aerial photo. */
+    /* Desktop (laptop through big PC monitors): same flat, non-vh nudge as
+       the welcome chapter above, so both chapters center identically no
+       matter how big or tall the screen is. */
     @media (min-width: 641px) {
-      .story-panel-about { padding-bottom: clamp(10rem, 30vh, 20rem); }
+      .story-panel-about { padding-bottom: 3rem; }
     }
     .story-panel-about .eyebrow {
       display: block; margin-bottom: .9rem;
@@ -577,7 +579,7 @@
        zoomed to fill the whole screen (is-frame-exiting) — before that,
        while the small collage box is still on screen, only the heading
        shows, so nothing doubles up with the collage's own "Local island /
-       South Ari Atoll" badge sitting right above it. */
+       North Ari Atoll" badge sitting right above it. */
     .frame-caption-inner h2,
     .frame-caption-inner .slide-badge,
     .frame-caption-inner p,
@@ -806,7 +808,7 @@
 
         <div class="story-panel story-panel-about" data-story-panel="1" id="about"><div class="story-panel-inner"><span class="eyebrow">About</span><h2>Comfortable rooms, <br><em>a beautiful island</em></h2><p>Warm wooden interiors and cozy, well-kept rooms made for rest — set on one of the Maldives' most beautiful local islands, with coral sands, warm lagoons, and calm all around you.</p></div></div>
 
-        <div class="story-panel story-panel-frame" data-story-panel="2"><div class="story-panel-inner"><div class="collage-tilt" id="story-collage-tilt"><figure class="collage-main"><img class="collage-main-img is-front" src="img/home/1.webp" alt="Dhaankolhu Rasdhoo shoreline" fetchpriority="high" decoding="async" /><img class="collage-main-img" src="img/home/1.webp" alt="" aria-hidden="true" decoding="async" /></figure><figure class="collage-accent" data-expand data-title="" tabindex="0" role="button" aria-haspopup="dialog" aria-label="View larger photo"><img src="img/home/2.webp" alt="Turquoise lagoon close-up" decoding="async" /></figure><div class="collage-badge"><span class="collage-badge-eyebrow">Local island</span><strong>South Ari Atoll, Maldives</strong></div></div></div><div class="frame-caption"><div class="frame-caption-inner"><h2>Ready for <br class="frame-title-break">Rasdhoo?</h2><p>Barefoot mornings, turquoise waters, warm nights, and memories that last.</p><a class="slide-cta frame-cta-glass" href="family-room.html">Book your stay</a></div></div><!-- Auto-cycling row of 3 numbered home photos (bottom-right, once the frame
+        <div class="story-panel story-panel-frame" data-story-panel="2"><div class="story-panel-inner"><div class="collage-tilt" id="story-collage-tilt"><figure class="collage-main"><img class="collage-main-img is-front" src="img/home/1.webp" alt="Dhaankolhu Rasdhoo shoreline" fetchpriority="high" decoding="async" /><img class="collage-main-img" src="img/home/1.webp" alt="" aria-hidden="true" decoding="async" /></figure><figure class="collage-accent" data-expand data-title="" tabindex="0" role="button" aria-haspopup="dialog" aria-label="View larger photo"><img src="img/home/2.webp" alt="Turquoise lagoon close-up" decoding="async" /></figure><div class="collage-badge"><span class="collage-badge-eyebrow">Local island</span><strong>North Ari Atoll, Maldives</strong></div></div></div><div class="frame-caption"><div class="frame-caption-inner"><h2>Ready for <br class="frame-title-break">Rasdhoo?</h2><p>Barefoot mornings, turquoise waters, warm nights, and memories that last.</p><a class="slide-cta frame-cta-glass" href="family-room.html">Book your stay</a></div></div><!-- Auto-cycling row of 3 numbered home photos (bottom-right, once the frame
              has zoomed to full-bleed) — the highlighted one also becomes the
              new full-screen backdrop photo above (see advanceFrameCards() in
              script.js). Swap the 3 <img> sources here any time to change
@@ -950,13 +952,23 @@
                 <div class="room-carousel-slide-inner">
                   <a class="room-carousel-media" href="family-room.html" tabindex="-1"><img loading="lazy" decoding="async" src="img/room/family%20room.webp" alt="" tabindex="-1" /></a>
                   <div class="room-carousel-copy">
-                    <span class="eyebrow">Room for everyone</span>
-                    <h3>Family Room</h3>
-                    <p>The largest of the three, with room enough for the whole family — steps from the shoreline.</p>
-                    <div class="offer-card-price"><span>Per night</span><strong>$95<small>+tax</small></strong></div>
-                    <div class="offer-card-actions">
-                      <a class="offer-btn offer-btn-outline" href="family-room.html" tabindex="-1">More Details</a>
-                      <a class="offer-btn offer-btn-solid" href="book-now.html" tabindex="-1">Book Now</a>
+                    <div class="room-carousel-copy-top">
+                      <span class="eyebrow">Room for everyone</span>
+                      <h3>Family Room</h3>
+                      <p>The largest of the three, with room enough for the whole family — steps from the shoreline.</p>
+                      <div class="room-carousel-meta">
+                        <a class="room-carousel-meta-item room-carousel-meta-link" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><strong>9.1 · 59 Reviews</strong></a>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="4" width="17" height="16" rx="1.4" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9h17M8 4v5M16 4v5" stroke="currentColor" stroke-width="1.6"/></svg><strong>22 m²</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 18v-5.5C3.5 11.12 4.62 10 6 10h12c1.38 0 2.5 1.12 2.5 2.5V18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3.5 15h17" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="8" r="1.7" stroke="currentColor" stroke-width="1.6"/></svg><strong>2 Queen Beds</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v18M4.5 7.5l15 9M19.5 7.5l-15 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4.5 7.5l.4-2.2M4.5 7.5l2.2.4M19.5 7.5l-2.2.4M19.5 7.5l-.4-2.2M4.5 16.5l2.2-.4M4.5 16.5l.4 2.2M19.5 16.5l-.4 2.2M19.5 16.5l-2.2-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><strong>Included</strong></div>
+                      </div>
+                    </div>
+                    <div class="room-carousel-copy-bottom">
+                      <div class="offer-card-price"><span>Per night</span><strong>$95<small>+tax</small></strong></div>
+                      <div class="offer-card-actions">
+                        <a class="offer-btn offer-btn-outline" href="family-room.html" tabindex="-1">More Details</a>
+                        <a class="offer-btn offer-btn-solid" href="book-now.html" tabindex="-1">Book Now</a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -966,13 +978,23 @@
                 <div class="room-carousel-slide-inner">
                   <a class="room-carousel-media" href="double-room.html"><img loading="lazy" decoding="async" src="img/room/double.webp" alt="Double Room" /></a>
                   <div class="room-carousel-copy">
-                    <span class="eyebrow">Room for two</span>
-                    <h3>Double Room</h3>
-                    <p>A relaxed room built for two, steps from the shoreline.</p>
-                    <div class="offer-card-price"><span>Per night</span><strong>$65<small>+tax</small></strong></div>
-                    <div class="offer-card-actions">
-                      <a class="offer-btn offer-btn-outline" href="double-room.html">More Details</a>
-                      <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
+                    <div class="room-carousel-copy-top">
+                      <span class="eyebrow">Room for two</span>
+                      <h3>Double Room</h3>
+                      <p>A relaxed room built for two, steps from the shoreline.</p>
+                      <div class="room-carousel-meta">
+                        <a class="room-carousel-meta-item room-carousel-meta-link" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><strong>9.1 · 59 Reviews</strong></a>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="4" width="17" height="16" rx="1.4" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9h17M8 4v5M16 4v5" stroke="currentColor" stroke-width="1.6"/></svg><strong>16 m²</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 18v-5.5C3.5 11.12 4.62 10 6 10h12c1.38 0 2.5 1.12 2.5 2.5V18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3.5 15h17" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="8" r="1.7" stroke="currentColor" stroke-width="1.6"/></svg><strong>1 Full Bed</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.1 5.9l-1.7 1.7M7.6 16.4l-1.7 1.7M18.1 18.1l-1.7-1.7M7.6 7.6L5.9 5.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><strong>City View</strong></div>
+                      </div>
+                    </div>
+                    <div class="room-carousel-copy-bottom">
+                      <div class="offer-card-price"><span>Per night</span><strong>$65<small>+tax</small></strong></div>
+                      <div class="offer-card-actions">
+                        <a class="offer-btn offer-btn-outline" href="double-room.html">More Details</a>
+                        <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -982,13 +1004,23 @@
                 <div class="room-carousel-slide-inner">
                   <a class="room-carousel-media" href="triple-room.html"><img loading="lazy" decoding="async" src="img/room/triple.webp" alt="Triple Room" /></a>
                   <div class="room-carousel-copy">
-                    <span class="eyebrow">Room for three</span>
-                    <h3>Triple Room</h3>
-                    <p>Extra space to spread out, ideal for three sharing the stay.</p>
-                    <div class="offer-card-price"><span>Per night</span><strong>$80<small>+tax</small></strong></div>
-                    <div class="offer-card-actions">
-                      <a class="offer-btn offer-btn-outline" href="triple-room.html">More Details</a>
-                      <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
+                    <div class="room-carousel-copy-top">
+                      <span class="eyebrow">Room for three</span>
+                      <h3>Triple Room</h3>
+                      <p>Extra space to spread out, ideal for three sharing the stay.</p>
+                      <div class="room-carousel-meta">
+                        <a class="room-carousel-meta-item room-carousel-meta-link" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><strong>9.1 · 59 Reviews</strong></a>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="4" width="17" height="16" rx="1.4" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9h17M8 4v5M16 4v5" stroke="currentColor" stroke-width="1.6"/></svg><strong>22 m²</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 18v-5.5C3.5 11.12 4.62 10 6 10h12c1.38 0 2.5 1.12 2.5 2.5V18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3.5 15h17" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="8" r="1.7" stroke="currentColor" stroke-width="1.6"/></svg><strong>1 Twin Bed + 1 Full Bed</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v18M4.5 7.5l15 9M19.5 7.5l-15 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4.5 7.5l.4-2.2M4.5 7.5l2.2.4M19.5 7.5l-2.2.4M19.5 7.5l-.4-2.2M4.5 16.5l2.2-.4M4.5 16.5l.4 2.2M19.5 16.5l-.4 2.2M19.5 16.5l-2.2-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><strong>Included</strong></div>
+                      </div>
+                    </div>
+                    <div class="room-carousel-copy-bottom">
+                      <div class="offer-card-price"><span>Per night</span><strong>$80<small>+tax</small></strong></div>
+                      <div class="offer-card-actions">
+                        <a class="offer-btn offer-btn-outline" href="triple-room.html">More Details</a>
+                        <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -998,13 +1030,23 @@
                 <div class="room-carousel-slide-inner">
                   <a class="room-carousel-media" href="family-room.html"><img loading="lazy" decoding="async" src="img/room/family%20room.webp" alt="Family Room" /></a>
                   <div class="room-carousel-copy">
-                    <span class="eyebrow">Room for everyone</span>
-                    <h3>Family Room</h3>
-                    <p>The largest of the three, with room enough for the whole family — steps from the shoreline.</p>
-                    <div class="offer-card-price"><span>Per night</span><strong>$95<small>+tax</small></strong></div>
-                    <div class="offer-card-actions">
-                      <a class="offer-btn offer-btn-outline" href="family-room.html">More Details</a>
-                      <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
+                    <div class="room-carousel-copy-top">
+                      <span class="eyebrow">Room for everyone</span>
+                      <h3>Family Room</h3>
+                      <p>The largest of the three, with room enough for the whole family — steps from the shoreline.</p>
+                      <div class="room-carousel-meta">
+                        <a class="room-carousel-meta-item room-carousel-meta-link" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><strong>9.1 · 59 Reviews</strong></a>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="4" width="17" height="16" rx="1.4" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9h17M8 4v5M16 4v5" stroke="currentColor" stroke-width="1.6"/></svg><strong>22 m²</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 18v-5.5C3.5 11.12 4.62 10 6 10h12c1.38 0 2.5 1.12 2.5 2.5V18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3.5 15h17" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="8" r="1.7" stroke="currentColor" stroke-width="1.6"/></svg><strong>2 Queen Beds</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v18M4.5 7.5l15 9M19.5 7.5l-15 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4.5 7.5l.4-2.2M4.5 7.5l2.2.4M19.5 7.5l-2.2.4M19.5 7.5l-.4-2.2M4.5 16.5l2.2-.4M4.5 16.5l.4 2.2M19.5 16.5l-.4 2.2M19.5 16.5l-2.2-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><strong>Included</strong></div>
+                      </div>
+                    </div>
+                    <div class="room-carousel-copy-bottom">
+                      <div class="offer-card-price"><span>Per night</span><strong>$95<small>+tax</small></strong></div>
+                      <div class="offer-card-actions">
+                        <a class="offer-btn offer-btn-outline" href="family-room.html">More Details</a>
+                        <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1014,13 +1056,23 @@
                 <div class="room-carousel-slide-inner">
                   <a class="room-carousel-media" href="double-room.html" tabindex="-1"><img loading="lazy" decoding="async" src="img/room/double.webp" alt="" tabindex="-1" /></a>
                   <div class="room-carousel-copy">
-                    <span class="eyebrow">Room for two</span>
-                    <h3>Double Room</h3>
-                    <p>A relaxed room built for two, steps from the shoreline.</p>
-                    <div class="offer-card-price"><span>Per night</span><strong>$65<small>+tax</small></strong></div>
-                    <div class="offer-card-actions">
-                      <a class="offer-btn offer-btn-outline" href="double-room.html" tabindex="-1">More Details</a>
-                      <a class="offer-btn offer-btn-solid" href="book-now.html" tabindex="-1">Book Now</a>
+                    <div class="room-carousel-copy-top">
+                      <span class="eyebrow">Room for two</span>
+                      <h3>Double Room</h3>
+                      <p>A relaxed room built for two, steps from the shoreline.</p>
+                      <div class="room-carousel-meta">
+                        <a class="room-carousel-meta-item room-carousel-meta-link" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><strong>9.1 · 59 Reviews</strong></a>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="4" width="17" height="16" rx="1.4" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9h17M8 4v5M16 4v5" stroke="currentColor" stroke-width="1.6"/></svg><strong>16 m²</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 18v-5.5C3.5 11.12 4.62 10 6 10h12c1.38 0 2.5 1.12 2.5 2.5V18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3.5 15h17" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="8" r="1.7" stroke="currentColor" stroke-width="1.6"/></svg><strong>1 Full Bed</strong></div>
+                        <div class="room-carousel-meta-item"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.1 5.9l-1.7 1.7M7.6 16.4l-1.7 1.7M18.1 18.1l-1.7-1.7M7.6 7.6L5.9 5.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><strong>City View</strong></div>
+                      </div>
+                    </div>
+                    <div class="room-carousel-copy-bottom">
+                      <div class="offer-card-price"><span>Per night</span><strong>$65<small>+tax</small></strong></div>
+                      <div class="offer-card-actions">
+                        <a class="offer-btn offer-btn-outline" href="double-room.html" tabindex="-1">More Details</a>
+                        <a class="offer-btn offer-btn-solid" href="book-now.html" tabindex="-1">Book Now</a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1043,7 +1095,7 @@
 
       <section id="gallery" class="gallery-section section-shell"><div class="section-index reveal">03 <span>/ gallery</span></div><div class="gallery-heading"><span class="eyebrow reveal">Gallery</span><h2 class="display-heading reveal">Joy, Laughter &amp; Beautiful Memories</h2><p class="section-lede reveal">Every visit to Dhaankolhu Rasdhoo Island creates a story worth telling. Here are some of the beautiful moments our guests have shared with us.</p></div><div class="gallery-grid"><figure class="gallery-item reveal" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><img loading="lazy" decoding="async" src="img/gallery/1.webp" alt="Dhaankolhu Rasdhoo gallery photo 1" /></figure><figure class="gallery-item reveal" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><img loading="lazy" decoding="async" src="img/gallery/2.webp" alt="Dhaankolhu Rasdhoo gallery photo 2" /></figure><figure class="gallery-item reveal" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><img loading="lazy" decoding="async" src="img/gallery/3.webp" alt="Dhaankolhu Rasdhoo gallery photo 3" /></figure><figure class="gallery-item reveal" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><img loading="lazy" decoding="async" src="img/gallery/4.webp" alt="Dhaankolhu Rasdhoo gallery photo 4" /></figure><figure class="gallery-item reveal" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><img loading="lazy" decoding="async" src="img/gallery/5.webp" alt="Dhaankolhu Rasdhoo gallery photo 5" /></figure><figure class="gallery-item reveal" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><img loading="lazy" decoding="async" src="img/gallery/6.webp" alt="Dhaankolhu Rasdhoo gallery photo 6" /></figure></div><div class="gallery-view-all-row"><button type="button" class="offer-btn offer-btn-outline gallery-view-all" id="gallery-view-all">See More</button></div></section>
 
-      <section id="why-choose-us" class="excursions-section section-shell"><div class="section-heading-row"><span class="eyebrow reveal">Resort experience</span><h2 class="display-heading reveal">Why Choose Us</h2><p class="section-lede reveal">Three reasons guests keep coming back to Dhaankolhu Rasdhoo.</p></div><div class="stay-card-grid"><article class="stay-card reveal card-offset-1" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="Spacious, well-appointed rooms built for real comfort — from cozy doubles to family rooms with room to spread out. Every stay is designed to feel like a home away from home." data-amenities="Double|Triple|Family Room|Comfort"><div class="card-image-wrap"><img loading="lazy" decoding="async" src="img/why%20choose%20us/1.webp" alt="Comfortable family room interior" /></div><div class="card-copy"><h3>Comfortable Stays for Every Guest</h3><p>Spacious, well-appointed rooms — from cozy doubles to family rooms with plenty of room to spread out.</p></div></article><article class="stay-card reveal card-offset-2" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="Set right on Rasdhoo Island in the heart of South Ari Atoll, minutes from the harbor and the island's best snorkeling spots. Everything you need for an easy, unhurried stay is within walking distance." data-amenities="Local Island|South Ari Atoll|Easy Access|Walkable"><div class="card-image-wrap"><img loading="lazy" decoding="async" src="img/why%20choose%20us/2.webp" alt="Aerial view of Dhaankolhu Rasdhoo Island" /></div><div class="card-copy"><h3>Prime Island Location</h3><p>Set right on Rasdhoo Island in the heart of South Ari Atoll, close to the harbor and the best of the lagoon.</p></div></article><article class="stay-card reveal card-offset-3" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="From sunset swings to snorkeling the house reef, every day here is shaped around genuine island life — warm hospitality, local flavor, and moments you'll want to relive." data-amenities="Island Life|Local Hospitality|Authentic|Memorable"><div class="card-image-wrap"><img loading="lazy" decoding="async" src="img/why%20choose%20us/3.webp" alt="Guests enjoying island life at Dhaankolhu Rasdhoo" /></div><div class="card-copy"><h3>Authentic Island Experience</h3><p>From sunset swings to snorkeling the house reef, every day here is shaped around genuine local island life.</p></div></article></div></section>
+      <section id="why-choose-us" class="excursions-section section-shell"><div class="section-heading-row"><span class="eyebrow reveal">Resort experience</span><h2 class="display-heading reveal">Why Choose Us</h2><p class="section-lede reveal">Three reasons guests keep coming back to Dhaankolhu Rasdhoo.</p></div><div class="stay-card-grid"><article class="stay-card reveal card-offset-1" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="Spacious, well-appointed rooms built for real comfort — from cozy doubles to family rooms with room to spread out. Every stay is designed to feel like a home away from home." data-amenities="Double|Triple|Family Room|Comfort"><div class="card-image-wrap"><img loading="lazy" decoding="async" src="img/why%20choose%20us/1.webp" alt="Comfortable family room interior" /></div><div class="card-copy"><h3>Comfortable Stays for Every Guest</h3><p>Spacious, well-appointed rooms — from cozy doubles to family rooms with plenty of room to spread out.</p></div></article><article class="stay-card reveal card-offset-2" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="Set right on Rasdhoo Island in the heart of North Ari Atoll, minutes from the harbor and the island's best snorkeling spots. Everything you need for an easy, unhurried stay is within walking distance." data-amenities="Local Island|North Ari Atoll|Easy Access|Walkable"><div class="card-image-wrap"><img loading="lazy" decoding="async" src="img/why%20choose%20us/2.webp" alt="Aerial view of Dhaankolhu Rasdhoo Island" /></div><div class="card-copy"><h3>Prime Island Location</h3><p>Set right on Rasdhoo Island in the heart of North Ari Atoll, close to the harbor and the best of the lagoon.</p></div></article><article class="stay-card reveal card-offset-3" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="From sunset swings to snorkeling the house reef, every day here is shaped around genuine island life — warm hospitality, local flavor, and moments you'll want to relive." data-amenities="Island Life|Local Hospitality|Authentic|Memorable"><div class="card-image-wrap"><img loading="lazy" decoding="async" src="img/why%20choose%20us/3.webp" alt="Guests enjoying island life at Dhaankolhu Rasdhoo" /></div><div class="card-copy"><h3>Authentic Island Experience</h3><p>From sunset swings to snorkeling the house reef, every day here is shaped around genuine local island life.</p></div></article></div></section>
 
       <section id="offers" class="slideshow-section section-shell"><div class="slideshow" id="offer-slideshow"><div class="slideshow-track"><div class="slide is-active" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="Our signature weekend packages include full beach access, cottage accommodations, and stunning ocean sunrise views." style="background-image:url('img/highlights/7.webp')"><img loading="lazy" decoding="async" class="slide-media" src="img/highlights/7.webp" alt="Escape to Clear Waters and White Sand" /><div class="slide-overlay"></div></div><div class="slide" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="Shaded picnic spots and cottage stays make room for slow mornings and easy family time." style="background-image:url('img/highlights/12.webp')"><img loading="lazy" decoding="async" class="slide-media" src="img/highlights/12.webp" alt="Gather Under the Palms" /><div class="slide-overlay"></div></div><div class="slide" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-detail="Private overwater tables set the scene for an evening you won't forget." style="background-image:url('img/highlights/17.webp')"><img loading="lazy" decoding="async" class="slide-media" src="img/highlights/17.webp" alt="Dine Above the Lagoon" /><div class="slide-overlay"></div></div><div class="slideshow-top-loader"><span class="slideshow-top-loader-fill"></span></div><div class="slideshow-nav-left"><div class="slideshow-dots" role="tablist" aria-label="Slideshow navigation"><button class="dot is-active" type="button" data-index="0" aria-label="Show slide 1"></button><button class="dot" type="button" data-index="1" aria-label="Show slide 2"></button><button class="dot" type="button" data-index="2" aria-label="Show slide 3"></button></div></div><div class="slideshow-center-text">Discover the Island</div><a href="offers.html" class="slide-cta slideshow-explore-cta">Explore Rasdhoo</a></div></div></section>
     </main>
@@ -1060,7 +1112,7 @@
           <a class="footer-v2-social-btn" href="https://www.instagram.com/dhaankolhu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg></a>
         </div>
         <p class="footer-v2-desc">A peaceful beach destination where the ocean meets serenity. Nestled along the turquoise shores of Rasdhoo, we offer an authentic taste of local island life paired with effortless comfort. Relax, unwind, and create lasting memories by the sea.</p>
-        <p class="footer-v2-address">South Ari Atoll, Maldives</p>
+        <p class="footer-v2-address">North Ari Atoll, Maldives</p>
         <p class="footer-v2-contact">
           <a href="mailto:info@dhaankolhu.com">info@dhaankolhu.com</a><br />
           <a href="tel:+9609898130">+960 989 8130</a>
