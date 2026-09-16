@@ -127,58 +127,22 @@
                 </div>
                 <div class="bk-field-row">
                   <div class="bk-field">
-                    <label for="bk-arrival">Arrival</label>
-                    <div class="bk-date-select" id="bk-arrival-select">
-                      <button type="button" class="bk-date-trigger" id="bk-arrival-trigger" aria-haspopup="dialog" aria-expanded="false">
-                        <svg class="bk-date-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 3V6.2M16 3V6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                        <span class="bk-date-value" data-empty-text="dd/mm/yyyy">dd/mm/yyyy</span>
-                      </button>
-                      <button type="button" class="bk-date-clear" id="bk-arrival-clear" aria-label="Clear arrival date">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                      </button>
+                    <label for="bk-arrival-trigger">Arrival</label>
+                    <div class="bk-date-field">
+                      <svg class="bk-date-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 3V6.2M16 3V6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                      <button type="button" class="bk-date-trigger" id="bk-arrival-trigger" data-empty="true" aria-haspopup="dialog" aria-expanded="false">dd/mm/yyyy</button>
                       <input type="hidden" id="bk-arrival" name="arrival" required />
-                      <input type="hidden" id="bk-arrival-time" name="arrivalTime" value="14:00" />
-                      <div class="bk-date-panel" role="dialog" aria-modal="false" aria-label="Choose your arrival date">
-                        <div class="bk-cal-head">
-                          <button type="button" class="bk-cal-nav" data-nav="-1" aria-label="Previous month">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                          </button>
-                          <span class="bk-cal-title"></span>
-                          <button type="button" class="bk-cal-nav" data-nav="1" aria-label="Next month">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                          </button>
-                        </div>
-                        <div class="bk-cal-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-                        <div class="bk-cal-grid" role="grid"></div>
-                      </div>
                     </div>
+                    <input type="hidden" id="bk-arrival-time" name="arrivalTime" value="14:00" />
                   </div>
                   <div class="bk-field">
-                    <label for="bk-departure">Departure</label>
-                    <div class="bk-date-select" id="bk-departure-select">
-                      <button type="button" class="bk-date-trigger" id="bk-departure-trigger" aria-haspopup="dialog" aria-expanded="false">
-                        <svg class="bk-date-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 3V6.2M16 3V6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                        <span class="bk-date-value" data-empty-text="dd/mm/yyyy">dd/mm/yyyy</span>
-                      </button>
-                      <button type="button" class="bk-date-clear" id="bk-departure-clear" aria-label="Clear departure date">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                      </button>
+                    <label for="bk-departure-trigger">Departure</label>
+                    <div class="bk-date-field">
+                      <svg class="bk-date-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 3V6.2M16 3V6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                      <button type="button" class="bk-date-trigger" id="bk-departure-trigger" data-empty="true" aria-haspopup="dialog" aria-expanded="false">dd/mm/yyyy</button>
                       <input type="hidden" id="bk-departure" name="departure" required />
-                      <input type="hidden" id="bk-departure-time" name="departureTime" value="12:00" />
-                      <div class="bk-date-panel" role="dialog" aria-modal="false" aria-label="Choose your departure date">
-                        <div class="bk-cal-head">
-                          <button type="button" class="bk-cal-nav" data-nav="-1" aria-label="Previous month">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                          </button>
-                          <span class="bk-cal-title"></span>
-                          <button type="button" class="bk-cal-nav" data-nav="1" aria-label="Next month">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                          </button>
-                        </div>
-                        <div class="bk-cal-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-                        <div class="bk-cal-grid" role="grid"></div>
-                      </div>
                     </div>
+                    <input type="hidden" id="bk-departure-time" name="departureTime" value="12:00" />
                   </div>
                 </div>
               </div>

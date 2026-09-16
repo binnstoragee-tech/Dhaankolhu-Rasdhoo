@@ -1667,3 +1667,5 @@ function initCardCarousel(config) {
 }
 
 initCardCarousel({ trackId: "room-carousel-track", prevId: "room-carousel-prev", nextId: "room-carousel-next", dotsId: "room-carousel-dots", carouselId: "room-carousel", viewAllId: "room-carousel-view-all-link", roomPages: ["double-room.html", "triple-room.html", "family-room.html"], roomLabels: ["View Double Room", "View Triple Room", "View Family Room"] });
+
+initCardCarousel({ trackId: "experience-carousel-track", prevId: "experience-carousel-prev", nextId: "experience-carousel-next", carouselId: "experience-carousel" });

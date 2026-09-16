@@ -23,10 +23,10 @@
 .mobile-menu .eyebrow { color: #6b6355 !important; }
 .mobile-menu nav a { color: #12100d !important; border-bottom: 1px solid rgba(20,18,14,.12); background: transparent !important; }
 .mobile-menu nav a span { color: #8a8071 !important; }
-.mobile-menu nav a:hover, .mobile-menu nav a:focus { background: rgba(20,18,14,.06) !important; color: #000 !important; }
+@media (hover: hover) and (pointer: fine) { .mobile-menu nav a:hover, .mobile-menu nav a:focus { background: rgba(20,18,14,.06) !important; color: #000 !important; } }
 .mobile-menu-divider { display: none; }
 .mobile-book-now { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: left !important; align-self: stretch !important; margin: 0 !important; background: transparent !important; color: #12100d !important; border: none !important; border-top: 1px solid rgba(20,18,14,.12) !important; box-shadow: none !important; border-radius: 0 !important; padding: 16px 24px !important; font-family: "DM Sans", sans-serif; font-size: 1rem !important; font-weight: 400 !important; cursor: pointer; }
-.mobile-book-now:hover { background: rgba(20,18,14,.06) !important; color: #000 !important; }
+@media (hover: hover) and (pointer: fine) { .mobile-book-now:hover { background: rgba(20,18,14,.06) !important; color: #000 !important; } }
 /* Keep header logo + close button dark and visible while the menu is open (same as index.html) */
 .site-shell:has(.mobile-menu.is-open) .site-header .brand-lockup,
 .site-shell:has(.mobile-menu.is-open) .site-header .brand-type,
@@ -57,15 +57,15 @@
 .footer-v2-socials { display: flex; gap: 14px; }
 .footer-v2-social-btn { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.4); color: #fff; transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
 .footer-v2-social-btn svg { width: 18px; height: 18px; }
-.footer-v2-social-btn:hover { background: #fff; border-color: #fff; color: #ba8d5c; transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) { .footer-v2-social-btn:hover { background: #fff; border-color: #fff; color: #ba8d5c; transform: translateY(-2px); } }
 .footer-v2-desc { font-size: .95rem; line-height: 1.75; color: rgba(255,255,255,.82); margin: 0; max-width: 640px; text-wrap: pretty; }
 .footer-v2-address, .footer-v2-contact { font-size: .95rem; line-height: 1.75; color: rgba(255,255,255,.82); margin: 0; max-width: 560px; }
 .footer-v2-contact a { color: #fff; text-decoration: none; transition: color .2s ease; }
-.footer-v2-contact a:hover { color: rgba(255,255,255,.7); }
+@media (hover: hover) and (pointer: fine) { .footer-v2-contact a:hover { color: rgba(255,255,255,.7); } }
 .footer-v2-bottom { max-width: 1280px; margin: 48px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.25); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: .82rem; color: rgba(255,255,255,.68); }
 .footer-v2-legal { display: flex; gap: 20px; }
 .footer-v2-legal a { color: rgba(255,255,255,.68); text-decoration: none; }
-.footer-v2-legal a:hover { color: #fff; }
+@media (hover: hover) and (pointer: fine) { .footer-v2-legal a:hover { color: #fff; } }
 @media (max-width: 560px) { .footer-v2-bottom { flex-direction: column; align-items: flex-start; } }
 
 /* ============================================================
@@ -74,6 +74,15 @@
 :root {
   --bk-mist: var(--ocean-mist, #e8f4f4);
   --bk-line: var(--ocean-line, #9bc5c7);
+}
+
+/* Prevent mobile browsers from treating quick successive taps (e.g. tap the
+   arrival field, then tap a date) as a double-tap-to-zoom gesture, which can
+   swallow the tap instead of registering it as a click. */
+#booking-flow button,
+#booking-flow [role="button"],
+#booking-flow a.bk-room-more-details {
+  touch-action: manipulation;
 }
 
 /* ---------- rise-up transition primitives ---------- */
@@ -93,7 +102,7 @@
 .bk-hero-content { width: min(100% - 2.5rem, 760px); text-align: center; padding-top: 3rem; }
 .bk-crumb { display: flex; align-items: center; justify-content: center; gap: .5rem; margin-bottom: 1.3rem; font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.62); }
 .bk-crumb a { color: rgba(255,255,255,.85); transition: color .2s ease; }
-.bk-crumb a:hover { color: #fff; }
+@media (hover: hover) and (pointer: fine) { .bk-crumb a:hover { color: #fff; } }
 .bk-hero-content h1 { margin: 0 0 1rem; font-family: "Playfair Display", Georgia, serif; font-size: clamp(2.52rem, 4.75vw, 4.41rem); font-weight: 600; letter-spacing: -.02em; line-height: 1.02; }
 .bk-hero-content h1 em { color: var(--brass); font-style: normal; }
 .bk-hero-content p { max-width: 34rem; margin: 0 auto; color: rgba(255,255,255,.8); font-size: clamp(0.83rem, 1.3vw, 0.95rem); line-height: 1.6; }
@@ -126,7 +135,7 @@
   transition: color .35s ease;
 }
 .bk-rail-step:not(:disabled) { cursor: pointer; }
-.bk-rail-step:not(:disabled):hover:not(.is-active) { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .bk-rail-step:not(:disabled):hover:not(.is-active) { color: var(--ink); } }
 .bk-rail-step:disabled:not(.is-active) { opacity: .55; }
 .bk-rail-step.is-active { transform: translateY(-.5px); }
 .bk-rail-label { font-size: 0.76rem; font-weight: 700; letter-spacing: -.01em; transition: color .35s ease; }
@@ -138,7 +147,7 @@
 .bk-rail-step-fixed { cursor: default !important; opacity: .55; }
 .bk-rail-step-fixed.is-active,
 .bk-rail-step-fixed.is-done { opacity: 1; }
-.bk-rail-step-fixed:hover { color: inherit !important; }
+@media (hover: hover) and (pointer: fine) { .bk-rail-step-fixed:hover { color: inherit !important; } }
 .bk-rail-icon { display: block; width: 16px; height: 16px; flex: 0 0 auto; transition: color .35s ease; }
 
 .bk-grid { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 44rem; margin: 0 auto; align-items: start; }
@@ -158,10 +167,24 @@
   box-shadow: 0 24px 60px rgba(17,30,34,.1), inset 0 1px 0 rgba(255,255,255,.7); overflow: hidden;
   transition: box-shadow .4s ease;
 }
-.bk-panel.bk-allow-overflow { overflow: visible; }
 .bk-step, .bk-success { display: none; }
 .bk-step.is-current, .bk-success.is-current { display: block; }
-.bk-step.is-current, .bk-success.is-current { opacity: 1; transform: translateY(0); transition: opacity .42s var(--ease-out), transform .42s var(--ease-out); position: relative; z-index: 1; }
+.bk-step.is-current, .bk-success.is-current {
+  opacity: 1;
+  /* NOTE: no "transform" here (not even translateY(0)) on purpose. Any
+     non-"none" transform on an ancestor of a native <input type="date">
+     breaks how mobile Chrome anchors/hit-tests its calendar popup: the
+     calendar still paints in the right spot, but taps land on stale
+     coordinates underneath it, so dates look tappable but silently don't
+     select — a real device/mobile-only symptom, since desktop mouse
+     clicks don't hit the same bug. The mid-transition frames (rise-in/out,
+     below) still pass through a transform briefly, but the element no
+     longer sits on one permanently once settled as .is-current, which is
+     when someone actually taps the date field. */
+  transition: opacity .42s var(--ease-out), transform .42s var(--ease-out);
+  position: relative;
+  z-index: 1;
+}
 .bk-step.bk-anim-out, .bk-success.bk-anim-out { opacity: 0 !important; transform: translateY(-20px) !important; }
 .bk-step.bk-anim-in-start, .bk-success.bk-anim-in-start { opacity: 0 !important; transform: translateY(26px) !important; }
 .bk-step-head { margin-bottom: clamp(1.6rem, 3vw, 2.2rem); }
@@ -195,7 +218,7 @@
 
 .bk-code-select { position: relative; flex: 0 0 auto; }
 .bk-code-trigger { display: flex; align-items: center; gap: .45rem; min-height: 46px; height: 46px; padding: 0 .8rem; border: 1px solid rgba(23,35,42,.18); border-radius: 10px; background: #fff; color: var(--ink); font-size: 0.79rem; font-family: "DM Sans", sans-serif; cursor: pointer; transition: border-color .2s ease, box-shadow .2s ease; }
-.bk-code-trigger:hover { border-color: rgba(23,35,42,.32); }
+@media (hover: hover) and (pointer: fine) { .bk-code-trigger:hover { border-color: rgba(23,35,42,.32); } }
 .bk-code-select.is-open .bk-code-trigger { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(186,141,92,.12); }
 .bk-code-flag { display: inline-flex; font-size: 0.95rem; line-height: 1; }
 .bk-code-flag img { width: 20px; height: 15px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgba(23,35,42,.08); }
@@ -208,101 +231,107 @@
 .bk-code-search { width: 100%; min-height: 42px; padding: 0 .9rem; border: 0; border-bottom: 1px solid rgba(23,35,42,.1); outline: none; color: var(--ink); background: var(--bk-mist); font-size: 0.76rem; font-family: "DM Sans", sans-serif; }
 .bk-code-list { max-height: 15.5rem; overflow-y: auto; padding: .35rem; }
 .bk-code-option { display: flex; align-items: center; gap: .55rem; width: 100%; padding: .55rem .6rem; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font-size: 0.76rem; font-family: "DM Sans", sans-serif; text-align: left; cursor: pointer; transition: background .15s ease; }
-.bk-code-option:hover, .bk-code-option.is-active { background: var(--bk-mist); }
+@media (hover: hover) and (pointer: fine) { .bk-code-option:hover, .bk-code-option.is-active { background: var(--bk-mist); } }
 .bk-code-option .bk-code-flag { font-size: 0.95rem; }
 .bk-code-option-name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bk-code-option-num { color: var(--muted-foreground); font-weight: 600; }
 .bk-code-empty { padding: 1rem .6rem; color: var(--muted-foreground); font-size: 0.74rem; text-align: center; }
 
-/* ---------- custom animated date picker ---------- */
-.bk-date-select { position: relative; }
-.bk-date-trigger { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 46px; padding: 0 2.4rem 0 .9rem; border: 1px solid rgba(23,35,42,.18); border-radius: 10px; background: #fff; color: var(--ink); font-size: 0.79rem; font-family: "DM Sans", sans-serif; cursor: pointer; text-align: left; transition: border-color .2s ease, box-shadow .2s ease; }
-.bk-date-trigger:hover { border-color: rgba(23,35,42,.32); }
-.bk-date-icon { flex: 0 0 auto; width: 17px; height: 17px; color: var(--muted-foreground); transition: color .2s ease; }
-.bk-date-value { flex: 1 1 auto; color: var(--muted-foreground); letter-spacing: .01em; }
-.bk-date-value.has-value { color: var(--ink); font-weight: 600; }
-.bk-date-select.is-open .bk-date-trigger { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(186,141,92,.12); }
-.bk-date-select.is-open .bk-date-icon { color: var(--brass); }
-.bk-date-clear {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: rgba(23,35,42,.06);
-  color: var(--muted-foreground);
-  cursor: pointer;
-  transition: background .18s ease, color .18s ease;
+/* ---------- date picker (custom calendar dropdown) ----------
+   Hand-rolled instead of native <input type="date">: the native picker's
+   popup is positioned/hit-tested by the browser itself, and on mobile
+   Chrome that positioning breaks (visually-fine, silently-untappable
+   dates) the moment any ancestor gets a CSS transform, transition, or a
+   few other layout features — brittle in a way that's outside our
+   control. This version is a plain DOM panel we size and place ourselves
+   (see book-now.js), appended straight to <body> so it's never nested
+   inside anything that could reintroduce that class of bug, and its taps
+   are ordinary click events — identical code path on phone and desktop. */
+.bk-date-field { position: relative; }
+.bk-date-icon {
+  position: absolute; top: 50%; left: .9rem; transform: translateY(-50%);
+  width: 17px; height: 17px; color: var(--muted-foreground);
+  pointer-events: none; transition: color .2s ease;
+  z-index: 1;
 }
-.bk-date-clear svg { width: 12px; height: 12px; }
-.bk-date-clear:hover { background: rgba(23,35,42,.12); color: var(--ink); }
-.bk-date-select.has-date .bk-date-clear { display: flex; }
-
-.bk-date-panel {
-  position: absolute; z-index: 30; top: calc(100% + .6rem); left: 0; width: 19rem; max-width: min(88vw, 19rem);
-  background: #fff; border-radius: 16px; box-shadow: 0 22px 48px rgba(15,25,28,.18), 0 2px 8px rgba(15,25,28,.06);
-  padding: 1rem 1rem 1.1rem; opacity: 0; visibility: hidden; transform: translateY(-8px) scale(.97); transform-origin: top left;
-  pointer-events: none; transition: opacity .22s var(--ease-out), transform .28s var(--ease-out), visibility 0s linear .28s;
+/* ".bk-field .bk-date-trigger" (two classes) — needs to out-specificity the
+   generic ".bk-field input" rule above, which would otherwise win and strip
+   the left padding the calendar icon sits in. It's a <button>, not an
+   <input>, so that generic rule doesn't apply anyway, but the selector is
+   kept parallel for clarity/consistency with the rest of the form. */
+.bk-field .bk-date-trigger {
+  display: flex; align-items: center;
+  width: 100%; min-height: 46px;
+  padding: 0 .9rem 0 2.5rem;
+  border: 1px solid rgba(23,35,42,.18); border-radius: 10px;
+  background: #fff; color: var(--ink);
+  font-size: 0.79rem; font-family: "DM Sans", sans-serif;
+  text-align: left; cursor: pointer;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
-.bk-date-select.is-open .bk-date-panel { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto; transition: opacity .22s var(--ease-out), transform .28s var(--ease-out); }
+.bk-date-trigger[data-empty="true"] { color: var(--muted-foreground); }
+@media (hover: hover) and (pointer: fine) { .bk-field .bk-date-trigger:hover { border-color: rgba(23,35,42,.32); } }
+.bk-field .bk-date-trigger:focus-visible,
+.bk-field .bk-date-trigger.is-open { outline: none; border-color: var(--brass); box-shadow: 0 0 0 3px rgba(186,141,92,.12); }
+.bk-date-field:has(.bk-date-trigger:focus-visible),
+.bk-date-field:has(.bk-date-trigger.is-open) { color: var(--brass); }
+.bk-date-field:has(.bk-date-trigger:focus-visible) .bk-date-icon,
+.bk-date-field:has(.bk-date-trigger.is-open) .bk-date-icon { color: var(--brass); }
 
-.bk-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .8rem; gap: .4rem; }
-.bk-cal-title { font-size: 0.74rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
-.bk-cal-nav { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--bk-mist); color: var(--brass); transition: background .2s ease, transform .15s var(--ease-out), color .2s ease; flex: 0 0 auto; }
-.bk-cal-nav svg { width: 15px; height: 15px; }
-.bk-cal-nav:hover { background: var(--brass); color: #fff; }
-.bk-cal-nav:active { transform: scale(.9); }
-
-.bk-cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: .3rem; }
-.bk-cal-weekdays span { display: block; text-align: center; font-size: 0.56rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); padding-bottom: .35rem; }
-
+/* the calendar panel itself — appended to <body>, positioned with fixed
+   coordinates computed in JS (see openCalendar in book-now.js), so its
+   placement never depends on where in the page it happens to render. */
+.bk-cal {
+  position: fixed;
+  z-index: 300;
+  width: 18.5rem; max-width: calc(100vw - 1.6rem);
+  background: #fff;
+  border: 1px solid rgba(23,35,42,.12);
+  border-radius: 14px;
+  box-shadow: 0 22px 48px rgba(15,25,28,.2);
+  padding: .9rem .9rem 1rem;
+  opacity: 0;
+  transform: translateY(-6px) scale(.98);
+  pointer-events: none;
+  transition: opacity .16s var(--ease-out), transform .16s var(--ease-out);
+}
+.bk-cal.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.bk-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .7rem; }
+.bk-cal-title { font-family: "DM Sans", sans-serif; font-weight: 700; font-size: 0.78rem; letter-spacing: .02em; color: var(--ink); }
+.bk-cal-nav { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: #f0efe9; color: var(--ink); transition: background .18s ease, opacity .18s ease, transform .12s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .bk-cal-nav:not(:disabled):hover { background: #e3e1d9; } }
+.bk-cal-nav:active:not(:disabled) { transform: scale(.92); }
+.bk-cal-nav:disabled { opacity: .3; cursor: default; }
+.bk-cal-nav svg { width: 14px; height: 14px; }
+.bk-cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: .2rem; }
+.bk-cal-weekdays span { display: block; text-align: center; font-size: 0.6rem; font-weight: 700; letter-spacing: .04em; color: var(--muted-foreground); padding-bottom: .35rem; }
 .bk-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
 .bk-cal-day {
-  position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; border-radius: 9px;
-  font-size: 0.72rem; font-weight: 500; color: var(--ink); background: transparent;
-  transition: background .16s ease, color .16s ease, transform .12s var(--ease-out);
+  display: grid; place-items: center;
+  aspect-ratio: 1; width: 100%;
+  border-radius: 8px;
+  background: transparent; color: var(--ink);
+  font-size: 0.74rem; font-weight: 500;
+  transition: background .15s ease, color .15s ease;
 }
-.bk-cal-day:hover:not(.is-disabled):not(.is-selected) { background: var(--bk-mist); }
-.bk-cal-day:active:not(.is-disabled) { transform: scale(.9); }
-.bk-cal-day.is-outside { color: rgba(23,35,42,.28); }
-.bk-cal-day.is-today:not(.is-selected) { box-shadow: inset 0 0 0 1.4px var(--brass); font-weight: 700; }
-.bk-cal-day.is-disabled { color: rgba(23,35,42,.18); cursor: not-allowed; }
-.bk-cal-day.is-in-range { background: var(--bk-mist); border-radius: 0; }
-.bk-cal-day.is-range-start { border-radius: 9px 0 0 9px; }
-.bk-cal-day.is-range-end { border-radius: 0 9px 9px 0; }
-.bk-cal-day.is-selected,
-.bk-cal-day.is-range-start,
-.bk-cal-day.is-range-end {
-  background: var(--brass); color: #fff; font-weight: 700; box-shadow: none;
-  animation: bk-day-pop .28s var(--ease-out);
-}
-@keyframes bk-day-pop { from { transform: scale(.55); } to { transform: scale(1); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .bk-date-panel { transition: opacity .01s linear, visibility 0s linear; }
-  .bk-cal-day.is-selected, .bk-cal-day.is-range-start, .bk-cal-day.is-range-end { animation: none; }
-}
-
-@media (max-width: 720px) {
-  .bk-date-panel { width: 100%; max-width: none; left: 0; right: 0; }
+.bk-cal-day[disabled] { color: rgba(23,35,42,.24); cursor: default; }
+.bk-cal-day.is-outside { color: rgba(23,35,42,.24); }
+.bk-cal-day.is-today { font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--brass); }
+@media (hover: hover) and (pointer: fine) { .bk-cal-day:not([disabled]):hover { background: var(--bk-mist, #f0efe9); } }
+.bk-cal-day.is-selected { background: var(--brass) !important; color: #fff !important; font-weight: 700; box-shadow: none; }
+@media (max-width: 640px) {
+  .bk-cal { width: calc(100vw - 1.6rem); }
 }
 
 .bk-stepper { display: inline-flex; align-items: center; gap: .4rem; min-height: 46px; padding: 0 .4rem; border: 1px solid rgba(23,35,42,.18); border-radius: 10px; width: fit-content; }
 .bk-stepper button { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 7px; background: #f0efe9; color: var(--ink); font-size: 0.99rem; font-weight: 700; line-height: 1; transition: background .35s ease, transform .3s var(--ease-out), color .35s ease; }
-.bk-stepper button:hover { background: #e3e1d9; color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .bk-stepper button:hover { background: #e3e1d9; color: var(--ink); } }
 .bk-stepper button:active { background: #d7d4c8; transform: scale(.92); }
 .bk-stepper span { min-width: 1.1rem; text-align: center; font-weight: 700; color: var(--ink); }
 
 .bk-room-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; margin-top: .3rem; }
 .bk-room { position: relative; display: flex; flex-direction: column; border: 1.5px solid rgba(255,255,255,.5); border-radius: 16px; overflow: hidden; cursor: pointer; background: rgba(255,255,255,.45); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%); transition: border-color .25s ease, transform .25s var(--ease-out), box-shadow .25s ease; }
-.bk-room:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(17,30,34,.1); }
+@media (hover: hover) and (pointer: fine) { .bk-room:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(17,30,34,.1); } }
 .bk-room.is-selected { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(186,141,92,.14); }
 .bk-room-media { position: relative; }
 .bk-room-img-wrap { position: relative; aspect-ratio: 16/9; overflow: hidden; cursor: pointer; }
@@ -317,11 +346,11 @@
 .bk-room-photo[data-demo-angle="2"] { object-position: 25% 70%; transform: scale(1.35); }
 #room-expand-img[data-demo-angle="1"] { object-position: 78% 35%; transform: scale(1.22); }
 #room-expand-img[data-demo-angle="2"] { object-position: 25% 70%; transform: scale(1.35); }
-.bk-room-img-wrap:hover .bk-room-photo { transform: scale(1.045); }
+@media (hover: hover) and (pointer: fine) { .bk-room-img-wrap:hover .bk-room-photo { transform: scale(1.045); } }
 .bk-room-photo.is-swapping { opacity: 0; }
 .bk-room-angles { position: absolute; top: 50%; right: .55rem; transform: translateY(-50%); display: flex; flex-direction: column; gap: .4rem; z-index: 2; }
 .bk-room-angle { width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,.7); background-size: cover; background-position: center; box-shadow: 0 4px 12px rgba(9,30,33,.28); cursor: pointer; padding: 0; opacity: .68; transition: opacity .2s ease, transform .2s var(--ease-out), border-color .2s ease; }
-.bk-room-angle:hover { opacity: .92; transform: translateX(-2px); }
+@media (hover: hover) and (pointer: fine) { .bk-room-angle:hover { opacity: .92; transform: translateX(-2px); } }
 .bk-room-angle.is-active { opacity: 1; border-color: #fff; box-shadow: 0 0 0 2px var(--brass), 0 4px 12px rgba(9,30,33,.32); }
 @media (min-width: 900px) {
   .bk-room-grid { gap: 1.6rem; }
@@ -338,9 +367,9 @@
    click/keydown handling (guarded in book-now.js) rather than just
    toggling the room as selected when tapped. */
 .bk-room-more-details { display: inline-flex; align-items: center; gap: .35rem; margin-top: .65rem; padding-top: .65rem; border-top: 1px solid rgba(23,35,42,.1); font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--brass); text-decoration: none; transition: gap .2s var(--ease-out), color .2s ease; }
-.bk-room-more-details:hover { gap: .55rem; color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .bk-room-more-details:hover { gap: .55rem; color: var(--ink); } }
 .bk-room-more-details span { transition: transform .2s var(--ease-out); }
-.bk-room-more-details:hover span { transform: translateX(2px); }
+@media (hover: hover) and (pointer: fine) { .bk-room-more-details:hover span { transform: translateX(2px); } }
 .bk-room-check { position: absolute; top: .7rem; right: .7rem; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.9); color: var(--brass); font-size: 0.63rem; opacity: 0; transform: scale(.6); transition: opacity .2s ease, transform .2s var(--ease-out); }
 .bk-room.is-selected .bk-room-check { opacity: 1; transform: scale(1); }
 
@@ -351,7 +380,7 @@
 .bk-review-download { display: flex; flex-direction: row-reverse; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .9rem; margin-top: 1.4rem; width: 100%; text-align: right; }
 .bk-download-row { position: relative; display: flex; align-items: center; }
 .bk-btn-download { position: relative; background: var(--brass); color: #fff; }
-.bk-btn-download:hover { background: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .bk-btn-download:hover { background: var(--ink); } }
 .bk-download-cursor { position: absolute; left: 50%; bottom: -14px; top: auto; right: auto; width: 24px; height: 24px; flex-shrink: 0; pointer-events: none; transform-origin: 22% 12%; animation: bkCursorTapBottom 3s cubic-bezier(0.45, 0, 0.2, 1) infinite; }
 .bk-download-cursor svg { position: relative; z-index: 1; width: 100%; height: 100%; display: block; filter: drop-shadow(0 3px 6px rgba(0,0,0,.35)); }
 /* wave/ripple removed per request — just the tap-hint cursor icon remains */
@@ -404,7 +433,7 @@
   color: #fff;
   background: var(--brass);
 }
-.bk-btn-primary:hover { background: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .bk-btn-primary:hover { background: var(--ink); } }
 .bk-btn-primary:disabled {
   background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(23,35,42,.06) 100%);
   backdrop-filter: blur(10px);
@@ -414,7 +443,7 @@
   color: rgba(23,35,42,.5);
   cursor: not-allowed;
 }
-.bk-btn-primary:disabled:hover { background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(23,35,42,.06) 100%); }
+@media (hover: hover) and (pointer: fine) { .bk-btn-primary:disabled:hover { background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(23,35,42,.06) 100%); } }
 /* Once the PDF has been downloaded, the Download button itself swaps to
    this same muted/"used" look — visually handing the spotlight over to
    "Send via WhatsApp" (which becomes solid teal once it unlocks, above). */
@@ -424,13 +453,13 @@
   border: 1px solid rgba(23,35,42,.14);
   box-shadow: none;
 }
-.bk-btn-download.is-done:hover { background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(23,35,42,.06) 100%); }
+@media (hover: hover) and (pointer: fine) { .bk-btn-download.is-done:hover { background: linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(23,35,42,.06) 100%); } }
 .bk-btn-download.is-done:focus-visible { outline: none; }
 .bk-btn-ghost { background: transparent; color: var(--ink); border: 1px solid rgba(23,35,42,.2); }
-.bk-btn-ghost:hover { background: var(--bk-mist); }
+@media (hover: hover) and (pointer: fine) { .bk-btn-ghost:hover { background: var(--bk-mist); } }
 .bk-btn:active:not(:disabled) { transform: scale(.97); }
 .bk-btn span { transition: transform .25s var(--ease-out); }
-.bk-btn:hover span { transform: translateX(3px); }
+@media (hover: hover) and (pointer: fine) { .bk-btn:hover span { transform: translateX(3px); } }
 
 /* ---------- success state ---------- */
 .bk-success { display: none; position: relative; text-align: center; padding: clamp(1.4rem, 3vw, 2.2rem) clamp(1.2rem, 4vw, 2.6rem) clamp(1.3rem, 2.5vw, 1.8rem); --bk-success-pad-x: clamp(1.2rem, 4vw, 2.6rem); }
@@ -447,10 +476,10 @@
 .bk-success-actions { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .65rem; width: 100%; max-width: 22rem; margin: 0 auto; }
 .bk-success-actions .bk-btn { min-height: 48px; width: 100%; justify-content: center; }
 .bk-btn-whatsapp { position: relative; gap: .55rem; background: linear-gradient(135deg, #29d16f, #1fae5b); color: #fff; box-shadow: 0 12px 26px rgba(31,174,91,.32); }
-.bk-btn-whatsapp:hover { background: linear-gradient(135deg, #22bd61, #189c4e); box-shadow: 0 14px 30px rgba(31,174,91,.4); }
+@media (hover: hover) and (pointer: fine) { .bk-btn-whatsapp:hover { background: linear-gradient(135deg, #22bd61, #189c4e); box-shadow: 0 14px 30px rgba(31,174,91,.4); } }
 .bk-whatsapp-mark { width: 18px; height: 18px; flex-shrink: 0; }
 .bk-btn-arrow { transition: transform .25s var(--ease-out); }
-.bk-btn-whatsapp:hover .bk-btn-arrow { transform: translateX(3px); }
+@media (hover: hover) and (pointer: fine) { .bk-btn-whatsapp:hover .bk-btn-arrow { transform: translateX(3px); } }
 
 
 /* success note: made prominent (filled card, not a faint top-border line) so people actually notice the fallback contact.
@@ -632,7 +661,7 @@
   border-color: rgba(255,255,255,.55);
   box-shadow: 0 10px 26px rgba(7,22,25,.35);
 }
-.room-gallery-panel .highlight-expand-nav-btn:hover { background: var(--brass-deep, #8a6339); transform: scale(1.06); }
+@media (hover: hover) and (pointer: fine) { .room-gallery-panel .highlight-expand-nav-btn:hover { background: var(--brass-deep, #8a6339); transform: scale(1.06); } }
 .room-gallery-panel .highlight-expand-nav-btn:active { transform: scale(.92); }
 
 .room-expand-thumbs { display: flex; gap: .55rem; flex-wrap: wrap; margin-top: .95rem; }
@@ -649,7 +678,7 @@
   opacity: .68;
   transition: opacity .2s ease, border-color .2s ease, transform .2s var(--ease-out);
 }
-.room-expand-thumb:hover { opacity: .9; transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) { .room-expand-thumb:hover { opacity: .9; transform: translateY(-2px); } }
 .room-expand-thumb.is-active { opacity: 1; border-color: #fff; box-shadow: 0 0 0 2px var(--brass); }
 
 @media (max-width: 640px) {
@@ -707,7 +736,7 @@
   background: linear-gradient(155deg, #4bc3ec, #229ed9);
   box-shadow: 0 12px 26px rgba(34,158,217,.4), inset 0 1px 0 rgba(255,255,255,.3);
 }
-.wa-bubble:hover .wa-bubble-btn { transform: translateY(-2px) scale(1.04); }
+@media (hover: hover) and (pointer: fine) { .wa-bubble:hover .wa-bubble-btn { transform: translateY(-2px) scale(1.04); } }
 
 .header-contact-bubbles {
   position: fixed;
@@ -716,7 +745,15 @@
   z-index: 60;
   display: inline-flex;
   align-items: center;
+  /* the column's own box spans the full height of its children — including
+     the chat panel even while it's invisible/closed (opacity:0) — so
+     without this, that empty space silently blocked taps on whatever sat
+     underneath it (e.g. the mobile date-picker calendar, which can land in
+     this same bottom-right corner of the screen). Same fix already applied
+     to .contact-bubbles on the homepage; this widget just never got it. */
+  pointer-events: none;
 }
+.header-contact-trigger { pointer-events: auto; }
 .header-contact-trigger-badge { position: absolute; top: -2px; right: -2px; z-index: 3; display: grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: #e14b3f; color: #fff; font-family: "DM Sans", Arial, Helvetica, sans-serif; font-size: .6rem; font-weight: 700; line-height: 1; box-shadow: 0 0 0 2px #fff, 0 3px 8px rgba(0,0,0,.25); transition: opacity .2s ease, transform .2s ease; }
 .header-contact-bubbles.is-open .header-contact-trigger-badge { opacity: 0; transform: scale(.5); pointer-events: none; }
 
@@ -753,7 +790,7 @@
   text-decoration: none;
   transition: background .2s ease;
 }
-.chat-widget-telegram-link:hover { background: var(--ivory, #f6f1e8); }
+@media (hover: hover) and (pointer: fine) { .chat-widget-telegram-link:hover { background: var(--ivory, #f6f1e8); } }
 .chat-widget-telegram-icon {
   flex-shrink: 0;
   display: grid;
@@ -782,7 +819,7 @@
   cursor: pointer;
   transition: transform .2s var(--ease-out), box-shadow .2s ease;
 }
-.header-contact-trigger:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 12px 24px rgba(0,0,0,.28); }
+@media (hover: hover) and (pointer: fine) { .header-contact-trigger:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 12px 24px rgba(0,0,0,.28); } }
 .header-contact-trigger-icon { position: absolute; display: grid; place-items: center; transition: opacity .2s ease, transform .25s var(--ease-out); }
 .header-contact-trigger-icon-open { inset: 0; }
 .header-contact-trigger-icon-open svg { display: block; }

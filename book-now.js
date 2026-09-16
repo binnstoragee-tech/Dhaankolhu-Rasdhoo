@@ -181,6 +181,8 @@
 
   var arrivalInput = document.getElementById("bk-arrival");
   var departureInput = document.getElementById("bk-departure");
+  var arrivalTrigger = document.getElementById("bk-arrival-trigger");
+  var departureTrigger = document.getElementById("bk-departure-trigger");
   var arrivalTimeInput = document.getElementById("bk-arrival-time");
   var departureTimeInput = document.getElementById("bk-departure-time");
   var roomGrid = document.getElementById("bk-room-grid");
@@ -226,7 +228,10 @@
   }
 
   /* today as the earliest selectable date */
-  var todayStr = new Date().toISOString().slice(0, 10);
+  var todayStr = (function () {
+    var now = new Date();
+    return toISO(now.getFullYear(), now.getMonth(), now.getDate());
+  })();
 
   /* ---------- dates ---------- */
   arrivalInput.addEventListener("change", function () {
@@ -252,8 +257,20 @@
     saveDraft();
   });
 
-  /* ---------- custom animated date pickers ---------- */
-  var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  /* ---------- custom calendar dropdown ----------
+     Was previously a native <input type="date">, which hands its popup
+     entirely to the browser — but on mobile Chrome that popup's own
+     positioning/hit-testing turned out to be fragile (see the
+     .bk-step.is-current fix above: any ancestor transform threw it off,
+     so dates painted fine but silently didn't register taps). This
+     version is a plain, self-built panel: same look on every phone and
+     desktop browser by construction, because we're the ones placing it
+     and handling its clicks — no browser-specific popup behavior left to
+     break. The two <input type="hidden"> fields (#bk-arrival /
+     #bk-departure) stay the source of truth for the rest of this file —
+     everything downstream (state.arrival/departure, syncDepartureMin,
+     validation, the draft, the ticket) still just reads their ISO
+     .value and reacts to their "change" event, unchanged. */
 
   function toISO(y, m, d) {
     var mm = String(m + 1).padStart(2, "0");
@@ -261,18 +278,17 @@
     return y + "-" + mm + "-" + dd;
   }
 
-  function parseISO(str) {
-    if (!str) return null;
-    var parts = str.split("-");
-    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  function parseISO(iso) {
+    var parts = (iso || "").split("-");
+    return { y: Number(parts[0]), m: Number(parts[1]) - 1, d: Number(parts[2]) };
   }
 
-  function displayDate(str) {
-    var d = parseISO(str);
-    if (!d) return "";
-    var dd = String(d.getDate()).padStart(2, "0");
-    var mm = String(d.getMonth() + 1).padStart(2, "0");
-    return dd + "/" + mm + "/" + d.getFullYear();
+  var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  function formatDisplayDate(iso) {
+    if (!iso) return "";
+    var p = parseISO(iso);
+    return p.d + " " + MONTH_NAMES[p.m].slice(0, 3) + " " + p.y;
   }
 
   function to12Hour(hhmm) {
@@ -285,278 +301,205 @@
     return { hour: String(h12), minute: m, period: period };
   }
 
-  function to24Hour(hour12, minute, period) {
-    var h = Number(hour12) % 12;
-    if (period === "PM") h += 12;
-    return String(h).padStart(2, "0") + ":" + minute;
-  }
-
   function formatTime(hhmm) {
     if (!hhmm) return "";
     var t = to12Hour(hhmm);
     return t.hour + ":" + t.minute + " " + t.period;
   }
 
-  function makeDatePicker(opts) {
-    var root = document.getElementById(opts.rootId);
-    var trigger = document.getElementById(opts.triggerId);
-    var valueEl = trigger.querySelector(".bk-date-value");
-    var input = document.getElementById(opts.inputId);
-    var clearBtn = document.getElementById(opts.clearId);
-    var panel = root.querySelector(".bk-date-panel");
-    var titleEl = root.querySelector(".bk-cal-title");
-    var gridEl = root.querySelector(".bk-cal-grid");
-    var timeInput = document.getElementById(opts.timeInputId);
-    var hourSelect = root.querySelector(".bk-cal-hour-select");
-    var minuteSelect = root.querySelector(".bk-cal-minute-select");
-    var periodSelect = root.querySelector(".bk-cal-period-select");
-    var todayD = parseISO(todayStr);
-    var view = parseISO(input.value) || todayD;
-    view = new Date(view.getFullYear(), view.getMonth(), 1);
-
-    /* time selects — the Time-of-day picker UI was removed; arrival/departure
-       still carry a fixed default time (set via the hidden inputs' value attr)
-       used for the summary/PDF, so this just guards against the now-missing
-       select elements instead of throwing. */
-    if (hourSelect && minuteSelect && periodSelect) {
-      for (var hh = 1; hh <= 12; hh++) {
-        var hOpt = document.createElement("option");
-        hOpt.value = String(hh);
-        hOpt.textContent = String(hh);
-        hourSelect.appendChild(hOpt);
-      }
-      ["00", "15", "30", "45"].forEach(function (mm) {
-        var mOpt = document.createElement("option");
-        mOpt.value = mm;
-        mOpt.textContent = mm;
-        minuteSelect.appendChild(mOpt);
-      });
-
-      [hourSelect, minuteSelect, periodSelect].forEach(function (sel) {
-        sel.addEventListener("click", function (e) { e.stopPropagation(); });
-        sel.addEventListener("change", commitTime);
-      });
+  function syncDepartureMin() {
+    departureInput.min = arrivalInput.value || todayStr;
+    /* if departure is no longer after the (possibly new) arrival, clear it */
+    if (departureInput.value && departureInput.value <= arrivalInput.value) {
+      departureInput.value = "";
+      departureInput.dispatchEvent(new Event("change", { bubbles: true }));
     }
-
-    function syncTimeSelects() {
-      if (!hourSelect || !minuteSelect || !periodSelect) return;
-      var t = to12Hour(timeInput.value);
-      hourSelect.value = t.hour;
-      minuteSelect.value = t.minute;
-      periodSelect.value = t.period;
-    }
-
-    function commitTime() {
-      timeInput.value = to24Hour(hourSelect.value, minuteSelect.value, periodSelect.value);
-      timeInput.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-
-    syncTimeSelects();
-
-    function minDate() {
-      var min = opts.getMin ? parseISO(opts.getMin()) : todayD;
-      return min && min > todayD ? min : todayD;
-    }
-
-    function isSameDay(a, b) {
-      return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-    }
-
-    function render() {
-      titleEl.textContent = MONTH_NAMES[view.getMonth()] + " " + view.getFullYear();
-      gridEl.innerHTML = "";
-      var min = minDate();
-      var selected = parseISO(input.value);
-      var rangeStart = parseISO(arrivalInput.value);
-      var rangeEnd = parseISO(departureInput.value);
-      var firstWeekday = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
-      var daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
-      var daysInPrevMonth = new Date(view.getFullYear(), view.getMonth(), 0).getDate();
-      var totalCells = 42;
-      var frag = document.createDocumentFragment();
-
-      for (var i = 0; i < totalCells; i++) {
-        var dayNum, cellMonth, cellYear, isOutside = false;
-        if (i < firstWeekday) {
-          dayNum = daysInPrevMonth - firstWeekday + 1 + i;
-          cellMonth = view.getMonth() - 1;
-          cellYear = view.getFullYear();
-          isOutside = true;
-        } else if (i >= firstWeekday + daysInMonth) {
-          dayNum = i - (firstWeekday + daysInMonth) + 1;
-          cellMonth = view.getMonth() + 1;
-          cellYear = view.getFullYear();
-          isOutside = true;
-        } else {
-          dayNum = i - firstWeekday + 1;
-          cellMonth = view.getMonth();
-          cellYear = view.getFullYear();
-        }
-        var cellDate = new Date(cellYear, cellMonth, dayNum);
-
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = String(dayNum);
-        btn.className = "bk-cal-day";
-        if (isOutside) btn.classList.add("is-outside");
-        if (isSameDay(cellDate, todayD)) btn.classList.add("is-today");
-        if (isSameDay(cellDate, selected)) btn.classList.add("is-selected");
-        if (rangeStart && rangeEnd && cellDate > rangeStart && cellDate < rangeEnd) btn.classList.add("is-in-range");
-        if (isSameDay(cellDate, rangeStart)) btn.classList.add("is-range-start");
-        if (isSameDay(cellDate, rangeEnd)) btn.classList.add("is-range-end");
-        if (cellDate < min) {
-          btn.disabled = true;
-          btn.classList.add("is-disabled");
-        }
-        btn.addEventListener("click", function (d) {
-          return function () { selectDate(d); };
-        }(cellDate));
-        frag.appendChild(btn);
-      }
-      gridEl.appendChild(frag);
-    }
-
-    function selectDate(d) {
-      input.value = toISO(d.getFullYear(), d.getMonth(), d.getDate());
-      valueEl.textContent = displayDate(input.value);
-      valueEl.classList.add("has-value");
-      root.classList.add("has-date");
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-      closePanel();
-      if (opts.onSelect) opts.onSelect(d);
-      /* re-render the *other* picker too, so the visual range/min updates immediately */
-      if (opts.sibling) opts.sibling.refresh();
-    }
-
-    function clearDate() {
-      input.value = "";
-      valueEl.textContent = valueEl.getAttribute("data-empty-text");
-      valueEl.classList.remove("has-value");
-      root.classList.remove("has-date");
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-      render();
-      if (opts.onClear) opts.onClear();
-      if (opts.sibling) opts.sibling.refresh();
-    }
-
-    if (clearBtn) {
-      clearBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        clearDate();
-      });
-    }
-
-    function openPanel() {
-      closeAllPickers(root);
-      view = new Date((parseISO(input.value) || minDate()).getFullYear(), (parseISO(input.value) || minDate()).getMonth(), 1);
-      render();
-      root.classList.add("is-open");
-      trigger.setAttribute("aria-expanded", "true");
-      var panelWrap = root.closest(".bk-panel");
-      if (panelWrap) panelWrap.classList.add("bk-allow-overflow");
-    }
-
-    function closePanel() {
-      root.classList.remove("is-open");
-      trigger.setAttribute("aria-expanded", "false");
-      var panelWrap = root.closest(".bk-panel");
-      if (panelWrap && !panelWrap.querySelector(".bk-date-select.is-open")) panelWrap.classList.remove("bk-allow-overflow");
-    }
-
-    function togglePanel() {
-      if (root.classList.contains("is-open")) closePanel();
-      else openPanel();
-    }
-
-    trigger.addEventListener("click", function (e) {
-      e.stopPropagation();
-      togglePanel();
-    });
-
-    root.querySelectorAll(".bk-cal-nav").forEach(function (nav) {
-      nav.addEventListener("click", function (e) {
-        e.stopPropagation();
-        var dir = Number(nav.getAttribute("data-nav"));
-        view = new Date(view.getFullYear(), view.getMonth() + dir, 1);
-        render();
-      });
-    });
-
-    panel.addEventListener("click", function (e) { e.stopPropagation(); });
-
-    if (input.value) {
-      valueEl.textContent = displayDate(input.value);
-      valueEl.classList.add("has-value");
-      root.classList.add("has-date");
-    }
-
-    var api = { close: closePanel, refresh: render, root: root, clear: clearDate, syncTime: syncTimeSelects };
-    return api;
+    departureCal.setMin(departureInput.min);
   }
 
-  function closeAllPickers(except) {
-    document.querySelectorAll(".bk-date-select.is-open").forEach(function (el) {
-      if (el !== except) {
-        el.classList.remove("is-open");
-        var t = el.querySelector(".bk-date-trigger");
-        if (t) t.setAttribute("aria-expanded", "false");
-        var panelWrap = el.closest(".bk-panel");
-        if (panelWrap && !panelWrap.querySelector(".bk-date-select.is-open")) panelWrap.classList.remove("bk-allow-overflow");
-      }
-    });
+  /* ---- one shared panel, reused for whichever field is currently open ---- */
+  var calPanel = document.createElement("div");
+  calPanel.className = "bk-cal";
+  calPanel.setAttribute("role", "dialog");
+  calPanel.innerHTML =
+    '<div class="bk-cal-head">' +
+      '<button type="button" class="bk-cal-nav" data-cal-prev aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+      '<span class="bk-cal-title" data-cal-title></span>' +
+      '<button type="button" class="bk-cal-nav" data-cal-next aria-label="Next month"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '</div>' +
+    '<div class="bk-cal-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>' +
+    '<div class="bk-cal-grid" data-cal-grid></div>';
+  document.body.appendChild(calPanel);
+
+  var calTitleEl = calPanel.querySelector("[data-cal-title]");
+  var calGridEl = calPanel.querySelector("[data-cal-grid]");
+  var calPrevBtn = calPanel.querySelector("[data-cal-prev]");
+  var calNextBtn = calPanel.querySelector("[data-cal-next]");
+
+  var activeCal = null; /* the field-controller currently driving the shared panel */
+
+  function positionCalPanel(triggerEl) {
+    var rect = triggerEl.getBoundingClientRect();
+    var gap = 8;
+    var top = rect.bottom + gap;
+    var left = rect.left;
+    var panelWidth = calPanel.offsetWidth || 296;
+    var maxLeft = window.innerWidth - panelWidth - 8;
+    if (left > maxLeft) left = Math.max(8, maxLeft);
+    /* not enough room below (e.g. field near the bottom of a short mobile
+       viewport) — open upward instead so the panel stays fully visible */
+    var panelHeight = calPanel.offsetHeight || 320;
+    if (top + panelHeight > window.innerHeight - 8 && rect.top - gap - panelHeight > 8) {
+      top = rect.top - gap - panelHeight;
+    }
+    calPanel.style.top = top + "px";
+    calPanel.style.left = left + "px";
   }
 
-  document.addEventListener("click", function () { closeAllPickers(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAllPickers(); });
+  function createCalendar(config) {
+    /* config: { triggerEl, hiddenInput, min } */
+    var controller = {
+      min: config.min || todayStr,
+      viewY: 0,
+      viewM: 0,
+      triggerEl: config.triggerEl,
+      hiddenInput: config.hiddenInput
+    };
 
-  var arrivalPicker = makeDatePicker({
-    rootId: "bk-arrival-select",
-    triggerId: "bk-arrival-trigger",
-    inputId: "bk-arrival",
-    clearId: "bk-arrival-clear",
-    timeInputId: "bk-arrival-time",
-    getMin: function () { return todayStr; },
-    onSelect: function (d) {
-      /* if departure is now before the new arrival, clear it */
-      var dep = parseISO(departureInput.value);
-      if (dep && dep <= d) {
-        departureInput.value = "";
-        var depValueEl = document.querySelector("#bk-departure-trigger .bk-date-value");
-        depValueEl.textContent = depValueEl.getAttribute("data-empty-text");
-        depValueEl.classList.remove("has-value");
-        document.getElementById("bk-departure-select").classList.remove("has-date");
-        departureInput.dispatchEvent(new Event("change", { bubbles: true }));
+    controller.render = function () {
+      calTitleEl.textContent = MONTH_NAMES[controller.viewM] + " " + controller.viewY;
+      var firstOfMonth = new Date(controller.viewY, controller.viewM, 1);
+      var startWeekday = firstOfMonth.getDay();
+      var daysInMonth = new Date(controller.viewY, controller.viewM + 1, 0).getDate();
+      var daysInPrevMonth = new Date(controller.viewY, controller.viewM, 0).getDate();
+      var selected = controller.hiddenInput.value;
+      var min = controller.min;
+
+      var cellsHtml = "";
+      for (var i = 0; i < 42; i++) {
+        var dayNum = i - startWeekday + 1;
+        var cellY = controller.viewY, cellM = controller.viewM, isOutside = false;
+        if (dayNum < 1) {
+          cellM = controller.viewM - 1; cellY = cellM < 0 ? controller.viewY - 1 : controller.viewY; cellM = (cellM + 12) % 12;
+          dayNum = daysInPrevMonth + dayNum;
+          isOutside = true;
+        } else if (dayNum > daysInMonth) {
+          dayNum = dayNum - daysInMonth;
+          cellM = controller.viewM + 1; cellY = cellM > 11 ? controller.viewY + 1 : controller.viewY; cellM = cellM % 12;
+          isOutside = true;
+        }
+        var iso = toISO(cellY, cellM, dayNum);
+        var disabled = iso < min;
+        var classes = "bk-cal-day";
+        if (isOutside) classes += " is-outside";
+        if (iso === todayStr) classes += " is-today";
+        if (iso === selected) classes += " is-selected";
+        cellsHtml += '<button type="button" class="' + classes + '" data-iso="' + iso + '"' + (disabled ? " disabled" : "") + '>' + dayNum + "</button>";
       }
-      /* smoothly guide the guest into picking the departure date next */
-      window.setTimeout(function () {
-        document.getElementById("bk-departure-trigger").click();
-      }, 220);
-    },
-    onClear: function () {
-      /* clearing arrival also clears departure, since it depends on it */
-      var dep = departureInput;
-      if (dep.value) {
-        dep.value = "";
-        var depValueEl = document.querySelector("#bk-departure-trigger .bk-date-value");
-        depValueEl.textContent = depValueEl.getAttribute("data-empty-text");
-        depValueEl.classList.remove("has-value");
-        document.getElementById("bk-departure-select").classList.remove("has-date");
-        dep.dispatchEvent(new Event("change", { bubbles: true }));
-      }
+      calGridEl.innerHTML = cellsHtml;
+
+      var minParsed = parseISO(min);
+      calPrevBtn.disabled = (controller.viewY < minParsed.y) || (controller.viewY === minParsed.y && controller.viewM <= minParsed.m);
+    };
+
+    controller.gotoMonth = function (y, m) {
+      if (m < 0) { m = 11; y -= 1; }
+      if (m > 11) { m = 0; y += 1; }
+      controller.viewY = y; controller.viewM = m;
+      controller.render();
+    };
+
+    controller.open = function () {
+      var base = controller.hiddenInput.value || controller.min;
+      var p = parseISO(base);
+      controller.viewY = p.y; controller.viewM = p.m;
+      activeCal = controller;
+      controller.render();
+      calPanel.classList.add("is-open");
+      controller.triggerEl.classList.add("is-open");
+      controller.triggerEl.setAttribute("aria-expanded", "true");
+      positionCalPanel(controller.triggerEl);
+      /* recompute once real layout has settled (panel just became visible) */
+      window.requestAnimationFrame(function () { positionCalPanel(controller.triggerEl); });
+    };
+
+    controller.close = function () {
+      if (activeCal !== controller) return;
+      calPanel.classList.remove("is-open");
+      controller.triggerEl.classList.remove("is-open");
+      controller.triggerEl.setAttribute("aria-expanded", "false");
+      activeCal = null;
+    };
+
+    controller.setValue = function (iso) {
+      controller.hiddenInput.value = iso;
+      controller.triggerEl.textContent = iso ? formatDisplayDate(iso) : "dd/mm/yyyy";
+      controller.triggerEl.setAttribute("data-empty", iso ? "false" : "true");
+      controller.hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+
+    controller.setMin = function (newMin) {
+      controller.min = newMin || todayStr;
+      if (activeCal === controller) controller.render();
+    };
+
+    return controller;
+  }
+
+  var arrivalCal = createCalendar({ triggerEl: arrivalTrigger, hiddenInput: arrivalInput, min: todayStr });
+  var departureCal = createCalendar({ triggerEl: departureTrigger, hiddenInput: departureInput, min: todayStr });
+
+  /* keep departure's own min (and its selected value, if it's no longer
+     valid) in sync every time arrival changes — same rule as before */
+  arrivalInput.addEventListener("change", syncDepartureMin);
+
+  arrivalTrigger.addEventListener("click", function (event) {
+    event.stopPropagation();
+    if (activeCal === arrivalCal) { arrivalCal.close(); return; }
+    arrivalCal.open();
+  });
+  departureTrigger.addEventListener("click", function (event) {
+    event.stopPropagation();
+    if (activeCal === departureCal) { departureCal.close(); return; }
+    departureCal.open();
+  });
+
+  calGridEl.addEventListener("click", function (event) {
+    var btn = event.target.closest(".bk-cal-day");
+    if (!btn || btn.disabled || !activeCal) return;
+    var wasArrival = activeCal === arrivalCal;
+    activeCal.setValue(btn.getAttribute("data-iso"));
+    activeCal.close();
+    /* guide the guest into picking the departure date next, same flow as
+       the previous native-picker version */
+    if (wasArrival) {
+      window.setTimeout(function () { departureCal.open(); }, 150);
     }
   });
-
-  var departurePicker = makeDatePicker({
-    rootId: "bk-departure-select",
-    triggerId: "bk-departure-trigger",
-    inputId: "bk-departure",
-    clearId: "bk-departure-clear",
-    timeInputId: "bk-departure-time",
-    getMin: function () { return arrivalInput.value || todayStr; }
+  calPrevBtn.addEventListener("click", function () {
+    if (activeCal) activeCal.gotoMonth(activeCal.viewY, activeCal.viewM - 1);
+  });
+  calNextBtn.addEventListener("click", function () {
+    if (activeCal) activeCal.gotoMonth(activeCal.viewY, activeCal.viewM + 1);
   });
 
-  arrivalPicker.sibling = departurePicker;
-  departurePicker.sibling = arrivalPicker;
+  document.addEventListener("click", function (event) {
+    if (!activeCal) return;
+    if (calPanel.contains(event.target) || event.target === arrivalTrigger || event.target === departureTrigger) return;
+    activeCal.close();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && activeCal) activeCal.close();
+  });
+  window.addEventListener("scroll", function () {
+    if (activeCal) positionCalPanel(activeCal.triggerEl);
+  }, { passive: true, capture: true });
+  window.addEventListener("resize", function () {
+    if (activeCal) positionCalPanel(activeCal.triggerEl);
+  });
+
+  syncDepartureMin();
+
 
   /* ---------- room selection ---------- */
   roomGrid.addEventListener("click", function (event) {
@@ -1300,24 +1243,13 @@
     /* dates */
     arrivalInput.value = state.arrival || "";
     departureInput.value = state.departure || "";
+    arrivalTrigger.textContent = state.arrival ? formatDisplayDate(state.arrival) : "dd/mm/yyyy";
+    arrivalTrigger.setAttribute("data-empty", state.arrival ? "false" : "true");
+    departureTrigger.textContent = state.departure ? formatDisplayDate(state.departure) : "dd/mm/yyyy";
+    departureTrigger.setAttribute("data-empty", state.departure ? "false" : "true");
     arrivalTimeInput.value = state.arrivalTime || "14:00";
     departureTimeInput.value = state.departureTime || "12:00";
-    arrivalPicker.syncTime();
-    departurePicker.syncTime();
-    [
-      ["bk-arrival-trigger", state.arrival],
-      ["bk-departure-trigger", state.departure]
-    ].forEach(function (pair) {
-      var el = document.getElementById(pair[0]);
-      if (!el) return;
-      var valueEl = el.querySelector(".bk-date-value");
-      if (pair[1]) {
-        valueEl.textContent = displayDate(pair[1]);
-        valueEl.classList.add("has-value");
-        var selectWrap = el.closest(".bk-date-select");
-        if (selectWrap) selectWrap.classList.add("has-date");
-      }
-    });
+    syncDepartureMin();
 
     /* stay/room */
     if (state.room) {

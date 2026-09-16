@@ -125,7 +125,14 @@
   z-index: 60;
   display: inline-flex;
   align-items: center;
+  /* the column's own box spans the full height of its children — including
+     the chat panel even while it's invisible/closed (opacity:0) — so
+     without this, that empty space silently blocked taps on whatever sat
+     underneath it on the page. Same fix already applied to .contact-bubbles
+     on the homepage; this widget just never got it. */
+  pointer-events: none;
 }
+.header-contact-trigger { pointer-events: auto; }
 .header-contact-trigger-badge { position: absolute; top: -2px; right: -2px; z-index: 3; display: grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: #e14b3f; color: #fff; font-family: "DM Sans", Arial, Helvetica, sans-serif; font-size: .6rem; font-weight: 700; line-height: 1; box-shadow: 0 0 0 2px #fff, 0 3px 8px rgba(0,0,0,.25); transition: opacity .2s ease, transform .2s ease; }
 .header-contact-bubbles.is-open .header-contact-trigger-badge { opacity: 0; transform: scale(.5); pointer-events: none; }
 

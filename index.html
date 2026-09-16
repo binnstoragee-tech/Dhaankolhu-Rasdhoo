@@ -530,7 +530,7 @@
        half the width the old single rectangle was, so this needs a
        noticeably bigger scale factor than before to reach the same
        full-bleed coverage. */
-    .story-panel-frame.is-frame-exiting .collage-main { transform: scale(7.2); }
+    .story-panel-frame.is-frame-exiting .collage-main { transform: scale(7.2); filter: blur(3px) brightness(.72) saturate(1.05); }
     /* Two stacked photo layers inside .collage-main — see advanceFrameCards()
        in script.js. Only .is-front is visible; the other sits ready behind
        it with the next photo already loaded, so switching which one carries
@@ -698,7 +698,7 @@
          does on desktop. On mobile the square is also narrower than the
          old single 4:3 box was, so this needs an even bigger jump than
          the desktop scale above did. */
-      .story-panel-frame.is-frame-exiting .collage-main { transform: scale(9.5); }
+      .story-panel-frame.is-frame-exiting .collage-main { transform: scale(9.5); filter: blur(3px) brightness(.72) saturate(1.05); }
     }
     /* While the stepper owns input, tell the browser at the compositor level
        (not just via JS preventDefault, which can lose a race on mobile under
@@ -838,42 +838,90 @@
       <section id="experience" class="excursions-section">
         <div class="section-heading-row section-shell"><span class="eyebrow reveal">Experiences</span><h2 class="display-heading reveal">Island Activities</h2><p class="section-lede reveal">Easy ways to fill your days around the island.</p></div>
 
-        <div class="discover-flat-grid">
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/snorkeling.webp" alt="Snorkeling half or full day" /></div>
-            <div class="offer-card-body">
-              <h3>Snorkeling</h3>
-              <p>Slip into the calm lagoon and drift above vibrant coral gardens, spotting colorful reef fish and gentle rays just steps from shore, with half or full-day sessions available.</p>
+        <div class="room-carousel experience-carousel reveal" id="experience-carousel">
+          <button type="button" class="room-carousel-arrow room-carousel-prev" id="experience-carousel-prev" aria-label="Previous activity">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <div class="room-carousel-viewport">
+            <div class="room-carousel-track" id="experience-carousel-track">
+
+              <article class="room-carousel-slide" data-clone="true" aria-hidden="true">
+                <div class="room-carousel-slide-inner">
+                  <div class="room-carousel-media"><img loading="lazy" decoding="async" src="img/experience/shark.webp" alt="" /></div>
+                  <div class="room-carousel-copy">
+                    <h3>Sharks</h3>
+                    <p>Venture to nearby reef channels to spot gentle nurse and reef sharks gliding through turquoise water, a thrilling yet safe wildlife encounter guided by experienced local boatmen.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="room-carousel-slide" data-activity="0">
+                <div class="room-carousel-slide-inner">
+                  <div class="room-carousel-media"><img loading="lazy" decoding="async" src="img/experience/snorkeling.webp" alt="Snorkeling half or full day" /></div>
+                  <div class="room-carousel-copy">
+                    <h3>Snorkeling</h3>
+                    <p>Slip into the calm lagoon and drift above vibrant coral gardens, spotting colorful reef fish and gentle rays just steps from shore, with half or full-day sessions available.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="room-carousel-slide" data-activity="1">
+                <div class="room-carousel-slide-inner">
+                  <div class="room-carousel-media"><img loading="lazy" decoding="async" src="img/experience/fishing.webp" alt="Night fishing" /></div>
+                  <div class="room-carousel-copy">
+                    <h3>Fishing</h3>
+                    <p>Head out after sunset with local fishermen for a traditional night fishing trip, learning old techniques and reeling in your own catch beneath a sky full of stars.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="room-carousel-slide" data-activity="2">
+                <div class="room-carousel-slide-inner">
+                  <div class="room-carousel-media"><img loading="lazy" decoding="async" src="img/experience/dolpin.webp" alt="Dolphin watching" /></div>
+                  <div class="room-carousel-copy">
+                    <h3>Dolphin</h3>
+                    <p>Cruise out to open water at golden hour as pods of spinner dolphins leap and play alongside the boat, a lively wildlife encounter guests remember long after the trip ends.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="room-carousel-slide" data-activity="3">
+                <div class="room-carousel-slide-inner">
+                  <div class="room-carousel-media"><img loading="lazy" decoding="async" src="img/experience/turtle.webp" alt="Sea turtle" /></div>
+                  <div class="room-carousel-copy">
+                    <h3>Turtle</h3>
+                    <p>Snorkel alongside gentle sea turtles gliding through crystal-clear shallows, an easy, unforgettable encounter with one of the ocean's most graceful creatures right off the island's shore.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="room-carousel-slide" data-activity="4">
+                <div class="room-carousel-slide-inner">
+                  <div class="room-carousel-media"><img loading="lazy" decoding="async" src="img/experience/shark.webp" alt="Shark" /></div>
+                  <div class="room-carousel-copy">
+                    <h3>Sharks</h3>
+                    <p>Venture to nearby reef channels to spot gentle nurse and reef sharks gliding through turquoise water, a thrilling yet safe wildlife encounter guided by experienced local boatmen.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="room-carousel-slide" data-clone="true" aria-hidden="true">
+                <div class="room-carousel-slide-inner">
+                  <div class="room-carousel-media"><img loading="lazy" decoding="async" src="img/experience/snorkeling.webp" alt="" /></div>
+                  <div class="room-carousel-copy">
+                    <h3>Snorkeling</h3>
+                    <p>Slip into the calm lagoon and drift above vibrant coral gardens, spotting colorful reef fish and gentle rays just steps from shore, with half or full-day sessions available.</p>
+                  </div>
+                </div>
+              </article>
+
             </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/fishing.webp" alt="Night fishing" /></div>
-            <div class="offer-card-body">
-              <h3>Fishing</h3>
-              <p>Head out after sunset with local fishermen for a traditional night fishing trip, learning old techniques and reeling in your own catch beneath a sky full of stars.</p>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/dolpin.webp" alt="Dolphin watching" /></div>
-            <div class="offer-card-body">
-              <h3>Dolphin</h3>
-              <p>Cruise out to open water at golden hour as pods of spinner dolphins leap and play alongside the boat, a lively wildlife encounter guests remember long after the trip ends.</p>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/turtle.webp" alt="Sea turtle" /></div>
-            <div class="offer-card-body">
-              <h3>Turtle</h3>
-              <p>Snorkel alongside gentle sea turtles gliding through crystal-clear shallows, an easy, unforgettable encounter with one of the ocean's most graceful creatures right off the island's shore.</p>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/shark.webp" alt="Shark" /></div>
-            <div class="offer-card-body">
-              <h3>Sharks</h3>
-              <p>Venture to nearby reef channels to spot gentle nurse and reef sharks gliding through turquoise water, a thrilling yet safe wildlife encounter guided by experienced local boatmen.</p>
-            </div>
-          </article>
+          </div>
+
+          <button type="button" class="room-carousel-arrow room-carousel-next" id="experience-carousel-next" aria-label="Next activity">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
 
         <div class="experience-carousel-view-all-row reveal">
@@ -1345,6 +1393,7 @@
       <figure class="gallery-item" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><div class="card-image-wrap gallery-item-media"><img decoding="async" src="img/highlights/17.webp" alt="Dhaankolhu Rasdhoo highlights photo 17" /></div><figcaption>Eagle rays gliding through the shallows</figcaption></figure>
       <figure class="gallery-item" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><div class="card-image-wrap gallery-item-media"><img decoding="async" src="img/highlights/18.webp" alt="Dhaankolhu Rasdhoo highlights photo 18" /></div><figcaption>Free diving over the house reef</figcaption></figure>
       <figure class="gallery-item" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><div class="card-image-wrap gallery-item-media"><img decoding="async" src="img/highlights/19.webp" alt="Dhaankolhu Rasdhoo highlights photo 19" /></div><figcaption>Swimming through sunlit water</figcaption></figure>
+      <figure class="gallery-item" data-expand tabindex="0" role="button" aria-haspopup="dialog" data-title=""><div class="card-image-wrap gallery-item-media"><img decoding="async" src="img/highlights/20.webp" alt="Dhaankolhu Rasdhoo highlights photo 20" /></div><figcaption>Bird's-eye view of the island and reef</figcaption></figure>
     </div>
   </div>
 
