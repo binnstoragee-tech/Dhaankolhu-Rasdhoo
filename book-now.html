@@ -17,12 +17,13 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="book-now.css" />
+  <link rel="stylesheet" href="smooth-ux.css" />
   <title>Book Now - Dhaankolhu Rasdhoo</title>
 </head>
 <body>
   <div class="site-shell">
     <header class="site-header" id="site-header">
-      <a class="brand-lockup" href="index.html" aria-label="Dhaankolhu Rasdhoo Island home"><img class="brand-mark" src="img/logo/logo-white.png" alt="Dhaankolhu Rasdhoo Island logo" /></a>
+      <a class="brand-lockup" href="./" aria-label="Dhaankolhu Rasdhoo Island home"><img class="brand-mark" src="img/logo/logo-white.png" alt="Dhaankolhu Rasdhoo Island logo" /></a>
       <div class="header-nav-group">
         <nav class="desktop-nav" aria-label="Primary navigation"><a href="index.html#about">About</a><a href="index.html#experience">Experience</a><div class="nav-dropdown"><a href="family-room.html" class="nav-dropdown-trigger">Accommodation<svg class="nav-dropdown-chevron" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><div class="nav-dropdown-panel"><a href="double-room.html">Double Room</a><a href="triple-room.html">Triple Room</a><a href="family-room.html">Family Room</a></div></div><a href="offers.html">Offers</a><div class="nav-dropdown"><a href="index.html#highlights" class="nav-dropdown-trigger" data-nav-noop>Others<svg class="nav-dropdown-chevron" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><div class="nav-dropdown-panel"><a href="index.html#highlights">Highlights</a><a href="index.html#gallery">Gallery</a></div></div></nav>
         <!-- "Book now" doesn't make sense in the header while you're already
@@ -145,6 +146,17 @@
                     <input type="hidden" id="bk-departure-time" name="departureTime" value="12:00" />
                   </div>
                 </div>
+                <div class="bk-field-row bk-field-row-single">
+                  <div class="bk-field">
+                    <label for="bk-pax">Number of pax</label>
+                    <div class="bk-pax">
+                      <button type="button" class="bk-pax-btn" id="bk-pax-minus" aria-label="Fewer guests">&minus;</button>
+                      <input type="number" id="bk-pax" name="pax" min="1" max="10" step="1" inputmode="numeric" placeholder="&mdash;" />
+                      <button type="button" class="bk-pax-btn" id="bk-pax-plus" aria-label="More guests">+</button>
+                    </div>
+                    <span class="bk-hint">Total number of guests staying</span>
+                  </div>
+                </div>
               </div>
 
               <!-- Step 2 — Choose Your Stay -->
@@ -158,12 +170,12 @@
                     <div class="bk-room-check">✓</div>
                     <div class="bk-room-media">
                       <div class="bk-room-img-wrap" data-room-gallery>
-                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/double.webp" alt="Double Room" data-angles="img/room/double.webp|img/room/double.webp|img/room/double.webp" />
+                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/double.webp" alt="Double Room" data-angles="img/room/double.webp|img/room/double1.webp|img/room/double2.webp" />
                       </div>
                       <div class="bk-room-angles" role="tablist" aria-label="Double Room angles">
                         <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/double.webp')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double1.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/double2.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
                       </div>
                     </div>
                     <div class="bk-room-body">
@@ -177,12 +189,12 @@
                     <div class="bk-room-check">✓</div>
                     <div class="bk-room-media">
                       <div class="bk-room-img-wrap" data-room-gallery>
-                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/triple.webp" alt="Triple Room" data-angles="img/room/triple.webp|img/room/triple.webp|img/room/triple.webp" />
+                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/triple.webp" alt="Triple Room" data-angles="img/room/triple.webp|img/room/triple1.webp|img/room/triple2.webp" />
                       </div>
                       <div class="bk-room-angles" role="tablist" aria-label="Triple Room angles">
                         <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/triple.webp')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple1.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/triple2.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
                       </div>
                     </div>
                     <div class="bk-room-body">
@@ -196,12 +208,12 @@
                     <div class="bk-room-check">✓</div>
                     <div class="bk-room-media">
                       <div class="bk-room-img-wrap" data-room-gallery>
-                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/family%20room.webp" alt="Family Room" data-angles="img/room/family%20room.webp|img/room/family%20room.webp|img/room/family%20room.webp" />
+                        <img loading="lazy" decoding="async" class="bk-room-photo" src="img/room/family%20room.webp" alt="Family Room" data-angles="img/room/family%20room.webp|img/room/family1.webp|img/room/family1.webp" />
                       </div>
                       <div class="bk-room-angles" role="tablist" aria-label="Family Room angles">
                         <button type="button" class="bk-room-angle is-active" style="background-image:url('img/room/family%20room.webp')" aria-label="Angle 1 of 3" aria-pressed="true"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family%20room.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
-                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family%20room.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family1.webp')" aria-label="Angle 2 of 3" aria-pressed="false"></button>
+                        <button type="button" class="bk-room-angle" style="background-image:url('img/room/family1.webp')" aria-label="Angle 3 of 3" aria-pressed="false"></button>
                       </div>
                     </div>
                     <div class="bk-room-body">
@@ -212,6 +224,7 @@
                     </div>
                   </div>
                 </div>
+                <p class="bk-hint bk-occupancy-note" id="bk-occupancy-note" hidden></p>
               </div>
 
               <!-- Step 3 — Your Details -->
@@ -321,7 +334,8 @@
                 <div class="bk-ticket-row is-empty" data-field="checkin"><span>Check-in</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="checkout"><span>Check-out</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="nights"><span>Nights</span><span>—</span></div>
-                <div class="bk-ticket-row is-empty" data-field="room"><span>Stay</span><span>Not chosen yet</span></div>
+                <div class="bk-ticket-row is-empty" data-field="pax"><span>Pax</span><span>&mdash;</span></div>
+                <div class="bk-ticket-row is-empty" data-field="room"><span>Room category</span><span>Not chosen yet</span></div>
                 <div class="bk-ticket-row is-empty" data-field="name"><span>Name</span><span>—</span></div>
                 <div class="bk-ticket-row is-empty" data-field="phone"><span>Contact</span><span>—</span></div>
                 </div>
@@ -358,7 +372,7 @@
       </div>
       <div class="footer-v2-bottom">
         <span>© 2026 Dhaankolhu Rasdhoo Island. All rights reserved.</span>
-        <div class="footer-v2-legal"><span>Website Designed &amp; Developed by AdFlare</span></div>
+        <div class="footer-v2-legal"><span>Website Designed &amp; Developed by <a href="https://www.ad-flare.org/" target="_blank" rel="noopener noreferrer">AdFlare</a></span></div>
       </div>
     </footer>
   </div>
@@ -397,5 +411,6 @@
 
 
   <script src="book-now.js"></script>
+  <script src="smooth-ux.js" defer></script>
 </body>
 </html>

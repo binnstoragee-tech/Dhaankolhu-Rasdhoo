@@ -14,8 +14,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="activity-rates.css" />
   <link rel="stylesheet" href="room-detail.css" />
   <link rel="stylesheet" href="offers.css" />
+  <link rel="stylesheet" href="smooth-ux.css" />
   <title>Discover the Island - Dhaankolhu Rasdhoo</title>
 </head>
 <body>
@@ -94,49 +96,11 @@
         <div class="discover-video-scrim"></div>
       </div>
 
-      <section id="discover-activities" class="excursions-section other-offers-section section-shell">
-        <div class="section-heading-row other-offers-heading-row">
-          <span class="eyebrow reveal">Experiences</span>
-          <h2 class="display-heading reveal">Island Activities</h2>
-          <p class="section-lede reveal">Easy ways to fill your days around the island.</p>
-        </div>
-        <div class="discover-flat-grid">
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/snorkeling.webp" alt="Snorkeling half or full day" /></div>
-            <div class="offer-card-body">
-              <h3>Snorkeling</h3>
-              <p>Slip into the calm lagoon and drift above vibrant coral gardens, spotting colorful reef fish and gentle rays just steps from shore, with half or full-day sessions available.</p>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/fishing.webp" alt="Night fishing" /></div>
-            <div class="offer-card-body">
-              <h3>Fishing</h3>
-              <p>Head out after sunset with local fishermen for a traditional night fishing trip, learning old techniques and reeling in your own catch beneath a sky full of stars.</p>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/dolpin.webp" alt="Dolphin watching" /></div>
-            <div class="offer-card-body">
-              <h3>Dolphin</h3>
-              <p>Cruise out to open water at golden hour as pods of spinner dolphins leap and play alongside the boat, a lively wildlife encounter guests remember long after the trip ends.</p>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/turtle.webp" alt="Sea turtle" /></div>
-            <div class="offer-card-body">
-              <h3>Turtle</h3>
-              <p>Snorkel alongside gentle sea turtles gliding through crystal-clear shallows, an easy, unforgettable encounter with one of the ocean's most graceful creatures right off the island's shore.</p>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/experience/shark.webp" alt="Shark" /></div>
-            <div class="offer-card-body">
-              <h3>Sharks</h3>
-              <p>Venture to nearby reef channels to spot gentle nurse and reef sharks gliding through turquoise water, a thrilling yet safe wildlife encounter guided by experienced local boatmen.</p>
-            </div>
-          </article>
-        </div>
+            <!-- ACTIVITY RATES (data lives in activity-rates.js) -->
+      <section id="activity-rates" class="excursions-section ar-section">
+        <div class="section-heading-row section-shell"><span class="eyebrow reveal">In-house rates</span><h2 class="display-heading reveal">Activity Rates</h2><p class="section-lede reveal">Excursions and events led by our island team — pick a category and find your perfect day out.</p>
+          <svg class="ar-wave" viewBox="0 0 120 14" aria-hidden="true"><path d="M2 7 Q17 -1 32 7 T62 7 T92 7 T118 7"/></svg></div>
+        <div class="ar-wrap"><div id="ar-root"></div></div>
       </section>
 
       <section id="discover-accommodation" class="room-offers-section other-offers-section section-shell">
@@ -145,43 +109,57 @@
           <h2 class="display-heading reveal">Comfortable Stays, Steps from the Shore</h2>
           <p class="section-lede reveal">Warm, well-kept rooms built for easy island living — every stay just steps from the shoreline, from $65 per night.</p>
         </div>
-        <div class="discover-flat-grid">
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/room/double.webp" alt="Double Room" /></div>
-            <div class="offer-card-body">
-              <h3>Double Room</h3>
-              <p>A relaxed room built for two, steps from the shoreline.</p>
-              <div class="offer-card-price"><span>Per night</span><strong>$65<small>+tax</small></strong></div>
-              <div class="offer-card-actions">
-                <a class="offer-btn offer-btn-outline" href="double-room.html">More Details</a>
-                <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
-              </div>
+        <div class="ar-carousel-top reveal">
+          <a class="ar-viewall-top" href="double-room.html">View All Rooms<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+
+        <div class="ar-carousel-wrap ar-rooms reveal" id="rooms-carousel">
+          <button type="button" class="ar-carousel-arrow ar-carousel-prev" id="rooms-prev" aria-label="Previous room">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="ar-carousel-viewport">
+            <div class="ar-carousel-track" id="rooms-track">
+              <article class="ar-card ar-card-preview ar-room">
+                <div class="ar-media">
+                  <img loading="lazy" decoding="async" src="img/room/double.webp" alt="Double Room" />
+                  <a class="ar-room-cover" href="double-room.html" aria-label="Double Room details"></a>
+                  <div class="ar-cap"><div class="ar-cap-l">
+                    <h3>Double Room</h3>
+                    <div class="ar-cap-price"><em>Per night</em><strong class="ar-price"><sup>$</sup><span>65</span></strong><span class="ar-per">+tax</span></div>
+                    <div class="ar-room-meta"><a class="ar-room-rating" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z"/></svg>9.1 · 59 Reviews</a><span>16 m²</span><span>1 Full Bed</span><span>City View</span></div>
+                    <a class="ar-room-book" href="book-now.html">Book Now</a>
+                  </div></div>
+                </div>
+              </article>
+              <article class="ar-card ar-card-preview ar-room">
+                <div class="ar-media">
+                  <img loading="lazy" decoding="async" src="img/room/triple.webp" alt="Triple Room" />
+                  <a class="ar-room-cover" href="triple-room.html" aria-label="Triple Room details"></a>
+                  <div class="ar-cap"><div class="ar-cap-l">
+                    <h3>Triple Room</h3>
+                    <div class="ar-cap-price"><em>Per night</em><strong class="ar-price"><sup>$</sup><span>80</span></strong><span class="ar-per">+tax</span></div>
+                    <div class="ar-room-meta"><a class="ar-room-rating" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z"/></svg>9.1 · 59 Reviews</a><span>22 m²</span><span>1 Twin Bed + 1 Full Bed</span><span>Included</span></div>
+                    <a class="ar-room-book" href="book-now.html">Book Now</a>
+                  </div></div>
+                </div>
+              </article>
+              <article class="ar-card ar-card-preview ar-room">
+                <div class="ar-media">
+                  <img loading="lazy" decoding="async" src="img/room/family%20room.webp" alt="Family Room" />
+                  <a class="ar-room-cover" href="family-room.html" aria-label="Family Room details"></a>
+                  <div class="ar-cap"><div class="ar-cap-l">
+                    <h3>Family Room</h3>
+                    <div class="ar-cap-price"><em>Per night</em><strong class="ar-price"><sup>$</sup><span>95</span></strong><span class="ar-per">+tax</span></div>
+                    <div class="ar-room-meta"><a class="ar-room-rating" href="https://www.booking.com/hotel/mv/dhaankolhu-rasdhoo.html#tab-main" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.9l-4.94 2.8.94-5.5-4-3.9 5.53-.8L12 3.5Z"/></svg>9.1 · 59 Reviews</a><span>22 m²</span><span>2 Queen Beds</span><span>Included</span></div>
+                    <a class="ar-room-book" href="book-now.html">Book Now</a>
+                  </div></div>
+                </div>
+              </article>
             </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/room/triple.webp" alt="Triple Room" /></div>
-            <div class="offer-card-body">
-              <h3>Triple Room</h3>
-              <p>Extra space to spread out, ideal for three sharing the stay.</p>
-              <div class="offer-card-price"><span>Per night</span><strong>$80<small>+tax</small></strong></div>
-              <div class="offer-card-actions">
-                <a class="offer-btn offer-btn-outline" href="triple-room.html">More Details</a>
-                <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
-              </div>
-            </div>
-          </article>
-          <article class="offer-card reveal">
-            <div class="offer-card-media"><img loading="lazy" decoding="async" src="img/room/family%20room.webp" alt="Family Room" /></div>
-            <div class="offer-card-body">
-              <h3>Family Room</h3>
-              <p>The largest of the three, with room enough for the whole family.</p>
-              <div class="offer-card-price"><span>Per night</span><strong>$95<small>+tax</small></strong></div>
-              <div class="offer-card-actions">
-                <a class="offer-btn offer-btn-outline" href="family-room.html">More Details</a>
-                <a class="offer-btn offer-btn-solid" href="book-now.html">Book Now</a>
-              </div>
-            </div>
-          </article>
+          </div>
+          <button type="button" class="ar-carousel-arrow ar-carousel-next" id="rooms-next" aria-label="Next room">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
       </section>
     </main>
@@ -206,11 +184,13 @@
       </div>
       <div class="footer-v2-bottom">
         <span>© 2026 Dhaankolhu Rasdhoo Island. All rights reserved.</span>
-        <div class="footer-v2-legal"><span>Website Designed &amp; Developed by AdFlare</span></div>
+        <div class="footer-v2-legal"><span>Website Designed &amp; Developed by <a href="https://www.ad-flare.org/" target="_blank" rel="noopener noreferrer">AdFlare</a></span></div>
       </div>
     </footer>
   </div>
 
   <script src="room-detail.js"></script>
+  <script src="activity-rates.js"></script>
+  <script src="smooth-ux.js" defer></script>
 </body>
 </html>

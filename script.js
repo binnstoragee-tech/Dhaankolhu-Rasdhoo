@@ -8,7 +8,7 @@
      added "is-preload" (page starts invisible); here we fade the page IN on
      load, and fade it OUT before navigating away on internal link clicks.
      ========================================================================== */
-  var PAGE_TRANSITION_MS = 380;
+  var PAGE_TRANSITION_MS = 220;
 
   /* fade in: wait two animation frames so the browser has actually painted
      the "invisible" state first, otherwise the opacity change won't transition */
@@ -99,6 +99,12 @@
      the two don't fight over the same element */
   var heroStoryPinnedActive = false;
 
+  /* true while the hero is shrunk into its rounded card (see .is-hero-card
+     in index.html) — the header then sits on white above it, so it wears the
+     same solid "scrolled" look even though the page is still at scrollY 0 */
+  var heroCardOn = false;
+  var heroCurrentStep = 0; /* mirrors the stepper's chapter so the intro knows whether the card should form */
+
   function applyScrollState() {
     /* the "ticking" flag is what lets each animation frame do its scroll
        work at most once — if anything inside threw before reaching the end,
@@ -107,7 +113,7 @@
        always gets released so the animation keeps running continuously. */
     try {
       var currentY = window.scrollY;
-      header.classList.toggle("is-scrolled", currentY > 56);
+      header.classList.toggle("is-scrolled", currentY > 56 || heroCardOn);
 
       if (heroStoryPinnedActive) {
         lastScrollY = currentY;
@@ -228,9 +234,46 @@
     });
 
     header.classList.add("is-intro-hidden");
-    var HERO_ZOOM_MS = 3000;
-    var HERO_START_DELAY = 250; /* small pause before the zoom-out begins, so it reads as intentional */
+    var heroReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var HERO_HOLD_MS = heroReducedMotion ? 0 : 700; /* beat on the full-screen video before it shrinks into the card */
+    var HERO_CARD_MS = 900; /* must match the .story-sticky clip-path transition in index.html */
+    var HERO_HEADER_DELAY = 750; /* header slides in only once the card has (almost) settled, so it never covers the video mid-shrink */
+    var HERO_TEXT_DELAY = 750; /* headline starts once the card has settled */
     var WORD_STEP_MS = 90; /* stagger between each word rising up */
+
+    var heroCardReady = false; /* flips true when the card is allowed to form */
+
+    /* the card's top edge = the header's real height + a small gap, so the
+       card never tucks under the navbar. Measured with transitions switched
+       off and the header in its solid (card) state, so the number is the
+       settled height rather than a mid-transition one. */
+    function measureHeroCardTop() {
+      var wasSolid = header.classList.contains("is-scrolled");
+      header.style.transition = "none";
+      header.classList.add("is-scrolled");
+      var headerHeight = header.offsetHeight;
+      if (!wasSolid && !heroCardOn && window.scrollY <= 56) header.classList.remove("is-scrolled");
+      void header.offsetHeight;
+      header.style.transition = "";
+      var gap = window.innerWidth >= 1024 ? 20 : 12;
+      heroSection.style.setProperty("--hero-card-top", (headerHeight + gap) + "px");
+    }
+    var heroResizeTimer = null;
+    function queueHeroCardMeasure() {
+      window.clearTimeout(heroResizeTimer);
+      heroResizeTimer = window.setTimeout(measureHeroCardTop, 120);
+    }
+    window.addEventListener("resize", queueHeroCardMeasure);
+    window.addEventListener("load", queueHeroCardMeasure); /* logo image + web fonts change the header's height once they arrive */
+    if (window.ResizeObserver) new ResizeObserver(queueHeroCardMeasure).observe(header);
+
+    function setHeroCard(on) {
+      if (on === heroCardOn) return;
+      if (on) measureHeroCardTop();
+      heroCardOn = on;
+      heroSection.classList.toggle("is-hero-card", on);
+      header.classList.toggle("is-scrolled", on || window.scrollY > 56);
+    }
 
     heroWords.forEach(function (word, index) {
       word.style.transitionDelay = (index * WORD_STEP_MS) + "ms";
@@ -243,19 +286,28 @@
        done — otherwise it would permanently override .button's own fast
        hover/active transition and make pressing the button feel broken. */
     var heroExploreBtn = heroSection.querySelector(".hero-explore-btn");
-    var heroBtnReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var HERO_BTN_DELAY_MS = heroWords.length * WORD_STEP_MS + 120;
-    var HERO_BTN_REVEAL_MS = heroBtnReducedMotion ? 0 : 2000;
-    if (heroExploreBtn && !heroBtnReducedMotion) {
+    var HERO_BTN_REVEAL_MS = heroReducedMotion ? 0 : 2000;
+    if (heroExploreBtn && !heroReducedMotion) {
       heroExploreBtn.style.transitionProperty = "opacity, transform";
       heroExploreBtn.style.transitionDuration = HERO_BTN_REVEAL_MS + "ms";
       heroExploreBtn.style.transitionTimingFunction = "cubic-bezier(.16,1,.3,1)";
       heroExploreBtn.style.transitionDelay = HERO_BTN_DELAY_MS + "ms";
     }
 
+    /* 1 — full-screen video shrinks into the rounded card */
     window.setTimeout(function () {
-      heroSection.classList.add("is-intro-revealed");
+      heroCardReady = true;
+      setHeroCard(heroCurrentStep === 0);
+    }, HERO_HOLD_MS);
+
+    /* 2 — header slides down */
+    window.setTimeout(function () {
       header.classList.remove("is-intro-hidden");
+    }, HERO_HOLD_MS + HERO_HEADER_DELAY);
+
+    /* 3 — headline blurs/rises in word by word, then the button */
+    window.setTimeout(function () {
       heroWords.forEach(function (word) { word.classList.add("is-shown"); });
       if (heroExploreBtn) {
         heroExploreBtn.classList.add("is-shown");
@@ -266,11 +318,15 @@
           heroExploreBtn.style.transitionDelay = "";
         }, HERO_BTN_DELAY_MS + HERO_BTN_REVEAL_MS + 50);
       }
-    }, HERO_START_DELAY);
+      /* release the GPU hints once the last word has landed */
+      window.setTimeout(function () {
+        heroWords.forEach(function (word) { word.style.willChange = "auto"; });
+      }, heroWords.length * WORD_STEP_MS + 1000);
+    }, HERO_HOLD_MS + HERO_TEXT_DELAY);
 
     window.setTimeout(function () {
       heroSection.classList.add("is-intro-done"); /* hand off to the ambient drift/flip animation */
-    }, HERO_START_DELAY + HERO_ZOOM_MS);
+    }, HERO_HOLD_MS + HERO_CARD_MS);
 
     /* ==========================================================================
        HERO STEPPER — a fixed, full-viewport hero that steps through three
@@ -428,6 +484,11 @@
       }
 
       function setBackdropForStep(step) {
+        /* the hero is a rounded card only on the Welcome chapter — it opens
+           up to full-bleed as soon as the stepper moves on, and closes back
+           into the card when the user climbs back to Welcome */
+        heroCurrentStep = step;
+        setHeroCard(heroCardReady && step === 0);
         if (heroBackdropWrap) {
           /* clear any inline transition left over from the "walking into the
              hallway" exit beat below, so ordinary per-chapter steps always
@@ -504,6 +565,9 @@
       var experienceSection = document.getElementById("experience");
 
       function playFrameExitThenRelease() {
+        /* the photo-frame chapter was removed — when the last chapter is a plain text panel
+           (About), skip the zoom-into-frame exit beat and just hand scrolling back to the page */
+        if (!storyPanels[lastStep].classList.contains("story-panel-frame")) { releaseLock(); return; }
         if (frameExited) { releaseLock(); return; }
         frameExited = true;
         transitioning = true;
@@ -578,6 +642,37 @@
         setBackdropForStep(lastStep);
       }
 
+      /* Back to the very first chapter (Welcome) with the stepper engaged —
+         used by the logo / "#home" link and by a page load that arrives at
+         "#home". Mirrors resetToEnd() but for step 0. */
+      function resetToStart() {
+        storyPanels.forEach(function (panel, i) {
+          panel.classList.remove("is-active", "is-exited", "is-frame-exiting");
+          if (i === 0) panel.classList.add("is-active");
+        });
+        currentStep = 0;
+        frameExited = false;
+        transitioning = false;
+        stopFrameCardStack();
+        if (storyCollageMainImgs.length) {
+          storyCollageMainImgs.forEach(function (img, i) {
+            img.classList.toggle("is-front", i === 0);
+            if (i === 0) img.src = "img/home/1.webp";
+          });
+        }
+        frameActiveIndex = 0;
+        if (frameCardItems.length) setActiveFrameCard(0);
+        if (heroBackdropWrap) { heroBackdropWrap.style.transition = ""; heroBackdropWrap.style.transformOrigin = ""; }
+        if (storyShade) storyShade.style.transition = "";
+        locked = true;
+        heroStoryPinnedActive = true;
+        climbingBack = false;
+        setLockClasses(true);
+        if (window.scrollY !== 0) window.scrollTo(0, 0);
+        setHeaderForStep(0);
+        setBackdropForStep(0);
+      }
+
       var justReengaged = false; /* true for the single event that re-locks, so it isn't ALSO treated as a step command (which would immediately step backward again since we just resumed on the last chapter) */
 
       function tryReengageLock(deltaY) {
@@ -593,21 +688,40 @@
         return locked;
       }
 
+      /* One physical swipe = one chapter. A laptop trackpad fires a long
+         burst of wheel events for a single swipe (plus momentum/inertia
+         that keeps trickling in well after the finger lifts). The
+         "transitioning" flag only covers the 700ms of the step animation,
+         so the tail of the SAME swipe used to land right after it and
+         count as a brand-new swipe — stepping Welcome -> About and then
+         immediately releasing the lock, so About flashed past unseen.
+         Fix: once a step fires, ignore every wheel event until the wheel
+         has been quiet for WHEEL_IDLE_MS (i.e. the gesture truly ended). */
+      var WHEEL_IDLE_MS = 160;
+      var lastWheelAt = 0;
+      var wheelGestureUsed = false;
+
       window.addEventListener("wheel", function (event) {
         if (!tryReengageLock(event.deltaY)) return; /* not our concern — let the page scroll normally */
-        if (justReengaged) { justReengaged = false; event.preventDefault(); return; } /* absorb the event that triggered the reset — don't also step on it */
-        if (transitioning) { event.preventDefault(); return; }
+        var wheelNow = window.performance && performance.now ? performance.now() : Date.now();
+        if (wheelNow - lastWheelAt > WHEEL_IDLE_MS) wheelGestureUsed = false; /* quiet gap = a new gesture */
+        lastWheelAt = wheelNow; /* every event (even absorbed ones) extends the quiet-time check */
+        if (justReengaged) { justReengaged = false; wheelGestureUsed = true; event.preventDefault(); return; } /* absorb the event that triggered the reset — don't also step on it */
+        if (transitioning || wheelGestureUsed) { event.preventDefault(); return; }
         if (event.deltaY > 0) {
           if (currentStep < lastStep) {
             event.preventDefault();
+            wheelGestureUsed = true;
             goToStep(currentStep + 1);
           } else {
             event.preventDefault(); /* hold the lock through the exit-grow animation instead of scrolling away immediately */
+            wheelGestureUsed = true;
             playFrameExitThenRelease();
           }
         } else if (event.deltaY < 0) {
           if (currentStep > 0) {
             event.preventDefault();
+            wheelGestureUsed = true;
             goToStep(currentStep - 1);
           } else {
             event.preventDefault(); /* already at the first chapter — nothing above it, so just stay put instead of releasing the lock */
@@ -696,6 +810,17 @@
       document.querySelectorAll('a[href^="#"]').forEach(function (link) {
         var hash = link.getAttribute("href");
         if (hash === "#about" || hash === "#" ) return; /* #about handled separately below; bare "#" isn't a section link */
+        if (hash === "#home") {
+          /* logo / Home: go back to the Welcome chapter with the stepper
+             ENGAGED. It used to release the lock like the section links
+             below, which left the hero as a plain scrolling block — so the
+             first scroll skipped straight past About into the page. */
+          link.addEventListener("click", function (event) {
+            event.preventDefault();
+            resetToStart();
+          });
+          return;
+        }
         link.addEventListener("click", function () {
           if (locked) releaseLock();
         });
@@ -735,6 +860,12 @@
           setLockClasses(true);
           goToStep(1);
         }, 30);
+      } else if (initialHash === "#home") {
+        /* "index.html#home" (what the logo link leaves in the URL) is just
+           the top of the page — start the stepper at Welcome as usual
+           instead of treating it like a section jump, which released the
+           lock and let the page scroll natively over the hero. */
+        window.scrollTo(0, 0);
       } else if (initialHash) {
         var initialHashTarget;
         try { initialHashTarget = document.querySelector(initialHash); } catch (err) { initialHashTarget = null; }
@@ -1388,64 +1519,76 @@
    cancelling the other out. Honours reduced motion, only runs while each
    image is near the viewport.
    ========================================================================== */
+/* One shared scroll-drift engine for every photo (was: a private rAF loop +
+   scroll listener + getBoundingClientRect per image, which multiplied layout
+   work on every scroll frame). Now: ONE passive scroll listener, ONE rAF
+   loop, all rect reads batched before all style writes (no layout thrash),
+   and only images currently near the viewport are ever touched. The drift is
+   still written to --img-drift, applied via transform in CSS (compositor). */
+var __driftItems = [];
+var __driftRaf = null;
+var __driftReady = false;
+var DRIFT_SMOOTHING = 0.12;
+
+function __driftFrame() {
+  __driftRaf = null;
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var active = [];
+  var i, it;
+  /* 1) reads */
+  for (i = 0; i < __driftItems.length; i++) {
+    it = __driftItems[i];
+    if (!it.near) continue;
+    var rect = it.media.getBoundingClientRect();
+    var progress = (vh - rect.top) / (vh + rect.height);
+    progress = Math.max(0, Math.min(1, progress));
+    it.target = (progress - 0.5) * it.range;
+    active.push(it);
+  }
+  /* 2) writes */
+  var moving = false;
+  for (i = 0; i < active.length; i++) {
+    it = active[i];
+    it.current += (it.target - it.current) * DRIFT_SMOOTHING;
+    if (Math.abs(it.target - it.current) < 0.05) it.current = it.target;
+    else moving = true;
+    it.img.style.setProperty("--img-drift", it.current.toFixed(1) + "px");
+  }
+  if (moving) __driftRaf = requestAnimationFrame(__driftFrame);
+}
+function __driftKick() {
+  if (__driftRaf === null) __driftRaf = requestAnimationFrame(__driftFrame);
+}
+
 function initImageDrift(selector, driftPx) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var wraps = Array.prototype.slice.call(document.querySelectorAll(selector));
   if (!wraps.length) return;
 
-  var SMOOTHING = 0.1;
+  var io = "IntersectionObserver" in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      entry.target.__drift.near = entry.isIntersecting;
+    });
+    __driftKick();
+  }, { rootMargin: "25% 0px 25% 0px" }) : null;
 
   wraps.forEach(function (wrap) {
     var img = wrap.tagName === "IMG" ? wrap : wrap.querySelector("img");
     if (!img) return;
     var media = wrap.tagName === "IMG" ? wrap.parentElement : wrap;
-    var nearViewport = false;
-    var rafId = null;
-    var currentShift = 0, targetShift = 0;
-
-    function computeTarget() {
-      var rect = media.getBoundingClientRect();
-      var vh = window.innerHeight || document.documentElement.clientHeight;
-      var progress = (vh - rect.top) / (vh + rect.height);
-      progress = Math.max(0, Math.min(1, progress));
-      targetShift = (progress - 0.5) * driftPx;
-    }
-
-    function tick() {
-      rafId = null;
-      computeTarget();
-      currentShift += (targetShift - currentShift) * SMOOTHING;
-      img.style.setProperty("--img-drift", currentShift.toFixed(2) + "px");
-      if (nearViewport && Math.abs(targetShift - currentShift) > 0.05) {
-        rafId = requestAnimationFrame(tick);
-      }
-    }
-
-    function ensureLoopRunning() {
-      if (rafId === null) rafId = requestAnimationFrame(tick);
-    }
-
-    function onScroll() {
-      if (!nearViewport) return;
-      ensureLoopRunning();
-    }
-
-    if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          nearViewport = entry.isIntersecting;
-          if (nearViewport) ensureLoopRunning();
-        });
-      }, { rootMargin: "25% 0px 25% 0px" });
-      io.observe(media);
-    } else {
-      nearViewport = true;
-      ensureLoopRunning();
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", function () { if (nearViewport) ensureLoopRunning(); });
+    if (media.__drift) { media.__drift.range = driftPx; return; } /* already registered by an earlier selector */
+    var item = { media: media, img: img, range: driftPx, current: 0, target: 0, near: !io };
+    media.__drift = item;
+    __driftItems.push(item);
+    if (io) io.observe(media);
   });
+
+  if (!__driftReady) {
+    __driftReady = true;
+    window.addEventListener("scroll", __driftKick, { passive: true });
+    window.addEventListener("resize", __driftKick, { passive: true });
+  }
+  __driftKick();
 }
 
 /* Accommodation cards (Double/Triple/Family carousel + the flat grids on
@@ -1454,7 +1597,8 @@ function initImageDrift(selector, driftPx) {
 initImageDrift(".offer-card-media", 60);
 /* Highlights section photos (Sunset Swing / Island From Above / Snorkeling
    the Lagoon + the mini gallery strip beneath them). */
-initImageDrift(".highlights-section .card-image-wrap", 60);
+/* Highlights photos intentionally do NOT drift up/down on scroll — they stay still. */
+/* initImageDrift(".highlights-section .card-image-wrap", 60); */
 /* Main Gallery section photos. */
 initImageDrift(".gallery-section .gallery-item", 55);
 /* Highlights mini-gallery strip (the 6 photos below the Sunset Swing /
@@ -1462,7 +1606,8 @@ initImageDrift(".gallery-section .gallery-item", 55);
    yet since it lives inside .highlights-section, not .gallery-section, so
    the main-gallery selector above never reached it. Drift range doubled
    (55 -> 110) for a more noticeable, deeper effect than the main gallery. */
-initImageDrift(".highlights-gallery-grid .gallery-item", 110);
+/* Highlights mini-gallery strip also stays still (no drift). */
+/* initImageDrift(".highlights-gallery-grid .gallery-item", 110); */
 
 
 /* ---------- Nav dropdowns (Accommodation + Others) ----------
@@ -1668,4 +1813,4 @@ function initCardCarousel(config) {
 
 initCardCarousel({ trackId: "room-carousel-track", prevId: "room-carousel-prev", nextId: "room-carousel-next", dotsId: "room-carousel-dots", carouselId: "room-carousel", viewAllId: "room-carousel-view-all-link", roomPages: ["double-room.html", "triple-room.html", "family-room.html"], roomLabels: ["View Double Room", "View Triple Room", "View Family Room"] });
 
-initCardCarousel({ trackId: "experience-carousel-track", prevId: "experience-carousel-prev", nextId: "experience-carousel-next", carouselId: "experience-carousel" });
+

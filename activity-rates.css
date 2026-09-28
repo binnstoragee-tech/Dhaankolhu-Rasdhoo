@@ -1,0 +1,607 @@
+/* Activity Rates — shared by index.html + offers.html */
+.ar-section { background: linear-gradient(180deg, #fff 0%, #f5f1e8 100%); position: relative; }
+.ar-section .section-heading-row { position: relative; }
+.ar-wave { display: block; width: 120px; height: 14px; margin: 1.3rem auto 0; color: var(--brass); overflow: visible; }
+.ar-wave path { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 6 8; animation: ar-flow 2.4s linear infinite; }
+@keyframes ar-flow { to { stroke-dashoffset: -28; } }
+
+.ar-wrap { max-width: 1400px; margin: 0 auto; padding: 0 clamp(1.2rem, 4vw, 3rem); }
+
+/* tabs */
+.ar-tabs-wrap { display: flex; justify-content: center; margin-bottom: clamp(1.6rem, 3vw, 2.4rem); }
+.ar-tabs { position: relative; display: flex; gap: .2rem; padding: .35rem; max-width: 100%; overflow-x: auto; scrollbar-width: none; background: #fff; border: 1px solid var(--border); border-radius: 999px; box-shadow: 0 10px 30px rgba(7, 61, 74, .08); }
+.ar-tabs::-webkit-scrollbar { display: none; }
+.ar-ind { position: absolute; top: .35rem; bottom: .35rem; left: 0; width: 0; border-radius: 999px; background: linear-gradient(135deg, var(--ocean-blue, #0b6170), var(--ocean-deep, #073d4a)); box-shadow: 0 6px 16px rgba(7, 61, 74, .28); transition: transform .45s cubic-bezier(.22, .9, .3, 1), width .45s cubic-bezier(.22, .9, .3, 1); }
+.ar-tab { position: relative; z-index: 1; flex: 0 0 auto; padding: .7rem 1.25rem; border: 0; background: transparent; border-radius: 999px; color: var(--ink); font: 600 .68rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: color .3s ease; }
+.ar-tab:hover { color: var(--teal); }
+.ar-tab.is-active, .ar-tab.is-active:hover { color: #fff; }
+
+/* grid */
+.ar-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(1.1rem, 2vw, 1.7rem); }
+.ar-card[hidden] { display: none; }
+.ar-card { position: relative; flex: 0 1 calc(33.333% - clamp(1.1rem, 2vw, 1.7rem) * 2 / 3); min-width: 280px; display: flex; flex-direction: column; padding: 0; background: var(--paper); border: 1px solid var(--border); border-radius: 18px; text-align: left; overflow: hidden;
+  opacity: 0; transform: translateY(34px) scale(.97); transition: opacity .8s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), transform .8s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), box-shadow .35s ease, border-color .35s ease; }
+.ar-card.is-in { opacity: 1; transform: none; }
+.ar-card::before { content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 100%; background: linear-gradient(90deg, var(--teal), var(--brass)); transform: scaleX(0); transform-origin: left; transition: transform .6s cubic-bezier(.22, .68, 0, 1); }
+.ar-card.is-in.is-in:hover { transform: translateY(-8px); box-shadow: 0 24px 44px rgba(7, 61, 74, .16); border-color: rgba(11, 110, 112, .35); transition-delay: 0ms; }
+.ar-card:hover::before { transform: scaleX(1); }
+
+/* image cards */
+.ar-card { padding: 0; }
+.ar-media { position: relative; aspect-ratio: 4 / 3.3; overflow: hidden; background: #0b3c46; }
+.ar-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s cubic-bezier(.22, .68, 0, 1); }
+.ar-card:hover .ar-media img { transform: scale(1.09); }
+.ar-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 30, 36, 0) 38%, rgba(7, 30, 36, .88) 100%); pointer-events: none; }
+.ar-badge { position: absolute; z-index: 2; top: .9rem; left: .9rem; padding: .42rem .8rem; border-radius: 999px; background: rgba(255, 255, 255, .95); color: var(--ink); font: 700 .62rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .08em; box-shadow: 0 4px 14px rgba(0, 0, 0, .18); transform: translateY(-6px); opacity: 0; transition: transform .6s cubic-bezier(.22, .68, 0, 1) calc(var(--d, 0ms) + 350ms), opacity .6s ease calc(var(--d, 0ms) + 350ms); }
+.ar-card.is-in .ar-badge { transform: none; opacity: 1; }
+.ar-cap { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; display: flex; align-items: flex-end; justify-content: space-between; gap: .8rem; padding: 1rem 1.1rem 1rem; color: #fff; }
+.ar-cap h3 { margin: 0 0 .4rem; font-family: "Cormorant Garamond", serif; font-weight: 600; font-size: clamp(1.35rem, 1.9vw, 1.65rem); line-height: 1.08; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, .35); }
+.ar-sub { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; color: rgba(255, 255, 255, .85); font: 500 .74rem/1.3 "DM Sans", Arial, sans-serif; }
+.ar-sub svg { color: var(--brass); flex: none; }
+.ar-cap-r { flex: none; text-align: right; }
+.ar-cap-r em { display: block; margin-bottom: .2rem; font: 500 .68rem/1 "DM Sans", Arial, sans-serif; font-style: normal; color: rgba(255, 255, 255, .78); }
+.ar-cap-r .ar-price { color: #fff; font-size: 1.85rem; }
+.ar-cap-r .ar-price sup { color: #fff; font-size: .9rem; }
+.ar-price { display: inline-flex; align-items: flex-start; justify-content: center; font-family: "Cormorant Garamond", serif; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.ar-price sup { margin: .2rem .12rem 0 0; }
+
+.ar-body { display: flex; flex-direction: column; flex: 1; padding: 1.1rem 1.1rem 1.2rem; }
+.ar-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-bottom: 1rem; }
+.ar-tiers-solo { grid-template-columns: 1fr; }
+.ar-tier { padding: .65rem .4rem .6rem; text-align: center; border-radius: 12px; background: var(--ivory); border: 1px solid transparent; transition: transform .3s ease; }
+.ar-tier.is-best { background: linear-gradient(135deg, rgba(11, 110, 112, .1), rgba(186, 141, 92, .16)); border-color: rgba(186, 141, 92, .4); }
+.ar-card:hover .ar-tier { transform: translateY(-2px); }
+.ar-tier small { display: block; margin-bottom: .3rem; color: var(--muted-foreground); font: 700 .56rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .13em; text-transform: uppercase; }
+.ar-tier b { font: 600 1.45rem/1 "Cormorant Garamond", serif; color: var(--ink); }
+
+.ar-incl { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1.2rem; padding: 0; list-style: none; }
+.ar-incl li { padding: .36rem .65rem; border: 1px solid var(--border); border-radius: 999px; background: #fff; font: 500 .7rem/1 "DM Sans", Arial, sans-serif; color: var(--ink); }
+
+/* ---------- Homepage "Experience" teaser carousel ----------
+   A horizontal, scroll-snap row of the same .ar-card markup used in the
+   full Activity Rates grid (just narrower + fixed width), with round
+   prev/next arrows either side — the compact "package carousel" layout,
+   populated from the DATA items flagged feat:true in activity-rates.js. */
+.ar-carousel-wrap { position: relative; display: flex; align-items: center; gap: clamp(.6rem, 1.8vw, 1.4rem); max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 3vw, 2rem); }
+/* Same widening treatment as .ar-wrap / .room-carousel on big monitors —
+   the container keeps growing past 1500px instead of sitting capped
+   there with empty gutters either side; more cards simply come into
+   view since each card is a fixed width. */
+@media (min-width: 1600px) { .ar-carousel-wrap { max-width: min(92vw, 1800px); } }
+@media (min-width: 1900px) { .ar-carousel-wrap { max-width: min(93vw, 2300px); } }
+@media (min-width: 2400px) { .ar-carousel-wrap { max-width: min(93vw, 2700px); } }
+.ar-carousel-viewport { flex: 1 1 auto; min-width: 0; }
+.ar-carousel-track { display: flex; gap: clamp(1rem, 1.6vw, 1.4rem); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: .2rem .2rem 1rem; }
+.ar-carousel-track::-webkit-scrollbar { display: none; }
+.ar-carousel-track .ar-card { flex: 0 0 300px; width: 300px; scroll-snap-align: start; }
+.ar-carousel-arrow { flex: 0 0 auto; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(23, 35, 42, .28); background: #fff; color: var(--ink); cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s var(--ease-out), opacity .2s ease; }
+.ar-carousel-arrow svg { width: 18px; height: 18px; }
+.ar-carousel-arrow:hover:not(:disabled) { background: var(--brass); border-color: var(--brass); color: #fff; }
+.ar-carousel-arrow:active:not(:disabled) { transform: scale(.94); }
+.ar-carousel-arrow:disabled { opacity: .35; cursor: default; }
+@media (max-width: 640px) {
+  .ar-carousel-wrap { gap: .5rem; padding: 0 .5rem; }
+  .ar-carousel-arrow { width: 36px; height: 36px; }
+  .ar-carousel-arrow svg { width: 15px; height: 15px; }
+  .ar-carousel-track .ar-card { flex-basis: 78vw; width: 78vw; }
+}
+@keyframes ar-shine { to { transform: translateX(120%); } }
+
+.ar-book { margin-top: auto; display: inline-flex; align-items: center; justify-content: center; gap: .6rem; padding: .85rem 1rem; border-radius: 999px; border: 1px solid var(--teal); color: var(--teal); font: 700 .66rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .13em; text-transform: uppercase; text-decoration: none; transition: background .3s ease, color .3s ease; }
+.ar-book svg { transition: transform .3s ease; }
+.ar-book:hover { background: var(--teal); color: #fff; }
+.ar-book:hover svg { transform: translateX(5px); }
+
+.ar-note { margin: clamp(1.8rem, 3vw, 2.4rem) 0 0; text-align: center; color: var(--muted-foreground); font: 500 .8rem/1.5 "DM Sans", Arial, sans-serif; }
+
+@media (max-width: 640px) {
+  .ar-card { flex: 1 1 100%; min-width: 0; }
+  .ar-tab { padding: .7rem 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ar-card, .ar-ind, .ar-badge, .ar-media img { transition: none; opacity: 1; transform: none; }
+  .ar-wave path { animation: none !important; }
+}
+
+/* two buttons side by side under the homepage activity carousel */
+.experience-carousel-view-all-row { flex-wrap: wrap; gap: .8rem; }
+
+/* ==========================================================================
+   Site palette pass — matches the Island Activities panel:
+   white section, warm ivory cards, ink text, brass accents/buttons.
+   ========================================================================== */
+.ar-section { background: #fff; }
+
+.ar-tabs { background: #fff; border-color: rgba(186, 141, 92, .45); box-shadow: 0 8px 24px rgba(23, 35, 42, .06); }
+.ar-ind { background: var(--brass); box-shadow: 0 6px 16px rgba(186, 141, 92, .4); }
+.ar-tab { color: var(--ink); }
+.ar-tab:hover { color: #a67a4a; }
+.ar-tab.is-active, .ar-tab.is-active:hover { color: #fff; }
+
+.ar-card { background: var(--ivory); border: 0; border-radius: 4px; }
+.ar-card::before { background: var(--brass); }
+.ar-card.is-in.is-in:hover { box-shadow: 0 22px 40px rgba(23, 35, 42, .14); border-color: transparent; }
+.ar-media { border-radius: 0; background: #d9cfbd; }
+
+.ar-tier { background: #fff; }
+.ar-tier.is-best { background: rgba(186, 141, 92, .16); border-color: rgba(186, 141, 92, .55); }
+.ar-tier b { color: var(--ink); }
+.ar-incl li { background: #fff; border-color: rgba(23, 35, 42, .1); color: var(--muted-foreground); }
+
+.ar-book { background: var(--brass); border-color: var(--brass); color: #fff; border-radius: 3px; }
+.ar-book:hover { background: #a67a4a; border-color: #a67a4a; color: #fff; }
+.ar-note { color: var(--muted-foreground); }
+
+/* ==========================================================================
+   Fluid sizing — container + columns + type scale with the screen.
+   (no Book button now, so the chips are the last row of the card)
+   ========================================================================== */
+.ar-incl { margin-bottom: 0; }
+.ar-body { padding: 1.1rem 1.1rem 1.3rem; }
+
+.ar-section { --ar-gap: clamp(1rem, 2vw, 1.8rem); --cols: 3; }
+.ar-wrap { max-width: 1400px; }
+.ar-grid { gap: var(--ar-gap); }
+.ar-card { flex: 0 0 calc((100% - var(--ar-gap) * (var(--cols) - 1)) / var(--cols)); min-width: 0; }
+
+@media (min-width: 1600px) { .ar-wrap { max-width: min(92vw, 1800px); } }
+@media (min-width: 1900px) { .ar-section { --cols: 4; } .ar-wrap { max-width: min(93vw, 2300px); } }
+@media (min-width: 2400px) { .ar-wrap { max-width: min(93vw, 2700px); } }
+@media (max-width: 999px)  { .ar-section { --cols: 2; } }
+@media (max-width: 640px)  { .ar-section { --cols: 2; --ar-gap: .7rem; } }
+
+/* type + chips scale up a little on big monitors */
+@media (min-width: 1900px) {
+  .ar-cap h3 { font-size: 1.9rem; }
+  .ar-cap-r .ar-price { font-size: 2.2rem; }
+  .ar-tier b { font-size: 1.7rem; }
+  .ar-incl li { font-size: .78rem; padding: .42rem .75rem; }
+  .ar-sub { font-size: .82rem; }
+}
+
+/* ==========================================================================
+   Typography pass — same fonts as the room panel ("Family Room" card):
+   Cormorant Garamond 500 titles · Poppins prices/meta · DM Sans small caps labels
+   ========================================================================== */
+.ar-cap h3 { font-family: "Cormorant Garamond", serif; font-weight: 500; letter-spacing: 0; }
+
+/* prices: Poppins, "$" sits inline like "$95" on the room card */
+.ar-price, .ar-tier b { font-family: "Poppins", Arial, sans-serif; font-weight: 600; letter-spacing: -.01em; }
+.ar-price sup { margin: 0 .05em 0 0; font-size: 1em; vertical-align: baseline; color: inherit; }
+.ar-cap-r .ar-price { font-size: 1.5rem; align-items: baseline; }
+.ar-cap-r .ar-price sup { font-size: 1em; color: #fff; }
+.ar-tier b { font-size: 1.15rem; }
+
+/* small uppercase labels ("PER NIGHT" style) */
+.ar-cap-r em, .ar-tier small { font-family: "DM Sans", Arial, sans-serif; font-size: .6rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+.ar-tier small { color: var(--muted-foreground); }
+
+/* meta line + chips */
+.ar-sub { font-family: "Poppins", Arial, sans-serif; font-weight: 500; font-size: .76rem; }
+.ar-incl li { font-family: "DM Sans", Arial, sans-serif; font-weight: 500; font-size: .72rem; }
+
+/* tabs + badge use the same button-style caps as .offer-btn */
+.ar-tab { font-family: "DM Sans", Arial, sans-serif; font-weight: 700; font-size: .62rem; letter-spacing: .12em; }
+.ar-badge { font-family: "DM Sans", Arial, sans-serif; font-weight: 700; font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; }
+
+@media (min-width: 1900px) {
+  .ar-cap-r .ar-price { font-size: 1.8rem; }
+  .ar-tier b { font-size: 1.35rem; }
+}
+
+/* Homepage activity carousel: title on top, description + details filling the panel below */
+#experience-carousel .room-carousel-copy-bottom { gap: 1.2rem; }
+#experience-carousel .room-carousel-copy-bottom p { max-width: 34rem; font-size: 1rem; }
+#experience-carousel .room-carousel-meta { gap: .7rem 1.6rem; }
+#experience-carousel .room-carousel-meta-item { font-size: .9rem; }
+#experience-carousel .room-carousel-meta-item svg { width: 18px; height: 18px; }
+
+/* Empty image frame (SHOW_IMAGES = false in activity-rates.js): same box, no photo yet */
+.ar-media { background: linear-gradient(160deg, #2b3d44 0%, #17232a 100%); }
+
+/* ==========================================================================
+   Clickable cards + "View details" modal
+   ========================================================================== */
+.ar-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ar-card:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+.ar-more { display: none; }
+
+/* ---- Mobile: 2 compact cards per row (rates live in the modal) ---- */
+@media (max-width: 640px) {
+  .ar-wrap { padding: 0 1rem; }
+  .ar-card { border-radius: 3px; }
+  .ar-media { aspect-ratio: 1 / 1.08; }
+  .ar-cap { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: .55rem; padding: .8rem .75rem .75rem; }
+  .ar-cap h3 { margin: 0 0 .3rem; font-size: 1.12rem; line-height: 1.1; }
+  .ar-sub { font-size: .66rem; gap: .3rem; }
+  .ar-sub svg { width: 12px; height: 12px; }
+  .ar-note-inline { display: none; }
+  .ar-cap-r { display: flex; align-items: baseline; gap: .35rem; text-align: left; }
+  .ar-cap-r em { margin: 0; font-size: .56rem; }
+  .ar-cap-r .ar-price { font-size: 1.2rem; }
+  .ar-badge { top: .6rem; left: .6rem; }
+  .ar-body { display: none; }
+  .ar-more { display: flex; align-items: center; justify-content: center; gap: .45rem; padding: .7rem .5rem; background: var(--ivory); color: var(--ink); border-top: 1px solid rgba(186, 141, 92, .35); font: 700 .58rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+  .ar-more svg { color: var(--brass); transition: transform .3s ease; }
+  .ar-card:active .ar-more svg { transform: translateX(4px); }
+  .ar-tab { padding: .7rem .95rem; }
+}
+@media (hover: none) {
+  .ar-card.is-in.is-in:hover { transform: none; box-shadow: none; }
+  .ar-card:hover .ar-media img, .ar-card:hover .ar-tier { transform: none; }
+}
+
+/* ---- Modal: photo on top · back/close button over the photo · Book button pinned at the bottom ---- */
+html.ar-modal-lock { overflow: hidden; }
+.ar-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; visibility: hidden; pointer-events: none; transition: visibility 0s linear .35s; }
+.ar-modal.is-open { visibility: visible; pointer-events: auto; transition-delay: 0s; }
+.ar-modal-backdrop { position: absolute; inset: 0; background: rgba(7, 30, 36, .62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transition: opacity .35s ease; }
+.ar-modal.is-open .ar-modal-backdrop { opacity: 1; }
+.ar-modal-panel { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 480px; max-height: calc(100dvh - 2rem); overflow: hidden; background: var(--ivory, #f5f1e8); border-radius: 4px; box-shadow: 0 30px 70px rgba(7, 30, 36, .4); outline: 0;
+  opacity: 0; transform: translateY(26px) scale(.98); transition: opacity .4s cubic-bezier(.22, .68, 0, 1), transform .45s cubic-bezier(.22, .68, 0, 1); }
+.ar-modal.is-open .ar-modal-panel { opacity: 1; transform: none; }
+.ar-modal-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+
+.ar-modal-x { position: absolute; z-index: 5; top: .8rem; right: .8rem; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border: 1px solid rgba(255, 255, 255, .4); border-radius: 50%; background: rgba(7, 30, 36, .45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #fff; cursor: pointer; transition: background .3s ease, transform .3s ease; }
+.ar-modal-x:hover { background: var(--brass); transform: rotate(90deg); }
+.ar-modal-x .ico-back { display: none; }
+
+.ar-modal-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(160deg, #2b3d44 0%, #17232a 100%); }
+.ar-modal-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ar-modal-media::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(7, 30, 36, .38) 0%, rgba(7, 30, 36, 0) 30%, rgba(7, 30, 36, .1) 45%, rgba(7, 30, 36, .88) 100%); }
+.ar-modal-ph { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255, 255, 255, .13); }
+.ar-modal-ph svg { width: 84px; height: 84px; stroke-width: 1.1; }
+.ar-modal-head { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; padding: 1.2rem 1.4rem 1.3rem; color: #fff; }
+.ar-modal-cat { display: block; margin-bottom: .55rem; color: var(--brass); font: 700 .6rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .22em; text-transform: uppercase; text-shadow: 0 1px 8px rgba(0, 0, 0, .45); }
+.ar-modal-head h3 { margin: 0 0 .55rem; font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: clamp(1.7rem, 6vw, 2.1rem); line-height: 1.05; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, .4); }
+.ar-modal-head .ar-sub { font-size: .8rem; }
+
+.ar-modal-body { padding: 1.3rem 1.4rem 1.4rem; }
+.ar-modal-label { margin: 0 0 .7rem; color: var(--ink); font: 700 .62rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+.ar-modal-label em { font-style: normal; font-weight: 500; letter-spacing: .08em; color: var(--muted-foreground); }
+.ar-modal-body .ar-tiers { margin-bottom: 1.3rem; }
+.ar-modal-body .ar-tier b { font-size: 1.3rem; }
+.ar-modal-body .ar-incl { margin: 0 0 1.2rem; }
+.ar-modal-note { margin: 0; color: var(--muted-foreground); font: 500 .72rem/1.5 "DM Sans", Arial, sans-serif; }
+.ar-modal-foot { flex: none; padding: .9rem 1.4rem calc(.9rem + env(safe-area-inset-bottom, 0px)); background: var(--ivory, #f5f1e8); border-top: 1px solid rgba(186, 141, 92, .35); }
+.ar-modal-book { display: flex; width: 100%; }
+
+/* Mobile: full-screen detail page — photo on top, back button top-left, Book pinned at the bottom */
+@media (max-width: 640px) {
+  .ar-modal { align-items: stretch; padding: 0; }
+  .ar-modal-panel { max-width: none; max-height: none; height: 100dvh; border-radius: 0; box-shadow: none; transform: translateY(100%); opacity: 1; }
+  .ar-modal.is-open .ar-modal-panel { transform: none; }
+  .ar-modal-x { top: calc(.85rem + env(safe-area-inset-top, 0px)); left: .9rem; right: auto; }
+  .ar-modal-x:hover { transform: none; }
+  .ar-modal-x .ico-x { display: none; }
+  .ar-modal-x .ico-back { display: block; }
+  /* photo fills whatever height the details don't need; details sit low, like a bottom sheet */
+  .ar-modal-scroll { display: flex; flex-direction: column; }
+  .ar-modal-media { flex: 1 0 auto; aspect-ratio: auto; min-height: 36dvh; max-height: none; }
+  .ar-modal-body { flex: none; padding: 1rem 1.1rem .9rem; }
+  .ar-modal-label { margin-bottom: .55rem; }
+  .ar-modal-body .ar-tiers { margin-bottom: 1rem; }
+  .ar-modal-body .ar-tier { padding: .55rem .4rem .5rem; }
+  .ar-modal-body .ar-tier b { font-size: 1.15rem; }
+  .ar-modal-body .ar-incl { margin-bottom: .9rem; }
+  .ar-modal-note { font-size: .66rem; }
+  .ar-modal-head { padding: 1rem 1.1rem 1.1rem; }
+  .ar-modal-foot { padding: .75rem 1.1rem calc(.75rem + env(safe-area-inset-bottom, 0px)); }
+}
+/* Desktop: landscape layout — big photo on the left, details on the right */
+@media (min-width: 861px) {
+  .ar-modal { padding: 2rem; }
+  .ar-modal-panel { display: grid; grid-template-columns: 1.15fr 1fr; grid-template-rows: minmax(0, 1fr) auto; width: min(1080px, 94vw); max-width: none; height: min(640px, 86dvh); max-height: none; overflow: hidden; }
+  .ar-modal-scroll { display: contents; }
+  .ar-modal-media { grid-column: 1; grid-row: 1 / 3; aspect-ratio: auto; height: 100%; min-height: 0; }
+  .ar-modal-ph svg { width: 110px; height: 110px; }
+  .ar-modal-head { padding: 2rem 2.2rem 2.2rem; }
+  .ar-modal-cat { margin-bottom: .8rem; font-size: .68rem; }
+  .ar-modal-head h3 { margin-bottom: .8rem; font-size: clamp(2.3rem, 3.2vw, 3rem); }
+  .ar-modal-head .ar-sub { font-size: .95rem; }
+  .ar-modal-body { grid-column: 2; grid-row: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 3.6rem 2.4rem 1.2rem; }
+  .ar-modal-body { display: flex; flex-direction: column; }
+  .ar-modal-body > :first-child { margin-top: auto; }
+  .ar-modal-body > :last-child { margin-bottom: auto; }
+  .ar-modal-label { margin-bottom: .9rem; font-size: .68rem; }
+  .ar-modal-body .ar-tiers { gap: .65rem; margin-bottom: 1.8rem; }
+  .ar-modal-body .ar-tier { padding: 1rem .5rem .9rem; }
+  .ar-modal-body .ar-tier small { font-size: .62rem; }
+  .ar-modal-body .ar-tier b { font-size: 1.6rem; }
+  .ar-modal-body .ar-incl { gap: .5rem; margin-bottom: 1.6rem; }
+  .ar-modal-body .ar-incl li { padding: .5rem .85rem; font-size: .8rem; }
+  .ar-modal-note { font-size: .76rem; }
+  .ar-modal-foot { grid-column: 2; grid-row: 2; padding: 1.2rem 2.4rem 2rem; }
+  .ar-modal-book { padding: 1.1rem 1rem; font-size: .72rem; }
+  .ar-modal-x { top: 1.1rem; right: 1.1rem; width: 42px; height: 42px; background: var(--ink, #17232a); border-color: transparent; }
+  .ar-modal-x:hover { background: var(--brass); }
+}
+@media (min-width: 1600px) {
+  .ar-modal-panel { width: min(1280px, 90vw); height: min(760px, 84dvh); }
+  .ar-modal-body { padding: 4rem 3rem 1.4rem; }
+  .ar-modal-foot { padding: 1.2rem 3rem 2.4rem; }
+  .ar-modal-head { padding: 2.4rem 2.8rem 2.6rem; }
+  .ar-modal-body .ar-tier b { font-size: 1.85rem; }
+  .ar-modal-body .ar-incl li { font-size: .88rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ar-modal-backdrop, .ar-modal-panel, .ar-modal-x { transition: none; }
+}
+
+/* ==========================================================================
+   Category tabs — desktop: text · mobile: icons only (no more cut-off tabs)
+   ========================================================================== */
+.ar-tab-ico, .ar-cat-label { display: none; }
+@media (max-width: 640px) {
+  .ar-tabs-wrap { margin-bottom: 1.3rem; }
+  .ar-tabs { width: 100%; max-width: 340px; overflow: visible; justify-content: space-between; gap: 0; }
+  .ar-tab { flex: 1 1 0; display: grid; place-items: center; padding: .8rem 0; }
+  .ar-tab-txt { display: none; }
+  .ar-tab-ico { display: grid; place-items: center; }
+  .ar-tab-ico svg { width: 21px; height: 21px; }
+  .ar-cat-label { display: block; margin: -.4rem 0 1.4rem; text-align: center; color: var(--ink); font: 700 .64rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; }
+}
+
+/* ---- Mobile spacing pass: more breathing room inside + around the 2-col cards ---- */
+@media (max-width: 640px) {
+  .ar-section .ar-wrap { padding-left: 1.1rem; padding-right: 1.1rem; }
+  .ar-section { --ar-gap: .85rem; }
+  .ar-cap { gap: .7rem; padding: 1rem 1rem .95rem; }
+  .ar-cap h3 { margin: 0 0 .5rem; font-size: 1.05rem; line-height: 1.15; }
+  .ar-sub { gap: .4rem; font-size: .68rem; line-height: 1.4; }
+  .ar-cap-r { gap: .45rem; padding-top: .1rem; }
+  .ar-cap-r em { font-size: .55rem; letter-spacing: .12em; }
+  .ar-cap-r .ar-price { font-size: 1.15rem; }
+  .ar-more { padding: .85rem .5rem; }
+  .ar-cat-label { margin: -.3rem 0 1.6rem; }
+}
+@media (max-width: 640px) {
+  .ar-cap-r { flex-direction: column; align-items: flex-start; gap: .3rem; }
+  .ar-cap-r em { white-space: nowrap; }
+}
+
+/* Desktop: smaller card titles */
+@media (min-width: 641px) {
+  .ar-cap h3 { font-size: clamp(1.1rem, 1.3vw, 1.35rem); line-height: 1.15; margin-bottom: .45rem; }
+}
+@media (min-width: 1900px) {
+  .ar-cap h3 { font-size: 1.5rem; }
+}
+
+/* ==========================================================================
+   Homepage Experience carousel — tall "package card" look, EXACT-FIT rows
+   Cards are sized from the viewport width so whole cards always fill the
+   row (no half-cut card at either edge). 4 / 3 / 2 / 1 cards by screen
+   width. Scoped to .ar-carousel-wrap; keep at the END of this file.
+   ========================================================================== */
+.ar-carousel-wrap { --cols: 3; --gap: clamp(1rem, 1.5vw, 1.5rem); max-width: min(94vw, 1800px); padding: 0 clamp(.8rem, 2vw, 1.6rem); }
+@media (min-width: 1700px) { .ar-carousel-wrap { --cols: 4; } }
+@media (max-width: 1199px) { .ar-carousel-wrap { --cols: 2; } }
+@media (max-width: 599px)  { .ar-carousel-wrap { --cols: 1; padding: 0 .6rem; } }
+
+.ar-carousel-viewport { overflow: hidden; }
+.ar-carousel-track { gap: var(--gap); padding: .5rem 0 1.6rem; scroll-snap-type: x mandatory; scroll-behavior: smooth; overscroll-behavior-x: contain; }
+.ar-carousel-track .ar-card.ar-card-preview { flex: 0 0 calc((100% - var(--gap) * (var(--cols) - 1)) / var(--cols)); width: auto; min-width: 0; scroll-snap-align: start; border-radius: 22px; background: #0b3c46; box-shadow: 0 10px 28px rgba(23, 35, 42, .14); }
+.ar-carousel-track .ar-card-preview::before { display: none; }
+.ar-carousel-track .ar-card-preview .ar-media { aspect-ratio: 3 / 4.1; border-radius: 22px; }
+.ar-carousel-track .ar-card-preview .ar-media::after { background: linear-gradient(180deg, rgba(7, 30, 36, 0) 42%, rgba(7, 30, 36, .9) 100%); }
+.ar-carousel-track .ar-card-preview .ar-badge { top: 1.1rem; left: 1.1rem; padding: .5rem .95rem; font-size: .68rem; letter-spacing: .06em; background: rgba(255, 255, 255, .22); color: #fff; border: 1px solid rgba(255, 255, 255, .35); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: none; }
+.ar-carousel-track .ar-card-preview .ar-cap { display: block; padding: 1.5rem 1.4rem; }
+.ar-carousel-track .ar-card-preview .ar-cap h3 { margin: 0 0 .55rem; font-size: clamp(1.8rem, 2.3vw, 2.3rem); line-height: 1.04; }
+.ar-cap-price { display: flex; align-items: baseline; gap: .4rem; margin: 0 0 .5rem; color: #fff; }
+.ar-cap-price em { font: 500 .78rem/1 "DM Sans", Arial, sans-serif; font-style: normal; color: rgba(255, 255, 255, .8); }
+.ar-cap-price .ar-price { font-size: 2.1rem; color: #fff; }
+.ar-cap-price .ar-price sup { font-size: 1rem; color: #fff; }
+.ar-cap-price .ar-per { font: 500 .78rem/1 "DM Sans", Arial, sans-serif; color: rgba(255, 255, 255, .75); }
+.ar-carousel-track .ar-card-preview .ar-sub { font-size: .8rem; }
+
+/* Reveal animation (same feel as the sample): blur -> sharp, rise + fade, staggered */
+.ar-carousel-track .ar-card-preview { opacity: 0; filter: blur(12px); transform: translateY(46px) scale(.97);
+  transition: opacity .9s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), filter .9s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), transform .9s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), box-shadow .35s ease; }
+.ar-carousel-track .ar-card-preview.is-in { opacity: 1; filter: none; transform: none; }
+.ar-carousel-track .ar-card-preview.is-in.is-in:hover { transform: translateY(-8px); transition-delay: 0ms; }
+
+/* Arrows: bigger, floating over the edges; on phones they sit on the card */
+.ar-carousel-wrap .ar-carousel-arrow { width: 52px; height: 52px; border: 0; background: #fff; box-shadow: 0 8px 22px rgba(23, 35, 42, .22); z-index: 3; }
+.ar-carousel-wrap .ar-carousel-arrow svg { width: 22px; height: 22px; }
+@media (max-width: 599px) {
+  .ar-carousel-wrap { position: relative; }
+  .ar-carousel-wrap .ar-carousel-arrow { position: absolute; top: 42%; width: 40px; height: 40px; }
+  .ar-carousel-wrap .ar-carousel-prev { left: 1rem; }
+  .ar-carousel-wrap .ar-carousel-next { right: 1rem; }
+  .ar-carousel-wrap .ar-carousel-arrow svg { width: 17px; height: 17px; }
+  .ar-carousel-track .ar-card-preview .ar-cap h3 { font-size: 1.75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ar-carousel-track { scroll-behavior: auto; }
+  .ar-carousel-track .ar-card-preview { opacity: 1; filter: none; transform: none; transition: none; }
+}
+
+/* ==========================================================================
+   Smaller card text + "View All Activities" pill at the top-right of the
+   carousel (like the sample's "View All (200+)" button). END of file.
+   ========================================================================== */
+.ar-carousel-track .ar-card-preview .ar-badge { top: .9rem; left: .9rem; padding: .38rem .75rem; font-size: .56rem; letter-spacing: .07em; }
+.ar-carousel-track .ar-card-preview .ar-cap { padding: 1.1rem 1.1rem 1.15rem; }
+.ar-carousel-track .ar-card-preview .ar-cap h3 { margin: 0 0 .4rem; font-size: clamp(1.1rem, 1.35vw, 1.4rem); line-height: 1.1; }
+.ar-cap-price { gap: .3rem; margin: 0 0 .35rem; }
+.ar-cap-price em { font-size: .64rem; }
+.ar-cap-price .ar-price { font-size: 1.3rem; }
+.ar-cap-price .ar-price sup { font-size: .72rem; margin-top: .12rem; }
+.ar-cap-price .ar-per { font-size: .64rem; }
+.ar-carousel-track .ar-card-preview .ar-sub { font-size: .68rem; gap: .3rem; }
+.ar-carousel-track .ar-card-preview .ar-sub svg { width: 12px; height: 12px; }
+@media (max-width: 599px) { .ar-carousel-track .ar-card-preview .ar-cap h3 { font-size: 1.3rem; } }
+
+.ar-carousel-top { display: flex; justify-content: flex-end; max-width: min(94vw, 1800px); margin: 0 auto .9rem; padding: 0 clamp(.8rem, 2vw, 1.6rem); box-sizing: border-box; }
+.ar-viewall-top { display: inline-flex; align-items: center; gap: .45rem; padding: .62rem 1.05rem; border-radius: 10px; background: var(--ink, #17232a); color: #fff; font: 600 .74rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .02em; text-decoration: none; transition: background .25s ease, transform .25s ease; }
+.ar-viewall-top svg { width: 13px; height: 13px; transition: transform .25s ease; }
+.ar-viewall-top:hover { background: var(--brass); transform: translateY(-1px); }
+.ar-viewall-top:hover svg { transform: translateX(3px); }
+@media (min-width: 900px) { .ar-carousel-top { padding-right: calc(clamp(.8rem, 2vw, 1.6rem) + 52px + clamp(.6rem, 1.8vw, 1.4rem)); } }
+
+/* ==========================================================================
+   No vertical motion on the Experience carousel: cards stay on one line.
+   Reveal = blur -> sharp + fade only; hover = shadow only. Left/right
+   sliding stays the normal smooth scroll. END of file.
+   ========================================================================== */
+.ar-carousel-track .ar-card-preview,
+.ar-carousel-track .ar-card-preview.is-in,
+.ar-carousel-track .ar-card-preview.is-in.is-in:hover { transform: none; }
+.ar-carousel-track .ar-card-preview { transition: opacity .9s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), filter .9s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), box-shadow .35s ease; }
+.ar-carousel-track .ar-card-preview.is-in.is-in:hover { box-shadow: 0 16px 36px rgba(23, 35, 42, .22); }
+.ar-carousel-track { scroll-behavior: smooth; }
+
+/* ==========================================================================
+   GPU-friendly motion pass  (only opacity + transform are animated, so
+   everything runs on the compositor: no layout, no repaint, no big blurs)
+   ========================================================================== */
+
+/* -- Experience carousel: fade + tiny scale-in (no filter blur), and a
+      contained, layer-friendly card so horizontal sliding stays smooth -- */
+.ar-carousel-track .ar-card-preview,
+.ar-carousel-track .ar-card-preview.is-in { filter: none; }
+.ar-carousel-track .ar-card-preview:not(.is-in) { transform: scale(.96); }
+.ar-carousel-track .ar-card-preview { transition: opacity .8s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), transform .8s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), box-shadow .35s ease; backface-visibility: hidden; contain: layout paint; }
+.ar-carousel-track { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+
+/* -- Island-categories grid (sample-style entrance) --
+   1) featured card + first tile fade in side by side (first tile enlarged to
+      cover the whole right half), featured words blur in one by one
+   2) first tile scales down into its cell (transform only, top-left anchored)
+   3) the other three tiles fade/scale in one after another
+   The grid always keeps its FINAL layout; nothing here changes layout. */
+.activity-theme-grid.atg-js .activity-theme-featured,
+.activity-theme-grid.atg-js .activity-theme-cell { opacity: 0; transition: opacity .8s cubic-bezier(.22, .68, 0, 1) var(--atg-d, 0ms), transform .8s cubic-bezier(.22, .68, 0, 1) var(--atg-d, 0ms); }
+.activity-theme-grid.atg-js .activity-theme-cell { transform: scale(.94); }
+.activity-theme-grid.atg-js .activity-theme-featured { transform: scale(.97); }
+.activity-theme-grid.atg-js .activity-theme-featured.is-in,
+.activity-theme-grid.atg-js .activity-theme-cell.is-in { opacity: 1; transform: none; }
+
+/* first tile: starts enlarged over the whole right half, shrinks to its cell */
+.activity-theme-grid.atg-js.atg-wide .activity-theme-cell.atg-first { transform-origin: 0 0; transform: scale(var(--atg-sx, 2), var(--atg-sy, 2)); will-change: transform, opacity; z-index: 2; }
+.activity-theme-grid.atg-js.atg-wide .activity-theme-cell.atg-first.is-in { transform: scale(var(--atg-sx, 2), var(--atg-sy, 2)); }
+.activity-theme-grid.atg-js.atg-wide .activity-theme-cell.atg-first.is-morph { transform: none; transition: opacity .8s cubic-bezier(.22, .68, 0, 1), transform .85s cubic-bezier(.65, 0, .35, 1); }
+
+/* featured copy: words blur in (small elements only) */
+.activity-theme-grid .atg-w { display: inline-block; }
+.activity-theme-grid.atg-js .atg-w { opacity: 0; filter: blur(6px); transition: opacity .7s ease var(--wd, 0ms), filter .7s ease var(--wd, 0ms); }
+.activity-theme-grid.atg-js.atg-go .atg-w { opacity: 1; filter: none; }
+.activity-theme-grid.atg-js .activity-theme-cta.atg-w { display: inline-flex; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-carousel-track .ar-card-preview:not(.is-in) { transform: none; }
+  .activity-theme-grid.atg-js .activity-theme-featured, .activity-theme-grid.atg-js .activity-theme-cell, .activity-theme-grid.atg-js .atg-w { opacity: 1; filter: none; transform: none !important; transition: none; }
+}
+
+/* ==========================================================================
+   Accommodation carousel (index #room-offers) — same card carousel as the
+   Experience section: exact-fit portrait cards, top-right "View All" pill,
+   compact text, opacity/transform-only motion. END of file.
+   ========================================================================== */
+/* 3 rooms: 3 across on desktop (never 4), 2 on tablets, 1 on phones */
+.ar-carousel-wrap.ar-rooms { --cols: 3; }
+@media (max-width: 1199px) { .ar-carousel-wrap.ar-rooms { --cols: 2; } }
+@media (max-width: 599px)  { .ar-carousel-wrap.ar-rooms { --cols: 1; } }
+/* nothing to slide (all rooms visible) -> hide the arrows but keep the layout */
+.ar-carousel-wrap.is-static .ar-carousel-arrow { visibility: hidden; }
+
+/* whole card opens the room page; rating + Book Now stay separately clickable */
+.ar-room .ar-room-cover { position: absolute; inset: 0; z-index: 1; }
+.ar-room .ar-cap { pointer-events: none; }
+.ar-room .ar-cap a { pointer-events: auto; position: relative; z-index: 3; }
+.ar-room-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; margin: 0 0 .8rem; font: 500 .68rem/1.3 "DM Sans", Arial, sans-serif; color: rgba(255, 255, 255, .86); }
+.ar-room-rating { display: inline-flex; align-items: center; gap: .3rem; color: #fff; text-decoration: none; font-weight: 600; }
+.ar-room-rating svg { color: var(--brass); }
+.ar-room-rating:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ar-room-book { display: inline-flex; align-items: center; justify-content: center; padding: .6rem 1.05rem; border-radius: 999px; background: var(--brass); color: #fff; font: 700 .62rem/1 "DM Sans", Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; transition: background .25s ease; }
+.ar-room-book:hover { background: #a67a4a; }
+
+/* ==========================================================================
+   Card shadows (Experience + Accommodation carousels)
+   The track is a scroll container, so any shadow that spills past its left /
+   right / bottom edge gets cut off in a hard straight line. Fix: a
+   downward-only shadow (negative spread keeps it inside the card's own width)
+   plus enough bottom room so it fades out fully. END of file.
+   ========================================================================== */
+.ar-carousel-wrap .ar-carousel-track { padding-bottom: 2.4rem; }
+.ar-carousel-wrap .ar-carousel-track .ar-card-preview { box-shadow: 0 14px 22px -12px rgba(23, 35, 42, .30); }
+.ar-carousel-wrap .ar-carousel-track .ar-card-preview.is-in.is-in:hover { box-shadow: 0 16px 26px -12px rgba(23, 35, 42, .38); }
+
+/* Category tiles open the same full-screen image viewer as Highlights
+   (data-expand). They're <figure role="button"> now, not links. */
+figure.activity-theme-cell { margin: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+figure.activity-theme-cell:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+/* Category tiles: keep people in frame. The tiles are wide + short, so the
+   default centered crop cut off heads/divers. Anchor those photos to the top.
+   (tweak the % if you want a little more/less of the top) */
+figure.activity-theme-cell[data-title="Snorkeling"] img { object-position: 50% 0%; transform-origin: 50% 15%; }
+figure.activity-theme-cell[data-title="Fishing"] img { object-position: 50% 6%; transform-origin: 50% 15%; }
+
+/* ==========================================================================
+   Laptop fit + GPU-friendly pass (Experience + Accommodation carousels)
+   1) Card height is capped by the viewport, so a whole card + its caption
+      fits on a laptop screen instead of running off the bottom (the old
+      3/4.1 portrait ratio made cards ~1.4x their width, way too tall).
+   2) No backdrop-filter on the badge (it re-blurs the photo every frame
+      while sliding/scrolling) — a solid translucent pill looks the same.
+   3) No box-shadow transitions (they repaint the whole card); only
+      opacity/transform animate, so it all stays on the compositor.
+   ========================================================================== */
+.ar-carousel-track .ar-card-preview .ar-media {
+  aspect-ratio: 4 / 5;
+  max-height: clamp(320px, calc(100vh - 300px), 560px);
+  width: 100%;
+}
+@media (max-width: 599px) {
+  .ar-carousel-track .ar-card-preview .ar-media { aspect-ratio: 3 / 4; max-height: none; }
+}
+.ar-carousel-track .ar-card-preview .ar-badge {
+  background: rgba(11, 60, 70, .55);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.ar-carousel-track .ar-card-preview,
+.ar-carousel-wrap .ar-carousel-track .ar-card-preview {
+  transition: opacity .8s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms), transform .8s cubic-bezier(.22, .68, 0, 1) var(--d, 0ms);
+}
+.ar-carousel-wrap .ar-carousel-track .ar-card-preview.is-in.is-in:hover { box-shadow: 0 14px 22px -12px rgba(23, 35, 42, .30); }
+/* one promoted layer per photo; hover zoom is transform-only */
+.ar-carousel-track .ar-card-preview .ar-media img { will-change: transform; backface-visibility: hidden; transform: translateZ(0); transition: transform .7s cubic-bezier(.22, .68, 0, 1); }
+.ar-carousel-track .ar-card-preview:hover .ar-media img { transform: scale(1.05) translateZ(0); }
+
+
+/* ==========================================================================
+   Curved cards — every Activity Rates card (Offers page grid, tabs, mobile
+   2-up) now uses the same soft rounded corners as the homepage carousels,
+   instead of the old 3-4px near-square corners. The card already clips its
+   photo/caption (overflow: hidden), so the top corners of the image curve
+   with it. END of file.
+   ========================================================================== */
+.ar-card,
+.ar-card.is-in { border-radius: 22px; }
+.ar-media { border-radius: 0; }
+.ar-book { border-radius: 999px; }
+@media (max-width: 640px) {
+  .ar-card { border-radius: 18px; }
+}
+/* Offers page: the rooms carousel section must not clip the arrows/shadows */
+#discover-accommodation.section-shell { overflow-x: visible; }
+
+
+/* -- Island-categories grid, phones/tablets: a clearly visible entrance.
+   Featured card rises + fades in, the four tiles slide in from alternating
+   sides (--atg-x set in JS) as each scrolls into view. Opacity + transform
+   only. Desktop (901px+) keeps its own sequence above. -- */
+@media (max-width: 900px) {
+  .activity-theme-grid.atg-js { overflow-x: clip; }
+  .activity-theme-grid.atg-js .activity-theme-featured {
+    opacity: 0; transform: translateY(48px) scale(.96);
+    transition: opacity .9s cubic-bezier(.22, .68, 0, 1), transform .9s cubic-bezier(.22, .68, 0, 1);
+  }
+  .activity-theme-grid.atg-js .activity-theme-cell {
+    opacity: 0; transform: translate(var(--atg-x, 0px), 34px) scale(.92);
+    transition: opacity .9s cubic-bezier(.22, .68, 0, 1), transform .9s cubic-bezier(.22, .68, 0, 1);
+  }
+}

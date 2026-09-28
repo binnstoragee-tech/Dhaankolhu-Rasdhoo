@@ -8,7 +8,7 @@
    inside the first IIFE, so the second IIFE's use of it threw
    "PAGE_TRANSITION_MS is not defined" the moment anyone clicked (or
    Enter-keyed) an "Other Rooms" card. */
-var PAGE_TRANSITION_MS = 380;
+var PAGE_TRANSITION_MS = 220;
 
 (function () {
   "use strict";

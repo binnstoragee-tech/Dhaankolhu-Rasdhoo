@@ -1,0 +1,189 @@
+/* ==========================================================================
+   smooth-ux.css — LOAD LAST on every page (after style.css and page CSS).
+   1) One consistent "semi-curve" radius for every main CTA.
+   2) Less GPU/paint work (blur, backdrop-filter) so scrolling stays 60fps,
+      especially on phones.
+   3) Touch + keyboard polish: no 300ms tap delay, 44px tap targets,
+      clear focus ring, header-aware anchor scrolling.
+   Nothing here changes layout or content — it only overrides finish/feel.
+   ========================================================================== */
+
+:root {
+  --radius-cta: 8px;          /* semi-curve: Book Now / More Details / Explore */
+  --radius-cta-sm: 7px;       /* same look, tighter on phones */
+  --ux-ease: cubic-bezier(.22, .68, 0, 1);
+}
+
+/* ---------- 1) Semi-curved CTAs ---------- */
+.header-cta,
+.offer-btn,
+.button,
+.hero-explore-btn,
+.bk-btn,
+.bk-actions .bk-btn {
+  border-radius: var(--radius-cta) !important;
+}
+@media (max-width: 640px) {
+  .header-cta,
+  .offer-btn,
+  .button,
+  .hero-explore-btn,
+  .bk-btn { border-radius: var(--radius-cta-sm) !important; }
+}
+
+/* Header "BOOK NOW": keep the clean outline look from the reference, just
+   curved — thin light border, subtle fill, no heavy glass. */
+.site-header:not(.is-scrolled) .header-cta {
+  border: 1.3px solid rgba(255, 255, 255, .9);
+  background: rgba(255, 255, 255, .06);
+  box-shadow: none;
+}
+.site-header:not(.is-scrolled) .header-cta:hover {
+  background: rgba(255, 255, 255, .18);
+  border-color: #fff;
+}
+
+/* ---------- 2) Performance ---------- */
+
+/* Small buttons/badges never need a live blur of what's behind them — it
+   is re-computed every frame while scrolling. Solid-ish fills look the same. */
+.button,
+.circle-link,
+.play-button,
+.video-play-button,
+.slide-badge,
+.footer-columns button,
+.footer-bottom button,
+.header-cta {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.button, .play-button, .circle-link { background-color: rgba(11, 97, 112, .55); }
+
+/* Phones / touch devices: drop the expensive effects entirely.
+   Opacity + transform (already used everywhere) are kept — those are cheap. */
+@media (max-width: 900px), (hover: none) {
+  .site-header,
+  .mobile-menu,
+  .chat-widget,
+  .chat-widget-panel,
+  .contact-trigger,
+  .bk-ticket,
+  .bk-room,
+  .bk-tab,
+  .bk-stepper,
+  .excursion-gallery-header,
+  .gallery-full-header,
+  .ar-badge,
+  [class*="glass"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  /* filter:blur() on many animating words/cards is the #1 cause of scroll
+     stutter on mid-range phones — fade + rise only. */
+  .word-rise,
+  .hero-content .word-rise,
+  .ar-carousel-track .ar-card-preview {
+    filter: none !important;
+  }
+  .bk-ticket, .bk-room { background-color: rgba(255, 255, 255, .92); }
+}
+
+/* Low-power devices / Data-Saver (class is set by smooth-ux.js) */
+html.lite-fx *, html.lite-fx *::before, html.lite-fx *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html.lite-fx .word-rise,
+html.lite-fx .hero-content .word-rise,
+html.lite-fx .ar-card-preview,
+html.lite-fx .atg-w { filter: none !important; }
+
+/* Images: reserve space + smooth decode (prevents layout jumps while
+   scrolling; lazy images already fade in via .is-loaded in style.css). */
+img { -webkit-user-drag: none; }
+
+/* ---------- 3) Touch + keyboard polish ---------- */
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+
+a, button, [role="button"], [data-expand], .offer-card, .ar-card, .dot, summary, label,
+input[type="button"], input[type="submit"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;           /* removes the double-tap-zoom delay */
+}
+
+/* instant, tactile press feedback on every CTA */
+.offer-btn:active, .bk-btn:active, .hero-explore-btn:active { transform: scale(.97); }
+
+/* 44px minimum tap target on touch screens (Apple/Google guideline) */
+@media (hover: none) and (pointer: coarse) {
+  .offer-btn, .header-cta, .button, .bk-btn, .hero-explore-btn { min-height: 44px; }
+  .dot { position: relative; }
+  .dot::after { content: ""; position: absolute; inset: -12px; }   /* bigger hit area, same look */
+}
+
+/* one clear focus ring for keyboard users (mouse/touch users never see it) */
+:where(a, button, [role="button"], input, select, textarea, summary):focus { outline: none; }
+:where(a, button, [role="button"], input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--brass, #ba8d5c);
+  outline-offset: 3px;
+}
+
+/* modals / scrollers: don't chain scroll into the page behind them */
+.ar-modal-scroll, .mobile-menu, .chat-widget-panel, .excursion-gallery-overlay,
+.gallery-full-overlay, .booking-panel { overscroll-behavior: contain; }
+
+/* Form fields: 16px on phones stops iOS from zooming the page on focus */
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px; }
+}
+
+/* Respect users who ask for less motion (extends the existing rule) */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+}
+
+/* ---------- Footer bottom bar: divider line runs edge to edge ----------
+   The line spans the full footer width; the copyright / credit text stays
+   aligned with the footer columns above (same 1280px content width). */
+.site-footer-v2 .footer-v2-bottom {
+  max-width: none;
+  margin-left: -6vw;
+  margin-right: -6vw;
+  padding-left: calc(6vw + max(0px, (100% - 1280px) / 2));
+  padding-right: calc(6vw + max(0px, (100% - 1280px) / 2));
+}
+.site-footer-v2 .footer-v2-legal a { color: inherit; text-decoration: none; transition: color .2s ease; }
+.site-footer-v2 .footer-v2-legal a:hover,
+.site-footer-v2 .footer-v2-legal a:focus-visible { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Highlights photos stay still (no scroll drift) — pin any leftover drift value to 0 */
+.highlights-section img { --img-drift: 0px !important; }
+
+/* ---------- Phones: smaller hero card + smaller hero text ----------
+   Card gets roomier margins (shorter + narrower, more white frame), and the
+   welcome text is re-centered INSIDE the card and scaled down to fit it. */
+@media (max-width: 640px) {
+  html body .hero-section.story-scroll {
+    --hero-card-x: 30px;
+    --hero-card-bottom: clamp(64px, 11vh, 104px);
+    --hero-card-r: 26px;
+  }
+  html body .hero-section.story-scroll .story-panel-welcome {
+    padding-top: var(--hero-card-top);
+    padding-bottom: var(--hero-card-bottom);
+    padding-left: calc(var(--hero-card-x) + .5rem);
+    padding-right: calc(var(--hero-card-x) + .5rem);
+  }
+  html body .story-panel-welcome .hero-content { width: 100%; }
+  html body .hero-content .hero-eyebrow,
+  html body .hero-content .eyebrow { font-size: .58rem; letter-spacing: .16em; }
+  html body .hero-content .hero-title {
+    font-size: clamp(1.55rem, 6.2vw, 2.15rem);
+    line-height: 1.35;
+    margin: .6rem auto 1rem;
+  }
+  html body .hero-content .hero-copy { font-size: .76rem; max-width: 14.5rem; line-height: 1.5; }
+  html body .hero-content .hero-explore-btn { margin-top: 1.6rem; }
+}

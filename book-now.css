@@ -881,3 +881,15 @@ html:not(.is-preload) .site-header .header-cta {
   .site-header .desktop-nav > *,
   .site-header .header-cta { transition: none !important; opacity: 1 !important; transform: none !important; }
 }
+
+
+/* ---------- Number of pax stepper (Step 1) + single-occupancy note (Step 2) ---------- */
+.bk-pax { display: inline-flex; align-items: center; gap: .5rem; }
+.bk-pax-btn { width: 46px; height: 46px; padding: 0; border: 1px solid rgba(23,35,42,.18); border-radius: 10px; background: #fff; color: var(--ink); font-size: 1.25rem; line-height: 1; font-family: "DM Sans", sans-serif; cursor: pointer; transition: border-color .2s ease, background .2s ease, opacity .2s ease; }
+.bk-pax-btn:focus-visible { outline: none; border-color: var(--brass); box-shadow: 0 0 0 3px rgba(186,141,92,.12); }
+.bk-pax-btn:disabled { opacity: .4; cursor: not-allowed; }
+@media (hover: hover) and (pointer: fine) { .bk-pax-btn:not(:disabled):hover { border-color: var(--brass); background: var(--bk-mist); } }
+.bk-field .bk-pax input { width: 5.2rem; text-align: center; font-weight: 600; -moz-appearance: textfield; appearance: textfield; }
+.bk-pax input::-webkit-outer-spin-button, .bk-pax input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.bk-occupancy-note { margin: 1.1rem 0 0; padding: .75rem 1rem; border: 1px solid var(--bk-line); border-radius: 10px; background: var(--bk-mist); color: var(--ink); font-size: .72rem; line-height: 1.5; }
+.bk-occupancy-note[hidden] { display: none; }
